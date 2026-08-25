@@ -1,0 +1,1258 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratorio Interactivo: Función SI con Gamificación</title>
+<style>
+  :root{
+    --bg:#f4f7fa; --card:#fff; --border:#d9e2ea; --dark:#17324d; --primary:#2f5f85;
+    --ok:#eaf6ef; --ok-border:#b8ddc7; --err-bg:#fff0f0; --err-border:#efb5b5;
+    --hint-bg:#fff7e6; --hint-border:#f1d39a;
+  }
+  *{box-sizing:border-box}
+  body{font-family:Segoe UI,Arial,sans-serif;margin:0;background:var(--bg);color:#263746}
+  header{background:var(--dark);color:#fff;padding:22px;text-align:center}
+  header h1{margin:0 0 8px}
+  header p{margin:0;opacity:.9}
+  main{max-width:1200px;margin:20px auto;padding:0 16px}
+  .top-bar{display:flex;flex-wrap:wrap;gap:15px;align-items:center;justify-content:space-between;margin-bottom:15px}
+  .stats{display:flex;gap:20px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);padding:10px 15px;border-radius:8px}
+  .stat{display:flex;flex-direction:column;align-items:center}
+  .stat span:first-child{font-size:12px;color:#687987;font-weight:600}
+  .stat span:last-child{font-size:20px;font-weight:bold}
+  .levels{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
+  .level-btn{padding:9px 13px;border-radius:7px;border:1px solid #ccd7e0;background:#fff;cursor:pointer;font-weight:600}
+  .level-btn.active{background:var(--dark);color:#fff}
+  .grid{display:grid;grid-template-columns:1fr 1.4fr;gap:18px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px}
+  .card h2{margin-top:0;font-size:1.2rem}
+  button.primary{background:var(--primary);color:white;border:none}
+  button{padding:9px 13px;border-radius:7px;border:1px solid #ccd7e0;background:#fff;cursor:pointer;font-weight:600}
+  .enunciado{background:#f8fafc;border-left:4px solid var(--primary);padding:14px;line-height:1.5}
+  .data-table{width:100%;border-collapse:collapse;margin-top:12px}
+  .data-table td,.data-table th{border:1px solid var(--border);padding:7px;text-align:left}
+  .data-table th{background:#eef3f7}
+  .zone{margin:12px 0}
+  .label{font-size:12px;font-weight:700;margin-bottom:5px;color:#687987}
+  .drop{min-height:45px;border:2px dashed #b9c7d3;border-radius:8px;padding:7px;display:flex;gap:6px;flex-wrap:wrap;background:#fff}
+  .sep-zone{min-height:45px;border:2px dashed #f1d39a;border-radius:8px;padding:7px;display:flex;gap:6px;flex-wrap:wrap;background:#fffbe6;width:60px;align-items:center;justify-content:center}
+  .bank{display:flex;gap:6px;flex-wrap:wrap;background:#f8fafc;padding:12px;border-radius:8px;border:1px solid var(--border)}
+  .block{padding:8px 10px;border-radius:6px;border:1px solid #c9d8e4;background:#edf3f8;cursor:grab;user-select:none;font-family:Consolas,monospace}
+  .var{background:#e9f2fb}
+  .op{background:#f1eefb}
+  .val{background:#f6f2e9}
+  .res{background:#edf6ef}
+  .func{background:#fde2e2}
+  .paren{background:#e2f0fb}
+  .sep{background:#fff3cd}
+  .eq{background:#d4edda}
+  .feedback{display:none;margin-top:14px;padding:12px;border-radius:8px;line-height:1.45}
+  .ok{display:block;background:var(--ok);border:1px solid var(--ok-border)}
+  .err{display:block;background:var(--err-bg);border:1px solid var(--err-border)}
+  .hint{display:block;background:var(--hint-bg);border:1px solid var(--hint-border)}
+  .formula{font-family:Consolas,monospace;background:#17212b;color:#d9edf7;padding:13px;border-radius:7px;min-height:24px;overflow:auto;white-space:pre-wrap}
+  .result-area{margin-top:10px;padding:10px;background:#eef3f7;border-radius:6px;font-weight:bold}
+  .error-msg{color:#c0392b;font-family:Consolas,monospace;font-weight:normal}
+  .mode-toggle{display:inline-flex;border:1px solid #ccc;border-radius:5px;overflow:hidden}
+  .mode-toggle button{padding:8px 16px;border:none;background:#fff;cursor:pointer;font-weight:600}
+  .mode-toggle button.active{background:var(--primary);color:#fff}
+  .mode-toggle button:disabled{background:#e0e0e0;color:#999;cursor:not-allowed}
+  .character-msg{background:#fffbe6;border:1px solid #f1d39a;padding:10px;border-radius:6px;margin-bottom:15px;display:flex;align-items:center;gap:10px}
+  .achievements{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .badge{background:#f0f0f0;border:1px solid #ccc;padding:5px 10px;border-radius:20px;font-size:12px;display:flex;align-items:center;gap:5px}
+  .badge.unlocked{background:#d4edda;border-color:#28a745;color:#155724}
+  .shake{animation:shake 0.5s}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+  .pulse{animation:pulse 0.8s}
+  @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s;
+  }
+  .overlay-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    font-size: 1.5rem;
+    box-shadow: 0 0 30px rgba(255,215,0,0.8);
+    animation: bounceIn 0.5s;
+  }
+  .crown { font-size: 4rem; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes bounceIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    60% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .progress-container {
+    flex: 1;
+    min-width: 200px;
+    max-width: 400px;
+    background: #e0e0e0;
+    border-radius: 20px;
+    height: 20px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #4CAF50, #2f5f85);
+    border-radius: 20px;
+    transition: width 0.5s ease;
+  }
+  .progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+  }
+  @media(max-width:800px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🏗️ Laboratorio Interactivo: Lógica de funciones SI</h1>
+  <p>Excel aplicado a seguridad y construcción · ¡Supera los desafíos y gana insignias!</p>
+</header>
+<main>
+  <div class="top-bar">
+    <div class="stats">
+      <div class="stat"><span>Puntos</span><span id="points">0</span></div>
+      <div class="stat"><span>Estrellas</span><span id="stars">0</span></div>
+      <div class="stat"><span>Tiempo</span><span id="timer">00:00</span></div>
+      <div class="stat"><span>Progreso</span><span id="score">0/4</span></div>
+    </div>
+    <div class="progress-container">
+      <div class="progress-fill" id="progressFill"></div>
+      <span class="progress-text" id="progressText">0%</span>
+    </div>
+    <div class="mode-toggle">
+      <button id="btnBlocks" class="active" onclick="setMode('blocks')">🧩 Bloques</button>
+      <button id="btnWrite" onclick="setMode('write')" disabled>⌨️ Escritura</button>
+    </div>
+  </div>
+
+  <div class="character-msg">
+    <span id="charText">¡Bienvenido! Soy el capataz. Completa los desafíos para asegurar la obra.</span>
+  </div>
+
+  <div class="levels">
+    <button class="level-btn active" onclick="load(1,this)">Nivel 1 · SI</button>
+    <button class="level-btn" onclick="load(2,this)">Nivel 2 · SI con números</button>
+    <button class="level-btn" onclick="load(3,this)">Nivel 3 · SI anidado</button>
+    <button class="level-btn" onclick="load(4,this)">Nivel 4 · SI + Y</button>
+    <button onclick="resetAll()">Reiniciar todo</button>
+  </div>
+
+  <div class="grid" style="margin-top:18px">
+    <section class="card">
+      <h2>1. Enunciado</h2>
+      <div id="text" class="enunciado"></div>
+      <div id="data"></div>
+      <button onclick="changeData()" style="margin-top:10px">🔄 Cambiar datos</button>
+      <h3>Pista</h3>
+      <button onclick="hint()">💡 Necesito una pista</button>
+      <div id="hint" class="feedback hint"></div>
+      <h3>Logros</h3>
+      <div class="achievements" id="achievements"></div>
+    </section>
+
+    <section class="card">
+      <h2>2. Construye la fórmula</h2>
+      <div id="blocksMode">
+        <div id="zonesContainer"></div>
+        <h3>Bloques disponibles (orden aleatorio)</h3>
+        <div id="bank" class="bank"></div>
+      </div>
+      <div id="writeMode" style="display:none">
+        <div class="label">ESCRIBE LA FÓRMULA</div>
+        <input type="text" id="formulaInput" style="width:100%;padding:10px;font-family:Consolas;border:1px solid #ccc;border-radius:5px" placeholder="=SI( ... )">
+        <p style="font-size:12px;color:#666">Usa referencias de celda como B2, C2 y separador ;</p>
+      </div>
+      <p>
+        <button class="primary" onclick="check()">Comprobar</button>
+        <button onclick="clearBuild()">Limpiar</button>
+      </p>
+      <div id="feedback" class="feedback"></div>
+      <h3>Fórmula resultante</h3>
+      <div id="formula" class="formula">Construye la lógica.</div>
+      <h3>Resultado calculado</h3>
+      <div class="result-area">
+        <span id="resultDisplay">—</span>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+// ===================== CONFIGURACIÓN DE REGISTRO =====================
+const endpoint = "https://script.google.com/macros/s/AKfycbwTNt780x1-Hg_hD7RzVL1OY5GlSm7bLY3nssmxKFNBR6o8ZoR1QsupDj9qIlRVlyt9vQ/exec";
+
+function registrarEvento(datos) {
+  if (!endpoint || endpoint.includes("AQUI_PEGAS")) return;
+  const query = new URLSearchParams(datos).toString();
+  fetch(endpoint + "?" + query, { method: "GET", mode: "no-cors" }).catch(() => {});
+}
+
+// ===================== DATOS DE NIVELES (ejercicios aleatorios) =====================
+const BLOCK_LEVELS = {
+  1: [
+    {
+      text:"En una obra, una cuadrilla se considera completa cuando tiene más de 10 trabajadores. Si cumple la condición, mostrar “Cuadrilla completa”; de lo contrario, “Cuadrilla incompleta”.",
+      data:[["B2","Trabajadores",12]],
+      blocks:[
+        {text:"B2", type:"var"},{text:">", type:"op"},{text:"10", type:"val"},
+        {text:'"Cuadrilla completa"', type:"res"},{text:'"Cuadrilla incompleta"', type:"res"},
+        {text:";", type:"sep"},{text:";", type:"sep"}
+      ],
+      zones:{
+        test: { blocks:["B2",">","10"] },
+        true: { blocks:['"Cuadrilla completa"'] },
+        false: { blocks:['"Cuadrilla incompleta"'] },
+        sep1: { blocks:[";"] }, sep2: { blocks:[";"] }
+      },
+      f:'=SI(B2>10;"Cuadrilla completa";"Cuadrilla incompleta")',
+      h:["La prueba lógica es B2>10.","El valor verdadero va entre comillas.","No olvides los separadores ; entre argumentos."],
+      eval: (data) => { const B2 = data[0][2]; return B2>10 ? 'Cuadrilla completa' : 'Cuadrilla incompleta'; },
+      randomData: () => Math.floor(Math.random()*20)+1
+    },
+    {
+      text:"Un trabajador es considerado apto si su edad es mayor o igual a 18 años. Si cumple, mostrar “Apto”; de lo contrario, “No apto”.",
+      data:[["B2","Edad",20]],
+      blocks:[
+        {text:"B2", type:"var"},{text:">=", type:"op"},{text:"18", type:"val"},
+        {text:'"Apto"', type:"res"},{text:'"No apto"', type:"res"},
+        {text:";", type:"sep"},{text:";", type:"sep"}
+      ],
+      zones:{
+        test: { blocks:["B2",">=","18"] },
+        true: { blocks:['"Apto"'] },
+        false: { blocks:['"No apto"'] },
+        sep1: { blocks:[";"] }, sep2: { blocks:[";"] }
+      },
+      f:'=SI(B2>=18;"Apto";"No apto")',
+      h:["“Mayor o igual” es >=.","La condición es B2>=18.","El resultado verdadero es “Apto”."],
+      eval: (data) => { const B2 = data[0][2]; return B2>=18 ? 'Apto' : 'No apto'; },
+      randomData: () => Math.floor(Math.random()*40)+16
+    },
+    {
+      text:"Una obra es segura si el número de accidentes es menor o igual a 2. Si cumple, mostrar “Segura”; de lo contrario, “En riesgo”.",
+      data:[["B2","Accidentes",1]],
+      blocks:[
+        {text:"B2", type:"var"},{text:"<=", type:"op"},{text:"2", type:"val"},
+        {text:'"Segura"', type:"res"},{text:'"En riesgo"', type:"res"},
+        {text:";", type:"sep"},{text:";", type:"sep"}
+      ],
+      zones:{
+        test: { blocks:["B2","<=","2"] },
+        true: { blocks:['"Segura"'] },
+        false: { blocks:['"En riesgo"'] },
+        sep1: { blocks:[";"] }, sep2: { blocks:[";"] }
+      },
+      f:'=SI(B2<=2;"Segura";"En riesgo")',
+      h:["“Menor o igual” es <=.","La condición es B2<=2.","El resultado verdadero es “Segura”."],
+      eval: (data) => { const B2 = data[0][2]; return B2<=2 ? 'Segura' : 'En riesgo'; },
+      randomData: () => Math.floor(Math.random()*5)
+    }
+  ],
+  2: [
+    {
+      text:"Si un trabajador registra 20 días trabajados o más, obtiene un bono de $50.000. Si registra menos de 20 días, obtiene $0.",
+      data:[["B2","Días trabajados",22]],
+      blocks:[
+        {text:"B2", type:"var"},{text:">=", type:"op"},{text:"20", type:"val"},
+        {text:"50000", type:"val"},{text:"0", type:"val"},
+        {text:";", type:"sep"},{text:";", type:"sep"}
+      ],
+      zones:{
+        test: { blocks:["B2",">=","20"] },
+        true: { blocks:["50000"] },
+        false: { blocks:["0"] },
+        sep1: { blocks:[";"] }, sep2: { blocks:[";"] }
+      },
+      f:"=SI(B2>=20;50000;0)",
+      h:["“20 días o más” es >=20.","Los resultados son números, no llevan comillas.","Recuerda los ; separadores."],
+      eval: (data) => { const B2 = data[0][2]; return B2>=20 ? 50000 : 0; },
+      randomData: () => Math.floor(Math.random()*30)+1
+    },
+    {
+      text:"Un trabajador recibe una bonificación de $30.000 si su asistencia es mayor al 85%. En caso contrario, no recibe bonificación.",
+      data:[["B2","Asistencia","88%"]],
+      blocks:[
+        {text:"B2", type:"var"},{text:">", type:"op"},{text:"85%", type:"val"},
+        {text:"30000", type:"val"},{text:"0", type:"val"},
+        {text:";", type:"sep"},{text:";", type:"sep"}
+      ],
+      zones:{
+        test: { blocks:["B2",">","85%"] },
+        true: { blocks:["30000"] },
+        false: { blocks:["0"] },
+        sep1: { blocks:[";"] }, sep2: { blocks:[";"] }
+      },
+      f:'=SI(B2>85%;30000;0)',
+      h:["“Mayor al 85%” es >85%.","Los resultados son números.","No olvides el % en el valor."],
+      eval: (data) => { const B2 = data[0][2]; return B2>0.85 ? 30000 : 0; },
+      randomData: () => (Math.floor(Math.random()*20)+70)+"%" 
+    },
+    {
+      text:"Un trabajador recibe una multa de $10.000 si llega tarde 3 o más veces. Si llega tarde menos de 3 veces, no recibe multa.",
+      data:[["B2","Llegadas tarde",4]],
+      blocks:[
+        {text:"B2", type:"var"},{text:">=", type:"op"},{text:"3", type:"val"},
+        {text:"10000", type:"val"},{text:"0", type:"val"},
+        {text:";", type:"sep"},{text:";", type:"sep"}
+      ],
+      zones:{
+        test: { blocks:["B2",">=","3"] },
+        true: { blocks:["10000"] },
+        false: { blocks:["0"] },
+        sep1: { blocks:[";"] }, sep2: { blocks:[";"] }
+      },
+      f:"=SI(B2>=3;10000;0)",
+      h:["“3 o más” es >=3.","Los resultados son números.","Recuerda los separadores."],
+      eval: (data) => { const B2 = data[0][2]; return B2>=3 ? 10000 : 0; },
+      randomData: () => Math.floor(Math.random()*8)
+    }
+  ],
+  3: [
+    {
+      text:"Clasifica el nivel de riesgo: 1 a 4 = Bajo; 5 a 9 = Medio; 10 a 16 = Alto; sobre 16 = Crítico.",
+      data:[["B2","Puntaje",13]],
+      blocks:[
+        {text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:"<=", type:"op"},{text:"4", type:"val"},{text:";", type:"sep"},{text:'"Bajo"', type:"res"},{text:";", type:"sep"},
+        {text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:"<=", type:"op"},{text:"9", type:"val"},{text:";", type:"sep"},{text:'"Medio"', type:"res"},{text:";", type:"sep"},
+        {text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:"<=", type:"op"},{text:"16", type:"val"},{text:";", type:"sep"},{text:'"Alto"', type:"res"},{text:";", type:"sep"},{text:'"Crítico"', type:"res"},
+        {text:")", type:"paren"},{text:")", type:"paren"},{text:")", type:"paren"}
+      ],
+      formulaArray:["SI","(","B2","<=","4",";",'"Bajo"',";","SI","(","B2","<=","9",";",'"Medio"',";","SI","(","B2","<=","16",";",'"Alto"',";",'"Crítico"',")",")",")"],
+      f:'=SI(B2<=4;"Bajo";SI(B2<=9;"Medio";SI(B2<=16;"Alto";"Crítico")))',
+      h:["Comienza con SI( y anida otro SI como tercer argumento.","Cada SI necesita su propio paréntesis de cierre.","Hay tres niveles de anidación."],
+      eval: (data) => { const B2 = data[0][2]; if (B2<=4) return 'Bajo'; if (B2<=9) return 'Medio'; if (B2<=16) return 'Alto'; return 'Crítico'; },
+      randomData: () => Math.floor(Math.random()*20)+1
+    },
+    {
+      text:"Clasifica la productividad: más de 40 = Alta; de 21 a 40 = Media; de 5 a 20 = Baja; menos de 5 = Muy baja.",
+      data:[["B2","Horas",25]],
+      blocks:[
+        {text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:">", type:"op"},{text:"40", type:"val"},{text:";", type:"sep"},{text:'"Alta"', type:"res"},{text:";", type:"sep"},
+        {text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:">", type:"op"},{text:"20", type:"val"},{text:";", type:"sep"},{text:'"Media"', type:"res"},{text:";", type:"sep"},
+        {text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:">", type:"op"},{text:"4", type:"val"},{text:";", type:"sep"},{text:'"Baja"', type:"res"},{text:";", type:"sep"},{text:'"Muy baja"', type:"res"},
+        {text:")", type:"paren"},{text:")", type:"paren"},{text:")", type:"paren"}
+      ],
+      formulaArray:["SI","(","B2",">","40",";",'"Alta"',";","SI","(","B2",">","20",";",'"Media"',";","SI","(","B2",">","4",";",'"Baja"',";",'"Muy baja"',")",")",")"],
+      f:'=SI(B2>40;"Alta";SI(B2>20;"Media";SI(B2>4;"Baja";"Muy baja")))',
+      h:["Ordena de mayor a menor usando >.","Cada SI anidado va como tercer argumento.","No olvides los paréntesis de cierre."],
+      eval: (data) => { const B2 = data[0][2]; if (B2>40) return 'Alta'; if (B2>20) return 'Media'; if (B2>4) return 'Baja'; return 'Muy baja'; },
+      randomData: () => Math.floor(Math.random()*50)
+    },
+    {
+      text:"Clasifica la temperatura en obra: menos de 5 = Frío; de 5 a 15 = Templado; de 16 a 30 = Cálido; más de 30 = Caluroso.",
+      data:[["B2","Temperatura",22]],
+      blocks:[
+        {text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:"<", type:"op"},{text:"5", type:"val"},{text:";", type:"sep"},{text:'"Frío"', type:"res"},{text:";", type:"sep"},
+        {text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:"<", type:"op"},{text:"16", type:"val"},{text:";", type:"sep"},{text:'"Templado"', type:"res"},{text:";", type:"sep"},
+        {text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:"<", type:"op"},{text:"31", type:"val"},{text:";", type:"sep"},{text:'"Cálido"', type:"res"},{text:";", type:"sep"},{text:'"Caluroso"', type:"res"},
+        {text:")", type:"paren"},{text:")", type:"paren"},{text:")", type:"paren"}
+      ],
+      formulaArray:["SI","(","B2","<","5",";",'"Frío"',";","SI","(","B2","<","16",";",'"Templado"',";","SI","(","B2","<","31",";",'"Cálido"',";",'"Caluroso"',")",")",")"],
+      f:'=SI(B2<5;"Frío";SI(B2<16;"Templado";SI(B2<31;"Cálido";"Caluroso")))',
+      h:["Usa < para los límites superiores.","Los intervalos son abiertos por la derecha.","Anida tres SI."],
+      eval: (data) => { const B2 = data[0][2]; if (B2<5) return 'Frío'; if (B2<16) return 'Templado'; if (B2<31) return 'Cálido'; return 'Caluroso'; },
+      randomData: () => Math.floor(Math.random()*40)
+    }
+  ],
+  4: [
+    {
+      text:"Un trabajador obtiene un bono si cumple simultáneamente dos condiciones: registra 20 días trabajados o más Y su asistencia es igual o superior al 90%. Si no cumple ambas, no obtiene bono.",
+      data:[["B2","Días trabajados",21],["C2","Asistencia","95%"]],
+      blocks:[
+        {text:"Y", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:">=", type:"op"},{text:"20", type:"val"},{text:";", type:"sep"},{text:"C2", type:"var"},{text:">=", type:"op"},{text:"90%", type:"val"},{text:")", type:"paren"},
+        {text:'"Bono"', type:"res"},{text:'"Sin bono"', type:"res"},{text:";", type:"sep"},{text:";", type:"sep"}
+      ],
+      zones:{
+        test: { blocks:["Y","(","B2",">=","20",";","C2",">=","90%",")"] },
+        true: { blocks:['"Bono"'] },
+        false: { blocks:['"Sin bono"'] },
+        sep1: { blocks:[";"] }, sep2: { blocks:[";"] }
+      },
+      f:'=SI(Y(B2>=20;C2>=90%);"Bono";"Sin bono")',
+      h:["La función Y agrupa las dos condiciones.","Dentro de Y los argumentos van separados por ;.","La estructura es =SI(prueba;verdadero;falso)."],
+      eval: (data) => { const B2 = data[0][2]; const C2 = data[1][2]; return (B2>=20 && C2>=0.9) ? 'Bono' : 'Sin bono'; },
+      randomData: () => [Math.floor(Math.random()*30)+1, (Math.floor(Math.random()*50)+50)+"%"]
+    },
+    {
+      text:"Un proyecto se considera en riesgo si los días de retraso son mayores o iguales a 10 Y la satisfacción del cliente es menor o igual a 50%. Si se cumple, mostrar “Crítico”; si no, “Aceptable”.",
+      data:[["B2","Días retraso",12],["C2","Satisfacción","45%"]],
+      blocks:[
+        {text:"Y", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:">=", type:"op"},{text:"10", type:"val"},{text:";", type:"sep"},{text:"C2", type:"var"},{text:"<=", type:"op"},{text:"50%", type:"val"},{text:")", type:"paren"},
+        {text:'"Crítico"', type:"res"},{text:'"Aceptable"', type:"res"},{text:";", type:"sep"},{text:";", type:"sep"}
+      ],
+      zones:{
+        test: { blocks:["Y","(","B2",">=","10",";","C2","<=","50%",")"] },
+        true: { blocks:['"Crítico"'] },
+        false: { blocks:['"Aceptable"'] },
+        sep1: { blocks:[";"] }, sep2: { blocks:[";"] }
+      },
+      f:'=SI(Y(B2>=10;C2<=50%);"Crítico";"Aceptable")',
+      h:["Una condición usa >= y la otra <=.","La función Y exige que ambas se cumplan.","Recuerda los separadores dentro de Y."],
+      eval: (data) => { const B2 = data[0][2]; const C2 = data[1][2]; return (B2>=10 && C2<=0.5) ? 'Crítico' : 'Aceptable'; },
+      randomData: () => [Math.floor(Math.random()*20), (Math.floor(Math.random()*60))+20+"%"]
+    },
+    {
+      text:"Un trabajador recibe un incentivo si su productividad es mayor o igual a 80% Y su número de errores es menor o igual a 2. Si cumple, “Incentivo”; si no, “Sin incentivo”.",
+      data:[["B2","Productividad","85%"],["C2","Errores",1]],
+      blocks:[
+        {text:"Y", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:">=", type:"op"},{text:"80%", type:"val"},{text:";", type:"sep"},{text:"C2", type:"var"},{text:"<=", type:"op"},{text:"2", type:"val"},{text:")", type:"paren"},
+        {text:'"Incentivo"', type:"res"},{text:'"Sin incentivo"', type:"res"},{text:";", type:"sep"},{text:";", type:"sep"}
+      ],
+      zones:{
+        test: { blocks:["Y","(","B2",">=","80%",";","C2","<=","2",")"] },
+        true: { blocks:['"Incentivo"'] },
+        false: { blocks:['"Sin incentivo"'] },
+        sep1: { blocks:[";"] }, sep2: { blocks:[";"] }
+      },
+      f:'=SI(Y(B2>=80%;C2<=2);"Incentivo";"Sin incentivo")',
+      h:["Una condición usa >= y la otra <=.","La función Y agrupa las dos condiciones.","No olvides los separadores."],
+      eval: (data) => { const B2 = data[0][2]; const C2 = data[1][2]; return (B2>=0.8 && C2<=2) ? 'Incentivo' : 'Sin incentivo'; },
+      randomData: () => [Math.floor(Math.random()*30)+70+"%", Math.floor(Math.random()*5)]
+    }
+  ]
+};
+
+const WRITE_LEVELS = {
+  1: [
+    {
+      text:"En una obra, un trabajador es considerado apto si tiene una edad mayor o igual a 18 años. Si cumple, mostrar “Apto”; de lo contrario, “No apto”.",
+      data:[["B2","Edad",20]],
+      f:'=SI(B2>=18;"Apto";"No apto")',
+      accepted:['=SI(B2<18;"No apto";"Apto")'],
+      h:["“Mayor o igual” es >=.","La condición es B2>=18.","El resultado verdadero es “Apto”.","También puedes invertir la condición.","No olvides los separadores ; y las comillas dobles."],
+      eval: (data) => { const B2 = data[0][2]; return B2>=18 ? 'Apto' : 'No apto'; },
+      randomData: () => Math.floor(Math.random()*40)+16
+    },
+    {
+      text:"Una obra es segura si el número de accidentes es menor o igual a 2. Si cumple, mostrar “Segura”; de lo contrario, “En riesgo”.",
+      data:[["B2","Accidentes",1]],
+      f:'=SI(B2<=2;"Segura";"En riesgo")',
+      accepted:['=SI(B2>2;"En riesgo";"Segura")'],
+      h:["“Menor o igual” es <=.","La condición es B2<=2.","El resultado verdadero es “Segura”.","Puedes invertir la condición.","Usa comillas dobles para los textos."],
+      eval: (data) => { const B2 = data[0][2]; return B2<=2 ? 'Segura' : 'En riesgo'; },
+      randomData: () => Math.floor(Math.random()*5)
+    },
+    {
+      text:"Un trabajador recibe un bono si su evaluación es mayor o igual a 80 puntos. Si cumple, mostrar “Bono”; si no, “Sin bono”.",
+      data:[["B2","Evaluación",85]],
+      f:'=SI(B2>=80;"Bono";"Sin bono")',
+      accepted:['=SI(B2<80;"Sin bono";"Bono")'],
+      h:["“Mayor o igual” es >=.","La condición es B2>=80.","El resultado verdadero es “Bono”.","Puedes invertir la condición.","Recuerda los separadores ;."],
+      eval: (data) => { const B2 = data[0][2]; return B2>=80 ? 'Bono' : 'Sin bono'; },
+      randomData: () => Math.floor(Math.random()*30)+60
+    }
+  ],
+  2: [
+    {
+      text:"Un trabajador recibe una bonificación de $30.000 si su asistencia es mayor al 85%. En caso contrario, no recibe bonificación.",
+      data:[["B2","Asistencia","88%"]],
+      f:'=SI(B2>85%;30000;0)',
+      accepted:['=SI(B2<=85%;0;30000)'],
+      h:["“Mayor al 85%” es >85%.","El resultado verdadero es 30000, el falso es 0.","Puedes invertir la condición y los resultados.","Recuerda que los porcentajes van con % en la fórmula.","Comprueba que el separador sea ;."],
+      eval: (data) => { const B2 = data[0][2]; return B2>0.85 ? 30000 : 0; },
+      randomData: () => (Math.floor(Math.random()*20)+70)+"%" 
+    },
+    {
+      text:"Un trabajador recibe una multa de $10.000 si llega tarde 3 o más veces. Si llega tarde menos de 3 veces, no recibe multa.",
+      data:[["B2","Llegadas tarde",4]],
+      f:'=SI(B2>=3;10000;0)',
+      accepted:['=SI(B2<3;0;10000)'],
+      h:["“3 o más” es >=3.","Los resultados son números.","Puedes invertir la condición.","No olvides los separadores ;.","La fórmula comienza con =SI(."],
+      eval: (data) => { const B2 = data[0][2]; return B2>=3 ? 10000 : 0; },
+      randomData: () => Math.floor(Math.random()*8)
+    },
+    {
+      text:"Un trabajador recibe un bono de $20.000 si su productividad es mayor o igual al 90%. Si no, recibe $5.000.",
+      data:[["B2","Productividad","92%"]],
+      f:'=SI(B2>=90%;20000;5000)',
+      accepted:['=SI(B2<90%;5000;20000)'],
+      h:["“Mayor o igual” es >=.","Resultado verdadero 20000, falso 5000.","Puedes invertir la condición.","Usa % en el valor.","Separador ;."],
+      eval: (data) => { const B2 = data[0][2]; return B2>=0.9 ? 20000 : 5000; },
+      randomData: () => (Math.floor(Math.random()*20)+80)+"%" 
+    }
+  ],
+  3: [
+    {
+      text:"Clasifica la productividad según horas trabajadas: menos de 20 = Baja; de 20 a 40 = Media; más de 40 = Alta.",
+      data:[["B2","Horas trabajadas",35]],
+      f:'=SI(B2<20;"Baja";SI(B2<=40;"Media";"Alta"))',
+      accepted:[
+        '=SI(B2>40;"Alta";SI(B2>=20;"Media";"Baja"))',
+        '=SI(B2<=40;SI(B2<20;"Baja";"Media");"Alta")'
+      ],
+      h:["Menos de 20 es <20.","Entre 20 y 40 incluye 40, usa <=40.","Más de 40 es el último caso.","También puedes ordenar los rangos de mayor a menor.","Prueba con SI(B2>40;\"Alta\";SI(B2>=20;\"Media\";\"Baja\"))"],
+      eval: (data) => { const B2 = data[0][2]; if (B2<20) return 'Baja'; if (B2<=40) return 'Media'; return 'Alta'; },
+      randomData: () => Math.floor(Math.random()*50)+5
+    },
+    {
+      text:"Clasifica la temperatura: menos de 5 = Frío; de 5 a 15 = Templado; de 16 a 30 = Cálido; más de 30 = Caluroso.",
+      data:[["B2","Temperatura",22]],
+      f:'=SI(B2<5;"Frío";SI(B2<16;"Templado";SI(B2<31;"Cálido";"Caluroso")))',
+      accepted:['=SI(B2>30;"Caluroso";SI(B2>15;"Cálido";SI(B2>4;"Templado";"Frío")))'],
+      h:["Usa < para los límites superiores.","Los intervalos son abiertos por la derecha.","Anida tres SI.","Puedes invertir el orden.","No olvides los paréntesis de cierre."],
+      eval: (data) => { const B2 = data[0][2]; if (B2<5) return 'Frío'; if (B2<16) return 'Templado'; if (B2<31) return 'Cálido'; return 'Caluroso'; },
+      randomData: () => Math.floor(Math.random()*40)
+    },
+    {
+      text:"Clasifica el riesgo: menos de 3 = Bajo; de 3 a 7 = Medio; de 8 a 12 = Alto; más de 12 = Crítico.",
+      data:[["B2","Nivel de riesgo",9]],
+      f:'=SI(B2<3;"Bajo";SI(B2<8;"Medio";SI(B2<13;"Alto";"Crítico")))',
+      accepted:['=SI(B2>12;"Crítico";SI(B2>7;"Alto";SI(B2>2;"Medio";"Bajo")))'],
+      h:["Usa < para los límites.","Tres SI anidados.","Puedes invertir el orden.","Recuerda los paréntesis.","Separador ;."],
+      eval: (data) => { const B2 = data[0][2]; if (B2<3) return 'Bajo'; if (B2<8) return 'Medio'; if (B2<13) return 'Alto'; return 'Crítico'; },
+      randomData: () => Math.floor(Math.random()*16)
+    }
+  ],
+  4: [
+    {
+      text:"Un trabajador recibe un incentivo si tiene una antigüedad mayor a 2 años Y un puntaje de evaluación igual o superior a 80. Si no cumple ambas, no recibe incentivo.",
+      data:[["B2","Antigüedad (años)",3],["C2","Puntaje evaluación",85]],
+      f:'=SI(Y(B2>2;C2>=80);"Incentivo";"Sin incentivo")',
+      accepted:['=SI(Y(B2>2;C2>=80);"Incentivo";"Sin incentivo")'],
+      h:["“Mayor a 2” es >2.","“Igual o superior a 80” es >=80.","Ambas condiciones deben cumplirse.","Usa la función Y dentro de SI.","La estructura es =SI(Y(cond1;cond2);verdadero;falso)."],
+      eval: (data) => { const B2 = data[0][2]; const C2 = data[1][2]; return (B2>2 && C2>=80) ? 'Incentivo' : 'Sin incentivo'; },
+      randomData: () => [Math.floor(Math.random()*5), Math.floor(Math.random()*30)+70]
+    },
+    {
+      text:"Un proyecto se considera crítico si los días de retraso son mayores o iguales a 10 Y la satisfacción del cliente es menor o igual a 50%.",
+      data:[["B2","Días retraso",12],["C2","Satisfacción","45%"]],
+      f:'=SI(Y(B2>=10;C2<=50%);"Crítico";"Aceptable")',
+      accepted:['=SI(Y(B2>=10;C2<=50%);"Crítico";"Aceptable")'],
+      h:["Una condición usa >= y la otra <=.","La función Y exige que ambas se cumplan.","Recuerda los separadores dentro de Y.","Usa % en el valor.","La estructura es =SI(Y(...);...;...)."],
+      eval: (data) => { const B2 = data[0][2]; const C2 = data[1][2]; return (B2>=10 && C2<=0.5) ? 'Crítico' : 'Aceptable'; },
+      randomData: () => [Math.floor(Math.random()*20), (Math.floor(Math.random()*60))+20+"%"]
+    },
+    {
+      text:"Un trabajador recibe un incentivo si su productividad es mayor o igual a 80% Y su número de errores es menor o igual a 2.",
+      data:[["B2","Productividad","85%"],["C2","Errores",1]],
+      f:'=SI(Y(B2>=80%;C2<=2);"Incentivo";"Sin incentivo")',
+      accepted:['=SI(Y(B2>=80%;C2<=2);"Incentivo";"Sin incentivo")'],
+      h:["Una condición usa >= y la otra <=.","La función Y agrupa las dos condiciones.","No olvides los separadores.","Usa % en el valor.","La estructura es =SI(Y(...);...;...)."],
+      eval: (data) => { const B2 = data[0][2]; const C2 = data[1][2]; return (B2>=0.8 && C2<=2) ? 'Incentivo' : 'Sin incentivo'; },
+      randomData: () => [Math.floor(Math.random()*30)+70+"%", Math.floor(Math.random()*5)]
+    }
+  ]
+};
+
+// ===================== ESTADO GLOBAL =====================
+let level = 1;
+let mode = 'blocks';
+let points = 0;
+let starsEarned = 0;
+let solved = new Set();
+let blockSolved = new Set();
+let writeSolved = new Set();
+let hi = 0;
+let timerInterval;
+let seconds = 0;
+let currentData = [];
+let achievements = new Set();
+let playerName = 'Anónimo';
+let currentExercise = null;
+
+try {
+  playerName = localStorage.getItem('excelPlayerName') || '';
+  if (!playerName) {
+    playerName = prompt('Ingresa tu nombre para el ranking:') || 'Anónimo';
+    localStorage.setItem('excelPlayerName', playerName);
+  }
+  const storedAchievements = JSON.parse(localStorage.getItem('excelAchievements') || '[]');
+  achievements = new Set(storedAchievements);
+} catch(e) {
+  console.warn('localStorage no disponible, usando valores por defecto.');
+  playerName = 'Anónimo';
+  achievements = new Set();
+}
+
+// ===================== FUNCIONES DE GAMIFICACIÓN =====================
+function updateStats() {
+  document.getElementById('points').textContent = points;
+  document.getElementById('stars').textContent = starsEarned;
+  document.getElementById('score').textContent = solved.size + '/4';
+
+  const blockPercent = (blockSolved.size / 4) * 50;
+  const writePercent = (writeSolved.size / 4) * 50;
+  const percentage = Math.round(blockPercent + writePercent);
+  const progressFill = document.getElementById('progressFill');
+  const progressText = document.getElementById('progressText');
+  if (progressFill) {
+    progressFill.style.width = percentage + '%';
+    progressText.textContent = percentage + '%';
+  }
+}
+
+function addPoints(amount) {
+  points = Math.max(0, points + amount);
+  updateStats();
+}
+
+function addStars(n) {
+  starsEarned = Math.min(starsEarned + n, 12);
+  updateStats();
+}
+
+function startTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  seconds = 0;
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    seconds++;
+    updateTimerDisplay();
+  }, 1000);
+}
+function stopTimer() {
+  clearInterval(timerInterval);
+}
+function updateTimerDisplay() {
+  const mins = Math.floor(seconds/60).toString().padStart(2,'0');
+  const secs = (seconds%60).toString().padStart(2,'0');
+  document.getElementById('timer').textContent = `${mins}:${secs}`;
+}
+
+function unlockAchievement(id) {
+  if (!achievements.has(id)) {
+    achievements.add(id);
+    try {
+      localStorage.setItem('excelAchievements', JSON.stringify([...achievements]));
+    } catch(e) {}
+    showAchievementToast(id);
+  }
+  renderAchievements();
+}
+
+const ACHIEVEMENTS = [
+  {id:'first', name:'Primer paso', desc:'Completa el Nivel 1', icon:'🏁'},
+  {id:'no_hint_1', name:'Sin ayuda', desc:'Completa un nivel sin usar pistas', icon:'🚫💡'},
+  {id:'perfect_1', name:'Lógica perfecta', desc:'Completa un nivel sin errores', icon:'🧠'},
+  {id:'nested_master', name:'Anidador', desc:'Completa el Nivel 3 (SI anidado)', icon:'🪆'},
+  {id:'logic_combiner', name:'Combinador', desc:'Completa el Nivel 4 (SI + Y)', icon:'🔗'},
+  {id:'all_levels', name:'Maestro de SI', desc:'Completa los 4 niveles', icon:'🏆'},
+  {id:'no_errors_all', name:'Sin fallos', desc:'Completa los 4 niveles sin errores', icon:'💯'},
+  {id:'speedrunner', name:'Velocista', desc:'Completa un nivel en menos de 30 segundos', icon:'⚡'},
+  {id:'cell_ref', name:'Referencia absoluta', desc:'Usa referencias de celda correctamente', icon:'🔢'},
+];
+
+function renderAchievements() {
+  const container = document.getElementById('achievements');
+  container.innerHTML = ACHIEVEMENTS.map(a => {
+    const unlocked = achievements.has(a.id);
+    return `<div class="badge ${unlocked ? 'unlocked' : ''}" title="${a.desc}">${a.icon} ${a.name}</div>`;
+  }).join('');
+}
+
+function showAchievementToast(id) {
+  const a = ACHIEVEMENTS.find(x => x.id === id);
+  if (a) {
+    const div = document.createElement('div');
+    div.style.cssText = 'position:fixed;top:20px;right:20px;background:#28a745;color:white;padding:15px 20px;border-radius:8px;box-shadow:0 4px 8px rgba(0,0,0,0.2);z-index:9999;animation:pulse 0.5s';
+    div.innerHTML = `<b>🏅 Logro desbloqueado:</b> ${a.icon} ${a.name}<br><small>${a.desc}</small>`;
+    document.body.appendChild(div);
+    setTimeout(() => div.remove(), 4000);
+  }
+}
+
+// ===================== FUNCIONES DE OVERLAY (COLA) =====================
+let overlayQueue = [];
+let overlayShowing = false;
+
+function enqueueOverlay(html, duration = 2500) {
+  overlayQueue.push({ html, duration });
+  processOverlayQueue();
+}
+
+function processOverlayQueue() {
+  if (overlayShowing || overlayQueue.length === 0) return;
+  overlayShowing = true;
+  const { html, duration } = overlayQueue.shift();
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  overlay.innerHTML = `<div class="overlay-content">${html}</div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', () => {
+    overlay.remove();
+    overlayShowing = false;
+    setTimeout(processOverlayQueue, 300);
+  });
+  setTimeout(() => {
+    if (overlay.parentNode) overlay.remove();
+    overlayShowing = false;
+    setTimeout(processOverlayQueue, 300);
+  }, duration);
+}
+
+function showOverlay(html) {
+  enqueueOverlay(html);
+}
+
+function showLevelComplete(level, mode) {
+  const modeText = mode === 'blocks' ? '🧩 Bloques' : '⌨️ Escritura';
+  showOverlay(`<div class="crown">👑</div><b>¡Nivel ${level} completado!</b><br>Modo: ${modeText}`);
+}
+
+function showAllBlockUnlocked() {
+  showOverlay(`<div class="crown">🏆</div><b>¡Modo escritura desbloqueado!</b><br>Has completado todos los niveles de bloques.`);
+}
+
+function showAllWritingComplete() {
+  showOverlay(`<div class="crown">🎖️</div><b>¡Felicidades!</b><br>Has completado todos los niveles de escritura.`);
+}
+
+// ===================== MANEJO DE DATOS =====================
+function getLevelData() {
+  return currentExercise;
+}
+
+function initData() {
+  const l = getLevelData();
+  currentData = l.data.map(row => [row[0], row[1], row[2]]);
+  renderDataTable();
+}
+
+function renderDataTable() {
+  const dataDiv = document.getElementById('data');
+  dataDiv.innerHTML = `<table class="data-table"><tr><th>Celda</th><th>Variable</th><th>Valor</th></tr>` +
+    currentData.map(row => `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td></tr>`).join('') +
+    `</table>`;
+}
+
+function changeData() {
+  const l = getLevelData();
+  if (level === 4) {
+    const [dias, asist] = l.randomData();
+    currentData[0][2] = dias;
+    currentData[1][2] = asist;
+  } else {
+    currentData[0][2] = l.randomData();
+  }
+  renderDataTable();
+  updateResult();
+
+  // Registro del evento
+  registrarEvento({
+    nombre: playerName,
+    nivel: level,
+    modo: mode,
+    evento: "cambio_datos",
+    tiempo: seconds
+  });
+}
+
+// ===================== CARGA DE NIVEL =====================
+function load(n, btn) {
+  level = n;
+  hi = 0;
+  stopTimer();
+  startTimer();
+  document.querySelectorAll('.level-btn').forEach(x => x.classList.remove('active'));
+  btn.classList.add('active');
+
+  const exercises = mode === 'blocks' ? BLOCK_LEVELS[n] : WRITE_LEVELS[n];
+  const randomIndex = Math.floor(Math.random() * exercises.length);
+  currentExercise = exercises[randomIndex];
+
+  const l = currentExercise;
+
+  const charTexts = {
+    blocks: {
+      1:"Arrastra los bloques a las zonas correspondientes. Recuerda los ; entre argumentos.",
+      2:"Arma la fórmula completa usando las zonas y los separadores.",
+      3:"Anida varios SI en una sola fila horizontal. Usa scroll si es necesario.",
+      4:"Usa la función Y y no olvides los ; dentro y fuera de Y."
+    },
+    write: {
+      1:"Escribe la fórmula para evaluar la condición.",
+      2:"Escribe la fórmula correcta.",
+      3:"Usa SI anidado.",
+      4:"Usa Y dentro de SI."
+    }
+  };
+  document.getElementById('charText').textContent = charTexts[mode][n];
+
+  document.getElementById('text').textContent = l.text;
+  initData();
+
+  if (mode === 'blocks') {
+    document.getElementById('blocksMode').style.display = '';
+    document.getElementById('writeMode').style.display = 'none';
+    const zonesContainer = document.getElementById('zonesContainer');
+    zonesContainer.innerHTML = '';
+
+    if (level === 3) {
+      zonesContainer.innerHTML = `
+        <div class="zone">
+          <div class="label">FÓRMULA COMPLETA (arrastra los bloques en orden horizontal)</div>
+          <div id="formula-zone" class="drop" style="flex-wrap:nowrap; overflow-x:auto; min-height:60px; align-items:center;"></div>
+        </div>`;
+      setupSingleZone();
+    } else {
+      zonesContainer.innerHTML = `
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:10px;">
+          <div class="zone" style="flex:1;min-width:200px;">
+            <div class="label">PRUEBA LÓGICA</div>
+            <div id="test" class="drop"></div>
+          </div>
+          <div class="zone" style="flex:0 0 auto;">
+            <div class="label">SEPARADOR</div>
+            <div id="sep1" class="sep-zone"></div>
+          </div>
+          <div class="zone" style="flex:1;min-width:200px;">
+            <div class="label">VALOR SI ES VERDADERO</div>
+            <div id="true" class="drop"></div>
+          </div>
+          <div class="zone" style="flex:0 0 auto;">
+            <div class="label">SEPARADOR</div>
+            <div id="sep2" class="sep-zone"></div>
+          </div>
+          <div class="zone" style="flex:1;min-width:200px;">
+            <div class="label">VALOR SI ES FALSO</div>
+            <div id="false" class="drop"></div>
+          </div>
+        </div>`;
+      setupSeparatedZones();
+    }
+
+    const shuffled = [...l.blocks].sort(() => Math.random() - 0.5);
+    const bank = document.getElementById('bank');
+    bank.innerHTML = '';
+    shuffled.forEach((block, i) => {
+      const e = document.createElement('div');
+      e.className = 'block ' + block.type;
+      e.textContent = block.text;
+      e.draggable = true;
+      e.dataset.i = i;
+      e.ondragstart = ev => {
+        ev.dataTransfer.setData('text/plain', i);
+        ev.dataTransfer.effectAllowed = 'move';
+      };
+      bank.appendChild(e);
+    });
+  } else {
+    document.getElementById('blocksMode').style.display = 'none';
+    document.getElementById('writeMode').style.display = '';
+    document.getElementById('formulaInput').value = '';
+  }
+
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('hint').style.display = 'none';
+  updateFormula();
+  updateResult();
+  renderAchievements();
+  updateStats();
+  updateWriteButton();
+
+  // Registro de inicio de nivel
+  registrarEvento({
+    nombre: playerName,
+    nivel: n,
+    modo: mode,
+    evento: "inicio",
+    tiempo: seconds,
+    pistas: hi,
+    puntos: points,
+    estrellas: starsEarned
+  });
+}
+
+// ===================== INSERCIÓN HORIZONTAL =====================
+function insertBlockAtPosition(zone, el, clientX) {
+  if (el.parentNode) {
+    el.parentNode.removeChild(el);
+  }
+  const children = [...zone.children];
+  if (children.length === 0) {
+    zone.appendChild(el);
+    return;
+  }
+  let insertIndex = children.length;
+  for (let i = 0; i < children.length; i++) {
+    const rect = children[i].getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    if (clientX < centerX) {
+      insertIndex = i;
+      break;
+    }
+  }
+  if (insertIndex >= children.length) {
+    zone.appendChild(el);
+  } else {
+    zone.insertBefore(el, children[insertIndex]);
+  }
+}
+
+// ===================== SETUP DE ZONAS =====================
+function setupSingleZone() {
+  const zone = document.getElementById('formula-zone');
+  zone.ondragover = ev => { ev.preventDefault(); ev.dataTransfer.dropEffect = 'move'; };
+  zone.ondrop = ev => {
+    ev.preventDefault();
+    const i = parseInt(ev.dataTransfer.getData('text/plain'), 10);
+    const el = document.querySelector(`[data-i="${i}"]`);
+    if (el) {
+      insertBlockAtPosition(zone, el, ev.clientX);
+      updateFormula();
+      updateResult();
+      document.getElementById('feedback').className = 'feedback';
+    }
+  };
+
+  const bank = document.getElementById('bank');
+  bank.ondragover = ev => { ev.preventDefault(); ev.dataTransfer.dropEffect = 'move'; };
+  bank.ondrop = ev => {
+    ev.preventDefault();
+    const i = parseInt(ev.dataTransfer.getData('text/plain'), 10);
+    const el = document.querySelector(`[data-i="${i}"]`);
+    if (el) bank.appendChild(el);
+    updateFormula();
+    updateResult();
+  };
+}
+
+function setupSeparatedZones() {
+  const zones = ['test', 'true', 'false', 'sep1', 'sep2'];
+  zones.forEach(zoneId => {
+    const zone = document.getElementById(zoneId);
+    zone.ondragover = ev => { ev.preventDefault(); ev.dataTransfer.dropEffect = 'move'; };
+    zone.ondrop = ev => {
+      ev.preventDefault();
+      const i = parseInt(ev.dataTransfer.getData('text/plain'), 10);
+      const el = document.querySelector(`[data-i="${i}"]`);
+      if (!el) return;
+      if (zoneId.startsWith('sep') && zone.children.length >= 1) {
+        showFeedback('err', '⚠️ Esta zona ya tiene un separador.');
+        return;
+      }
+      insertBlockAtPosition(zone, el, ev.clientX);
+      updateFormula();
+      updateResult();
+      document.getElementById('feedback').className = 'feedback';
+    };
+  });
+
+  const bank = document.getElementById('bank');
+  bank.ondragover = ev => { ev.preventDefault(); ev.dataTransfer.dropEffect = 'move'; };
+  bank.ondrop = ev => {
+    ev.preventDefault();
+    const i = parseInt(ev.dataTransfer.getData('text/plain'), 10);
+    const el = document.querySelector(`[data-i="${i}"]`);
+    if (el) bank.appendChild(el);
+    updateFormula();
+    updateResult();
+  };
+}
+
+// ===================== MODO DE INTERACCIÓN =====================
+function setMode(newMode) {
+  if (newMode === 'write' && blockSolved.size !== 4) {
+    alert('Debes completar todos los niveles de bloques antes de acceder a la escritura.');
+    return;
+  }
+  if (mode === newMode) return;
+  mode = newMode;
+  document.getElementById('btnBlocks').classList.toggle('active', mode === 'blocks');
+  document.getElementById('btnWrite').classList.toggle('active', mode === 'write');
+  const activeBtn = document.querySelector('.level-btn.active');
+  load(level, activeBtn);
+}
+
+function updateWriteButton() {
+  const btnWrite = document.getElementById('btnWrite');
+  btnWrite.disabled = !(blockSolved.size === 4);
+  if (btnWrite.disabled) {
+    btnWrite.title = 'Completa todos los niveles de bloques para desbloquear la escritura';
+  } else {
+    btnWrite.title = '';
+  }
+}
+
+// ===================== OBTENER SECUENCIA DE BLOQUES =====================
+function getZoneBlocks(zoneId) {
+  return [...document.getElementById(zoneId).children].map(x => x.textContent);
+}
+
+function getFormulaSequenceForZones() {
+  if (level === 3) {
+    return getZoneBlocks('formula-zone');
+  } else {
+    const test = getZoneBlocks('test');
+    const trueVal = getZoneBlocks('true');
+    const falseVal = getZoneBlocks('false');
+    const sep1 = getZoneBlocks('sep1');
+    const sep2 = getZoneBlocks('sep2');
+    return [...test, ...sep1, ...trueVal, ...sep2, ...falseVal];
+  }
+}
+
+// ===================== ACTUALIZAR FÓRMULA Y RESULTADO =====================
+function updateFormula() {
+  const l = getLevelData();
+  let formulaText = '';
+  if (mode === 'blocks') {
+    const seq = getFormulaSequenceForZones();
+    if (level === 3) {
+      formulaText = seq.length ? '=' + seq.join('') : 'Construye la fórmula.';
+    } else {
+      formulaText = seq.length ? '=SI(' + seq.join('') + ')' : 'Construye la fórmula.';
+    }
+  } else {
+    formulaText = document.getElementById('formulaInput').value.trim() || 'Construye la fórmula.';
+  }
+  document.getElementById('formula').textContent = formulaText;
+  updateResult();
+}
+
+function updateResult() {
+  const resultDisplay = document.getElementById('resultDisplay');
+  resultDisplay.textContent = '—';
+  const l = getLevelData();
+  if (mode === 'blocks') {
+    const seq = getFormulaSequenceForZones();
+    if (level === 3) {
+      const expected = l.formulaArray;
+      if (seq.length === expected.length && seq.every((val, idx) => val === expected[idx])) {
+        resultDisplay.textContent = l.eval(currentData);
+      }
+    } else {
+      const expected = l.zones;
+      const ok = 
+        JSON.stringify(getZoneBlocks('test')) === JSON.stringify(expected.test.blocks) &&
+        JSON.stringify(getZoneBlocks('true')) === JSON.stringify(expected.true.blocks) &&
+        JSON.stringify(getZoneBlocks('false')) === JSON.stringify(expected.false.blocks) &&
+        JSON.stringify(getZoneBlocks('sep1')) === JSON.stringify(expected.sep1.blocks) &&
+        JSON.stringify(getZoneBlocks('sep2')) === JSON.stringify(expected.sep2.blocks);
+      if (ok) {
+        resultDisplay.textContent = l.eval(currentData);
+      }
+    }
+  } else {
+    const formula = document.getElementById('formulaInput').value.trim();
+    if (formula) {
+      const accepted = [l.f, ...(l.accepted || [])];
+      const user = formula.toLowerCase().replace(/\s/g,'');
+      const isCorrect = accepted.some(f => f.toLowerCase().replace(/\s/g,'') === user);
+      if (isCorrect) {
+        resultDisplay.textContent = l.eval(currentData);
+      } else {
+        resultDisplay.innerHTML = `<span class="error-msg">#¿NOMBRE? o fórmula incorrecta</span>`;
+      }
+    }
+  }
+}
+
+// ===================== COMPROBAR =====================
+function check() {
+  const l = getLevelData();
+  let ok = true;
+  let errors = [];
+  let usedHint = hi > 0;
+
+  if (mode === 'blocks') {
+    if (level === 3) {
+      const seq = getFormulaSequenceForZones();
+      const expected = l.formulaArray;
+      if (seq.length === 0) {
+        errors.push('No has colocado ningún bloque en la zona de fórmula.');
+        ok = false;
+      } else if (seq.length !== expected.length) {
+        errors.push(`La fórmula tiene ${seq.length} bloques, pero debería tener ${expected.length}.`);
+        ok = false;
+      } else {
+        for (let i = 0; i < expected.length; i++) {
+          if (seq[i] !== expected[i]) {
+            errors.push(`Posición ${i+1}: se esperaba "${expected[i]}" y se encontró "${seq[i]}".`);
+            ok = false;
+          }
+        }
+      }
+      if (document.getElementById('bank').children.length > 0) {
+        errors.push('Aún hay bloques sin usar en el banco.');
+        ok = false;
+      }
+    } else {
+      const expected = l.zones;
+      const zonesToCheck = ['test', 'true', 'false', 'sep1', 'sep2'];
+      for (const zoneId of zonesToCheck) {
+        const actual = getZoneBlocks(zoneId);
+        const exp = expected[zoneId].blocks;
+        if (JSON.stringify(actual) !== JSON.stringify(exp)) {
+          ok = false;
+          if (actual.length === 0) errors.push(`La zona ${zoneId.toUpperCase()} está vacía.`);
+          else errors.push(`La zona ${zoneId.toUpperCase()} no coincide: tiene "${actual.join(' ')}" y se esperaba "${exp.join(' ')}".`);
+        }
+      }
+      if (document.getElementById('bank').children.length > 0) {
+        errors.push('Aún hay bloques sin usar en el banco.');
+        ok = false;
+      }
+    }
+  } else {
+    const userFormula = document.getElementById('formulaInput').value.trim().toLowerCase().replace(/\s/g,'');
+    const accepted = [l.f, ...(l.accepted || [])];
+    const isCorrect = accepted.some(f => f.toLowerCase().replace(/\s/g,'') === userFormula);
+    ok = isCorrect;
+    if (!ok) errors.push('La fórmula escrita no es correcta. Revisa la sintaxis.');
+  }
+
+  // Registro del evento de comprobación
+  registrarEvento({
+    nombre: playerName,
+    nivel: level,
+    modo: mode,
+    evento: "comprobar",
+    resultado: ok ? "exito" : "fallo",
+    errores: errors.join("|") || "ninguno",
+    tiempo: seconds,
+    pistas: hi,
+    puntos: points,
+    estrellas: starsEarned
+  });
+
+  if (ok) {
+    solved.add(level);
+    if (mode === 'blocks') {
+      blockSolved.add(level);
+      updateWriteButton();
+      if (blockSolved.size === 4) {
+        showAllBlockUnlocked();
+      }
+    } else if (mode === 'write') {
+      writeSolved.add(level);
+      if (writeSolved.size === 4) {
+        showAllWritingComplete();
+      }
+    }
+
+    showLevelComplete(level, mode);
+
+    let pts = 100;
+    if (usedHint) pts -= 20 * hi;
+    if (seconds > 120) pts -= 30;
+    pts = Math.max(10, pts);
+    addPoints(pts);
+    let estrellas = 3;
+    if (usedHint) estrellas--;
+    if (seconds > 120) estrellas--;
+    if (pts < 100) estrellas = Math.max(1, estrellas);
+    addStars(estrellas);
+
+    if (level === 1) unlockAchievement('first');
+    if (level === 3) unlockAchievement('nested_master');
+    if (level === 4) unlockAchievement('logic_combiner');
+    if (solved.size === 4) unlockAchievement('all_levels');
+    if (!usedHint) unlockAchievement('no_hint_1');
+    if (estrellas === 3) unlockAchievement('perfect_1');
+    if (seconds < 30) unlockAchievement('speedrunner');
+    if (solved.size === 4 && points >= 400) unlockAchievement('no_errors_all');
+    if (solved.size === 4 && points >= 400) unlockAchievement('cell_ref');
+
+    showFeedback('ok', `✅ <b>¡Correcto!</b><br>Has ganado ${pts} puntos y ${estrellas} estrellas.<br>Fórmula: ${l.f}`);
+    document.getElementById('formula').textContent = l.f;
+    document.getElementById('resultDisplay').textContent = l.eval(currentData);
+    stopTimer();
+  } else {
+    addPoints(-15);
+    showFeedback('err', '⚠️ <b>Revisa tu construcción.</b><br>• ' + errors.join('<br>• ') + '<br>Se te han restado 15 puntos.');
+    const feedbackEl = document.getElementById('feedback');
+    feedbackEl.classList.add('shake');
+    setTimeout(() => feedbackEl.classList.remove('shake'), 500);
+  }
+  updateStats();
+}
+
+function showFeedback(type, msg) {
+  const e = document.getElementById('feedback');
+  e.className = 'feedback ' + type;
+  e.innerHTML = msg;
+}
+
+// ===================== PISTAS =====================
+function hint() {
+  const h = getLevelData().h;
+  if (hi < h.length) {
+    document.getElementById('hint').textContent = '💡 ' + h[hi++];
+    document.getElementById('hint').style.display = 'block';
+
+    // Registro del uso de pista
+    registrarEvento({
+      nombre: playerName,
+      nivel: level,
+      modo: mode,
+      evento: "pista",
+      pistas: hi,
+      tiempo: seconds
+    });
+  } else {
+    document.getElementById('hint').textContent = '💡 No quedan más pistas.';
+    document.getElementById('hint').style.display = 'block';
+  }
+}
+
+// ===================== LIMPIAR =====================
+function clearBuild() {
+  if (mode === 'blocks') {
+    const bank = document.getElementById('bank');
+    if (level === 3) {
+      const zone = document.getElementById('formula-zone');
+      [...zone.children].forEach(e => bank.appendChild(e));
+    } else {
+      const zones = ['test', 'true', 'false', 'sep1', 'sep2'];
+      zones.forEach(zoneId => {
+        const zone = document.getElementById(zoneId);
+        [...zone.children].forEach(e => bank.appendChild(e));
+      });
+    }
+    document.getElementById('feedback').className = 'feedback';
+  } else {
+    document.getElementById('formulaInput').value = '';
+  }
+  updateFormula();
+  updateResult();
+}
+
+// ===================== REINICIAR TODO =====================
+function resetAll() {
+  stopTimer();
+  if (confirm('¿Seguro que deseas reiniciar todos los puntos y progreso?')) {
+    points = 0;
+    starsEarned = 0;
+    solved.clear();
+    blockSolved.clear();
+    writeSolved.clear();
+    achievements.clear();
+    try { localStorage.removeItem('excelAchievements'); } catch(e) {}
+    updateStats();
+    renderAchievements();
+    const activeBtn = document.querySelector('.level-btn.active');
+    load(1, document.querySelector('.level-btn'));
+    updateWriteButton();
+  }
+}
+
+// ===================== INICIALIZACIÓN =====================
+renderAchievements();
+load(1, document.querySelector('.level-btn'));
+</script>
+</body>
+</html>
