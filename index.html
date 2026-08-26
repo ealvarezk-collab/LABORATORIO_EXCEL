@@ -941,8 +941,9 @@ function setupSeparatedZones() {
       const el = document.querySelector(`[data-i="${i}"]`);
       if (!el) return;
       if (zoneId.startsWith('sep') && zone.children.length >= 1) {
-        showFeedback('err', '⚠️ Esta zona ya tiene un separador.');
-        return;
+       const sepName = zoneId === 'sep1' ? 'SEPARADOR 1' : 'SEPARADOR 2';
+  showFeedback('err', `⚠️ La zona ${sepName} ya tiene un separador.`);
+  return;
       }
       insertBlockAtPosition(zone, el, ev.clientX);
       updateFormula();
