@@ -1091,22 +1091,29 @@ function check() {
         ok = false;
       }
     } else {
-      const expected = l.zones;
-      const zonesToCheck = ['test', 'true', 'false', 'sep1', 'sep2'];
-      for (const zoneId of zonesToCheck) {
-        const actual = getZoneBlocks(zoneId);
-        const exp = expected[zoneId].blocks;
-        if (JSON.stringify(actual) !== JSON.stringify(exp)) {
-          ok = false;
-          if (actual.length === 0) errors.push(`La zona ${zoneId.toUpperCase()} está vacía.`);
-          else errors.push(`La zona ${zoneId.toUpperCase()} no coincide: tiene "${actual.join(' ')}" y se esperaba "${exp.join(' ')}".`);
-        }
-      }
-      if (document.getElementById('bank').children.length > 0) {
-        errors.push('Aún hay bloques sin usar en el banco.');
-        ok = false;
-      }
+  const expected = l.zones;
+  const zoneNames = {
+    test: "PRUEBA LÓGICA",
+    true: "VALOR SI ES VERDADERO",
+    false: "VALOR SI ES FALSO",
+    sep1: "SEPARADOR 1",
+    sep2: "SEPARADOR 2"
+  };
+  const zonesToCheck = ['test', 'true', 'false', 'sep1', 'sep2'];
+  for (const zoneId of zonesToCheck) {
+    const actual = getZoneBlocks(zoneId);
+    const exp = expected[zoneId].blocks;
+    if (JSON.stringify(actual) !== JSON.stringify(exp)) {
+      ok = false;
+      if (actual.length === 0) errors.push(`La zona ${zoneNames[zoneId]} está vacía.`);
+      else errors.push(`La zona ${zoneNames[zoneId]} no coincide: tiene "${actual.join(' ')}" y se esperaba "${exp.join(' ')}".`);
     }
+  }
+  if (document.getElementById('bank').children.length > 0) {
+    errors.push('Aún hay bloques sin usar en el banco.');
+    ok = false;
+  }
+}
   } else {
     const userFormula = document.getElementById('formulaInput').value.trim().toLowerCase().replace(/\s/g,'');
     const accepted = [l.f, ...(l.accepted || [])];
