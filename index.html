@@ -180,7 +180,6 @@
       <div class="stat"><span>Escritura</span><span id="writeProg">0/4</span></div>
     </div>
     
-    <!-- BARRA DE PROGRESO EXPANDIDA -->
     <div class="progress-container">
       <div class="progress-fill" id="progressFill"></div>
       <span class="progress-text" id="progressText">Progreso del curso: 0%</span>
@@ -260,7 +259,6 @@
 </main>
 
 <script>
-/* BANCO DE EJERCICIOS CON TEXTO DESCRIPTIVO (SIN SÍMBOLOS MATEMÁTICOS EN EL ENUNCIADO) */
 const EXERCISE_BANK = {
   1: [
     {
@@ -292,7 +290,7 @@ const EXERCISE_BANK = {
       data: [["B2", "Estado Casco", "Conforme"]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:"=", type:"op"}, {text:'"Conforme"', type:"val"},
-        {text:";", type:"sep"}, {text:'"Ingreso permittedo"', type:"res"}, {text:";", type:"sep"},
+        {text:";", type:"sep"}, {text:'"Ingreso permitido"', type:"res"}, {text:";", type:"sep"},
         {text:'"Ingreso denegado"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2="Conforme";"Ingreso permitido";"Ingreso denegado")',
@@ -413,7 +411,7 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Apto"', type:"res"}, {text:";", type:"sep"}, {text:'"No Apto"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(Y(B2="Sí";C2="Sí");"Apto";"No Apto")',
-      hints: ["Usa Y() para condicionar la igualdad de dos textos con =.", "Coloca los separadores ; en las casillas marcadas.", "Respuestas esperadas: \"Apto\" e \"No Apto\"."],
+      hints: ["Usa Y() para condicionar la igualdad de dos textos con =.", "Coloca los separadores ; en las casillas marcadas.", "Respuestas esperadas: \"Apto\" y \"No Apto\"."],
       eval: (d) => (d[0][2] === 'Sí' && d[1][2] === 'Sí') ? 'Apto' : 'No Apto'
     }
   ]
@@ -604,6 +602,8 @@ function updateFormulaFromText() {
 
 /* MOTOR DE DIAGNÓSTICO Y RETROALIMENTACIÓN DETALLADA DE ERRORES */
 function diagnoseError() {
+  const currentFormula = document.getElementById('formula').textContent.trim();
+  
   if (activeMode === 'block') {
     const bank = document.getElementById('bank');
     if (bank.children.length > 0) {
@@ -613,186 +613,174 @@ function diagnoseError() {
     if (currentLevel === 3) {
       const r1 = Array.from(document.getElementById('row1').children).map(c => c.textContent).join('');
       const r2 = Array.from(document.getElementById('row2').children).map(c => c.textContent).join('');
-      
+
       if (!r1.startsWith('=SI(')) {
-        return "Revisa la Fila 1: La fórmula debe iniciar con '=SI(' en la primera fila.";
+        return "Revisa la Fila 1: Debe iniciar obligatoriamente con la función '=SI('.";
       }
-      if (!r1.includes(';')) {
-        return "Revisa la Fila 1: Falta el separador ';' después del valor verdadero de la primera condición.";
+      if (!r1.endsWith(';')) {
+        return "Revisa el final de la Fila 1: Debe terminar con un punto y coma ';' para dar paso al SI anidado.";
       }
       if (!r2.startsWith('SI(')) {
-        return "Revisa la Fila 2: La condición anidada debe comenzar con 'SI(' (sin el signo igual).";
+        return "Revisa la Fila 2: Debe comenzar con la función anidada 'SI('.";
       }
       if (!r2.endsWith('))')) {
-        return "Revisa el final de la Fila 2: Recuerda cerrar ambos paréntesis '))' al terminar la función anidada.";
+        return "Revisa los paréntesis de cierre en la Fila 2: Una función anidada con dos SI requiere cerrar con '))'.";
       }
-      return "Revisa el orden de los criterios o valores en ambas filas. Los bloques están desordenados.";
-    } 
-    else {
+    } else {
+      const sep1 = Array.from(document.getElementById('sep1').children).map(c => c.textContent).join('');
+      const sep2 = Array.from(document.getElementById('sep2').children).map(c => c.textContent).join('');
+
+      if (sep1 !== ';' || sep2 !== ';') {
+        return "Asegúrate de colocar las casillas separadoras ';' entre cada una de las tres partes de la función.";
+      }
       const r1 = Array.from(document.getElementById('row1').children).map(c => c.textContent).join('');
-      const s1 = Array.from(document.getElementById('sep1').children).map(c => c.textContent).join('');
-      const r2 = Array.from(document.getElementById('row2').children).map(c => c.textContent).join('');
-      const s2 = Array.from(document.getElementById('sep2').children).map(c => c.textContent).join('');
-      const r3 = Array.from(document.getElementById('row3').children).map(c => c.textContent).join('');
-
-      if (!r1) return "La fila '1. Prueba Lógica' está totalmente vacía.";
-      if (!r2) return "La fila '2. Valor Verdadero' está vacía. Debes ingresar el resultado cuando se cumple la condición.";
-      if (!r3) return "La fila '3. Valor Falso' está vacía. Debes colocar la respuesta o cierre en caso de no cumplirse.";
-      
-      if (s1 !== ';' || s2 !== ';') {
-        return "Revisa los separadores en los recuadros amarillos. Asegúrate de colocar el bloque ';' en cada casilla cuadrada de separador.";
-      }
-
       if (!r1.startsWith('=SI(')) {
-        return "Revisa la 'Prueba Lógica': Debe empezar con '=SI('. Reubica el bloque inicial.";
+        return "La primera casilla/fila debe iniciar con la estructura '=SI('.";
       }
-
-      if (currentLevel === 4) {
-        if (!r1.includes('Y(') && !r1.includes('O(')) {
-          return "Revisa la 'Prueba Lógica': Falta la función lógica Y(...) u O(...) requerida para evaluar múltiples condiciones en este nivel.";
-        }
-      }
-
-      if (r1.includes('"') && !r2.includes('"') && isNaN(r2)) {
-        return "Atención: Es posible que hayas colocado un texto o resultado en la zona de Prueba Lógica por error.";
-      }
-
+      const r3 = Array.from(document.getElementById('row3').children).map(c => c.textContent).join('');
       if (!r3.endsWith(')')) {
-        return "Revisa el final de la fila '3. Valor Falso': Falta colocar el paréntesis de cierre ')' al final de la fórmula.";
+        return "La última casilla/fila debe finalizar cerrando el paréntesis de la función ')'.";
       }
-
-      return "Los bloques están desordenados. Revisa si colocaste la respuesta verdadera en el lugar de la falsa o si invertiste la prueba lógica.";
     }
-  } 
-  else {
-    // MODO ESCRITURA MANUAL
-    const txt = document.getElementById('manualFormula').value.trim();
-    if (!txt) return "El campo de texto está vacío. Escribe tu fórmula de Excel completa.";
-    if (!txt.startsWith('=')) return "Toda fórmula en Excel debe comenzar con el signo igual '='.";
-    if (!txt.toUpperCase().startsWith('=SI(')) return "La fórmula debe iniciar con la estructura '=SI('.";
-    
-    const countSemi = (txt.match(/;/g) || []).length;
-    if (countSemi < 2) {
-      return `Revisa los separadores: Una función SI requiere al menos 2 punto y coma ';'. Tu fórmula actualmente tiene ${countSemi}.`;
+  } else {
+    if (!currentFormula.startsWith('=')) {
+      return "Toda fórmula en Excel debe comenzar obligatoriamente con el signo igual '='.";
     }
-
-    const openParen = (txt.match(/\(/g) || []).length;
-    const closeParen = (txt.match(/\)/g) || []).length;
+    if (!currentFormula.toUpperCase().startsWith('=SI(')) {
+      return "Sintaxis incorrecta. La fórmula principal debe ser la función SI, comenzando por '=SI('.";
+    }
+    const openParen = (currentFormula.match(/\(/g) || []).length;
+    const closeParen = (currentFormula.match(/\)/g) || []).length;
     if (openParen !== closeParen) {
-      return `Error en paréntesis: Hay ${openParen} paréntesis abiertos y ${closeParen} cerrados. Asegúrate de cerrar todos los paréntesis.`;
+      return `Error de paréntesis: Tienes ${openParen} paréntesis abierto(s) y ${closeParen} cerrado(s).`;
     }
-
-    if (txt.includes('"') && (txt.match(/"/g) || []).length % 2 !== 0) {
-      return "Falta una comilla: Los valores de texto deben estar encerrados en comillas dobles en pares (ej. \"Texto\").";
+    if (!currentFormula.includes(';')) {
+      return "Recuerda separar los argumentos de la función utilizando punto y coma ';'.";
     }
-
-    return "Error de sintaxis o valores: Revisa si el nombre de la celda (ej. B2), el operador de comparación (>, <, =) o los textos requeridos están bien escritos.";
   }
+
+  return "La estructura o los valores colocados no coinciden con la respuesta esperada. Revisa el orden de las expresiones e inténtalo de nuevo.";
 }
 
 function checkCurrentPhase() {
-  const expected = currentExercise.expected.replace(/\s+/g, '');
-  const fb = document.getElementById('feedback');
-  fb.style.display = 'block';
-
-  let currentBuilt = '';
-  if (activeMode === 'block') {
-    updateFormulaFromRows();
-    currentBuilt = document.getElementById('formula').textContent.replace(/\s+/g, '');
-  } else {
-    currentBuilt = document.getElementById('manualFormula').value.replace(/\s+/g, '');
-  }
-
-  if (currentBuilt === expected) {
-    fb.className = 'feedback ok';
-    fb.innerHTML = '<b>¡Excelente trabajo!</b> La sintaxis y la estructura lógica de la función son completamente correctas.';
-    
-    let isNewSolve = false;
-    if (activeMode === 'block' && !solvedBlocks.has(currentLevel)) {
-      solvedBlocks.add(currentLevel);
-      isNewSolve = true;
-    } else if (activeMode === 'write' && !solvedWrites.has(currentLevel)) {
-      solvedWrites.add(currentLevel);
-      isNewSolve = true;
-    }
-
-    if (isNewSolve) {
-      addPoints(100);
-      stars++;
-      updateStats();
-      checkBadges();
-    }
-
-    document.getElementById('resultDisplay').textContent = currentExercise.eval(currentExercise.data);
-
-    if (activeMode === 'block' && solvedBlocks.size === 4) {
-      document.getElementById('btnModeWrite').classList.remove('locked');
-      document.getElementById('btnModeWrite').textContent = '✍️ FASE 2: MODO ESCRITURA MANUAL (DESBLOQUEADO)';
-      showOverlay('🎉 ¡Fase de Bloques Completada!', 'Has superado los 4 niveles de bloques. Se ha desbloqueado el Modo de Escritura Manual Libre.', '🏆');
-    } else {
-      showOverlay('¡Acierto!', `Has completado exitosamente el Nivel ${currentLevel} en ${activeMode === 'block' ? 'Modo Bloques' : 'Modo Escritura'}.`, '⭐');
-    }
-
-  } else {
-    addPoints(-25);
-    const detailMsg = diagnoseError();
-    fb.className = 'feedback err';
-    fb.innerHTML = `<b>⚠️ Revisa tu fórmula (-25 pts):</b><br>${detailMsg}`;
-  }
-}
-
-function addPoints(val) {
-  points = Math.max(0, points + val);
-  const changeEl = document.getElementById('pointChange');
-  changeEl.textContent = val > 0 ? `+${val}` : `${val}`;
-  changeEl.className = `stat-change ${val > 0 ? 'stat-plus' : 'stat-minus'}`;
-  setTimeout(() => { changeEl.textContent = ''; }, 1500);
-  document.getElementById('points').textContent = points;
-}
-
-function updateStats() {
-  document.getElementById('points').textContent = points;
-  document.getElementById('stars').textContent = `${stars} ⭐`;
-  document.getElementById('blockProg').textContent = `${solvedBlocks.size}/4`;
-  document.getElementById('writeProg').textContent = `${solvedWrites.size}/4`;
+  const formulaStr = document.getElementById('formula').textContent.trim();
+  const feedbackEl = document.getElementById('feedback');
   
-  const totalSolved = solvedBlocks.size + solvedWrites.size;
-  const pct = Math.round((totalSolved / 8) * 100);
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressText').textContent = `Progreso del curso: ${pct}%`;
-}
+  if (!formulaStr || formulaStr === '=SI(...)') {
+    feedbackEl.className = 'feedback err';
+    feedbackEl.style.display = 'block';
+    feedbackEl.textContent = 'Debes armar o escribir una fórmula antes de comprobar.';
+    return;
+  }
 
-function checkBadges() {
-  if (solvedBlocks.size >= 1 || solvedWrites.size >= 1) document.getElementById('badge1').classList.add('unlocked');
-  if (solvedBlocks.size === 4) document.getElementById('badge2').classList.add('unlocked');
-  if (solvedWrites.size >= 1) document.getElementById('badge3').classList.add('unlocked');
-  if (solvedBlocks.size === 4 && solvedWrites.size === 4) document.getElementById('badge4').classList.add('unlocked');
-}
+  const expectedClean = currentExercise.expected.replace(/\s+/g, '');
+  const userClean = formulaStr.replace(/\s+/g, '');
 
-function showHint() {
-  const hBox = document.getElementById('hint');
-  hBox.style.display = 'block';
-  hBox.textContent = currentExercise.hints[hintIndex];
-  hintIndex = (hintIndex + 1) % currentExercise.hints.length;
+  if (userClean === expectedClean) {
+    feedbackEl.className = 'feedback ok';
+    feedbackEl.style.display = 'block';
+    
+    const calculated = currentExercise.eval(currentExercise.data);
+    feedbackEl.innerHTML = `<strong>¡Excelente! Respuesta Correcta.</strong><br>La sintaxis es perfectamente válida.`;
+    document.getElementById('resultDisplay').textContent = calculated;
+
+    if (activeMode === 'block') {
+      if (!solvedBlocks.has(currentLevel)) {
+        solvedBlocks.add(currentLevel);
+        addPoints(100);
+        updateProgress();
+      }
+      if (solvedBlocks.size === 4) {
+        unlockBadge('badge2');
+        document.getElementById('btnModeWrite').classList.remove('locked');
+        showOverlay('🏆 ¡Fase 1 Completada!', 'Has dominado la estructura de bloques en los 4 niveles. Se ha desbloqueado la Fase 2: Modo Escritura Manual.', '🥇');
+      } else {
+        showOverlay('¡Nivel Superado!', `Completaste correctamente el Nivel ${currentLevel} en Modo Bloques.`, '⭐');
+      }
+    } else {
+      if (!solvedWrites.has(currentLevel)) {
+        solvedWrites.add(currentLevel);
+        addPoints(150);
+        updateProgress();
+      }
+      if (solvedWrites.size === 4) {
+        unlockBadge('badge3');
+        unlockBadge('badge4');
+        showOverlay('👑 ¡Dominio Total!', '¡Felicidades! Has completado con éxito la Fase de Escritura Manual y has dominado las Funciones SI.', '👑');
+      } else {
+        showOverlay('¡Sintaxis Perfecta!', `Escribiste correctamente la fórmula para el Nivel ${currentLevel}.`, '✍️');
+      }
+    }
+
+    if (solvedBlocks.size > 0 || solvedWrites.size > 0) {
+      unlockBadge('badge1');
+    }
+
+  } else {
+    const errorMsg = diagnoseError();
+    feedbackEl.className = 'feedback err';
+    feedbackEl.style.display = 'block';
+    feedbackEl.innerHTML = `<strong>Error detectado:</strong> ${errorMsg}`;
+    document.getElementById('resultDisplay').textContent = '—';
+  }
 }
 
 function clearCurrentPhase() {
   if (activeMode === 'block') {
-    const bank = document.getElementById('bank');
-    document.querySelectorAll('.drop-zone-row').forEach(zone => {
-      while (zone.firstChild) bank.appendChild(zone.firstChild);
-    });
-    updateFormulaFromRows();
+    renderBank(currentExercise ? currentExercise.blocks : []);
+    const rows = document.querySelectorAll('.drop-zone-row');
+    rows.forEach(r => r.innerHTML = '');
+    document.getElementById('formula').textContent = '=SI(...)';
   } else {
-    document.getElementById('manualFormula').value = '';
-    updateFormulaFromText();
+    const input = document.getElementById('manualFormula');
+    if (input) input.value = '';
+    document.getElementById('formula').textContent = '=SI(...)';
   }
+  document.getElementById('feedback').style.display = 'none';
+  document.getElementById('resultDisplay').textContent = '—';
+}
+
+function showHint() {
+  if (!currentExercise || !currentExercise.hints) return;
+  const hintEl = document.getElementById('hint');
+  hintEl.style.display = 'block';
+  hintEl.textContent = `Pista ${hintIndex + 1}: ${currentExercise.hints[hintIndex]}`;
+  hintIndex = (hintIndex + 1) % currentExercise.hints.length;
+}
+
+function addPoints(val) {
+  points += val;
+  stars = Math.floor(points / 100);
+  document.getElementById('points').textContent = points;
+  document.getElementById('stars').textContent = `${stars} ⭐`;
+  
+  const ptChange = document.getElementById('pointChange');
+  ptChange.textContent = `+${val}`;
+  ptChange.className = 'stat-change stat-plus';
+  setTimeout(() => { ptChange.textContent = ''; }, 2000);
+}
+
+function updateProgress() {
+  const totalTasks = 8;
+  const completed = solvedBlocks.size + solvedWrites.size;
+  const pct = Math.round((completed / totalTasks) * 100);
+  
+  document.getElementById('progressFill').style.width = `${pct}%`;
+  document.getElementById('progressText').textContent = `Progreso del curso: ${pct}%`;
+  
+  document.getElementById('blockProg').textContent = `${solvedBlocks.size}/4`;
+  document.getElementById('writeProg').textContent = `${solvedWrites.size}/4`;
+}
+
+function unlockBadge(id) {
+  const b = document.getElementById(id);
+  if (b) b.classList.add('unlocked');
 }
 
 function showOverlay(title, msg, icon) {
-  document.getElementById('overlayIcon').textContent = icon || '👑';
   document.getElementById('overlayTitle').textContent = title;
   document.getElementById('overlayMsg').textContent = msg;
+  document.getElementById('overlayIcon').textContent = icon || '👑';
   document.getElementById('overlay').style.display = 'flex';
 }
 
@@ -801,17 +789,27 @@ function closeOverlay() {
 }
 
 function resetAll() {
-  points = 0; stars = 0;
-  solvedBlocks.clear(); solvedWrites.clear();
-  updateStats();
+  points = 0;
+  stars = 0;
+  solvedBlocks.clear();
+  solvedWrites.clear();
+  document.getElementById('points').textContent = '0';
+  document.getElementById('stars').textContent = '0 ⭐';
   document.querySelectorAll('.badge').forEach(b => b.classList.remove('unlocked'));
+  
+  activeMode = 'block';
+  document.getElementById('btnModeBlock').className = 'mode-btn active';
   document.getElementById('btnModeWrite').className = 'mode-btn locked';
-  document.getElementById('btnModeWrite').textContent = '🔒 FASE 2: MODO ESCRITURA MANUAL';
-  switchMode('block');
-  loadLevel(1, document.querySelector('.level-btn'));
+  document.getElementById('blockArea').style.display = 'block';
+  document.getElementById('writeArea').style.display = 'none';
+  
+  updateProgress();
+  loadLevel(1, document.querySelectorAll('.level-btn')[0]);
 }
 
-setTimeout(() => loadLevel(1), 100);
+window.onload = function() {
+  loadLevel(1);
+};
 </script>
 </body>
 </html>
