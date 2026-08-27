@@ -36,31 +36,31 @@
   .zone{margin:12px 0}
   .label{font-size:12px;font-weight:700;margin-bottom:5px;color:#687987}
   .drop {
-    min-height: 80px;
-    border: 2px dashed #b9c7d3;
-    border-radius: 8px;
-    padding: 10px;
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    background: #fff;
-    align-content: flex-start;
-    overflow: visible;
-  }
-  .sep-zone {
-    min-height: 80px;
-    border: 2px dashed #f1d39a;
-    border-radius: 8px;
-    padding: 10px;
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    background: #fffbe6;
-    width: 80px;
-    align-items: center;
-    justify-content: center;
-    align-content: center;
-  }
+  min-height: 50px;
+  border: 2px dashed #b9c7d3;
+  border-radius: 8px;
+  padding: 5px;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  background: #fff;
+  align-content: flex-start;
+  overflow: visible;
+}
+.sep-zone {
+  min-height: 50px;
+  border: 2px dashed #f1d39a;
+  border-radius: 8px;
+  padding: 5px;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  background: #fffbe6;
+  width: 60px;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+}
   .bank{display:flex;gap:6px;flex-wrap:wrap;background:#f8fafc;padding:12px;border-radius:8px;border:1px solid var(--border)}
   .block{padding:8px 10px;border-radius:6px;border:1px solid #c9d8e4;background:#edf3f8;cursor:grab;user-select:none;font-family:Consolas,monospace}
   .var{background:#e9f2fb}
@@ -832,7 +832,7 @@ function load(n, btn) {
       setupSingleZone();
     } else {
       zonesContainer.innerHTML = `
-        <div style="display:flex;flex-direction:column;gap:20px;">
+        <div style="display:flex;flex-direction:column;gap:10px;">
           <div class="zone">
             <div class="label">PRUEBA LÓGICA</div>
             <div id="test" class="drop"></div>
