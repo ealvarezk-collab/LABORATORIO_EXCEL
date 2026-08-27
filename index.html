@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Laboratorio Interactivo: Función SI con Ejercicios Aleatorios</title>
+<title>Laboratorio Interactivo: Función SI con retroalimentación avanzada</title>
 <style>
   :root{
     --bg:#f4f7fa; --card:#fff; --border:#d9e2ea; --dark:#17324d; --primary:#2f5f85;
@@ -17,15 +17,30 @@
   header p{margin:0;opacity:.9}
   main{max-width:1200px;margin:20px auto;padding:0 16px}
 
-  /* BARRA SUPERIOR DE ESTADÍSTICAS */
-  .top-bar{display:flex;flex-wrap:wrap;gap:15px;align-items:center;justify-content:space-between;margin-bottom:15px}
-  .stats{display:flex;gap:20px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);padding:10px 15px;border-radius:8px}
+  /* BARRA SUPERIOR DE ESTADÍSTICAS REESTRUCTURADA Y BARRA DE PROGRESO EXPANDIDA */
+  .top-bar{display:flex;gap:15px;align-items:center;justify-content:space-between;margin-bottom:15px;flex-wrap:nowrap}
+  .stats{display:flex;gap:20px;background:var(--card);border:1px solid var(--border);padding:10px 15px;border-radius:8px;flex:0 0 auto}
   .stat{display:flex;flex-direction:column;align-items:center}
   .stat span:first-child{font-size:12px;color:#687987;font-weight:600}
   .stat span:last-child{font-size:20px;font-weight:bold}
   .stat-change { font-size: 11px; font-weight: bold; transition: all 0.3s; }
   .stat-plus { color: #28a745; }
   .stat-minus { color: #dc3545; }
+
+  /* PROGRESO EXPANDIDO */
+  .progress-container { 
+    flex: 1 1 auto; 
+    background: #e2e8f0; 
+    border-radius: 12px; 
+    height: 32px; 
+    position: relative; 
+    overflow: hidden; 
+    border: 1px solid #cbd5e1;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+    margin: 0 10px;
+  }
+  .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #3b82f6, #2563eb); transition: width 0.5s ease; }
+  .progress-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 13px; font-weight: bold; color: #1e293b; text-shadow: 0 0 2px #fff; }
 
   /* SELECTOR DE MODOS */
   .mode-selector { display: flex; gap: 10px; margin-bottom: 15px; background: #dce5ed; padding: 6px; border-radius: 8px; }
@@ -51,7 +66,7 @@
   .data-table td,.data-table th{border:1px solid var(--border);padding:7px;text-align:left}
   .data-table th{background:#eef3f7}
 
-  /* ESTRUCTURA DIDÁCTICA POR FILAS */
+  /* ESTRUCTURA POR FILAS */
   .formula-builder-container {
     background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 12px;
   }
@@ -92,7 +107,7 @@
   .block.paren{background:#e2f0fb; border-color:#b6d4fe; color:#084298}
   .block.sep{background:#fff3cd; border-color:#ffeeba; color:#856404}
 
-  /* CAMPO DE ESCRITURA LIBRE */
+  /* ESCRITURA MANUAL */
   .input-formula-container {
     background: #f0f4f8; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 12px;
   }
@@ -101,7 +116,7 @@
     border: 2px solid var(--primary); border-radius: 6px; margin-top: 8px; background: #fff;
   }
 
-  .feedback{display:none;margin-top:14px;padding:12px;border-radius:8px;line-height:1.45}
+  .feedback{display:none;margin-top:14px;padding:14px;border-radius:8px;line-height:1.5;font-size:0.95rem}
   .ok{display:block;background:var(--ok);border:1px solid var(--ok-border);color:#155724}
   .err{display:block;background:var(--err-bg);border:1px solid var(--err-border);color:#721c24}
   .hint{display:block;background:var(--hint-bg);border:1px solid var(--hint-border);color:#856404}
@@ -125,10 +140,12 @@
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes bounceIn { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
   
-  .progress-container { flex: 1; min-width: 150px; max-width: 300px; background: #e0e0e0; border-radius: 20px; height: 20px; position: relative; overflow: hidden; }
-  .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #4CAF50, #2f5f85); transition: width 0.5s ease; }
-  .progress-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 11px; font-weight: bold; }
-  @media(max-width:800px){.grid{grid-template-columns:1fr} .sep-row-container{padding-left:0;}}
+  @media(max-width:900px){
+    .top-bar{flex-wrap:wrap;}
+    .progress-container{width:100%;margin:5px 0;}
+    .grid{grid-template-columns:1fr} 
+    .sep-row-container{padding-left:0;}
+  }
 </style>
 </head>
 <body>
@@ -137,14 +154,14 @@
   <div class="overlay-content">
     <div class="crown" id="overlayIcon">👑</div>
     <div id="overlayTitle" style="font-weight:bold; margin-bottom:10px;">¡Nivel Completado!</div>
-    <div id="overlayMsg" style="font-size:1rem; color:#475569;">Ha avanzado en el laboratorio.</div>
+    <div id="overlayMsg" style="font-size:1rem; color:#475569;">Avanzaste en el laboratorio.</div>
     <button class="primary" onclick="closeOverlay()" style="margin-top:20px; width:100%;">Continuar</button>
   </div>
 </div>
 
 <header>
   <h1>🏗️ Laboratorio Interactivo: Lógica de Funciones SI</h1>
-  <p>Ejercicios aleatorios de construcción estructurada y sintaxis directa</p>
+  <p>Construcción guiada con diagnóstico detallado de errores y sintaxis directa</p>
 </header>
 <main>
   <div class="top-bar">
@@ -162,9 +179,11 @@
       <div class="stat"><span>Bloques</span><span id="blockProg">0/4</span></div>
       <div class="stat"><span>Escritura</span><span id="writeProg">0/4</span></div>
     </div>
+    
+    <!-- BARRA DE PROGRESO EXPANDIDA -->
     <div class="progress-container">
       <div class="progress-fill" id="progressFill"></div>
-      <span class="progress-text" id="progressText">0%</span>
+      <span class="progress-text" id="progressText">Progreso del curso: 0%</span>
     </div>
   </div>
 
@@ -218,7 +237,7 @@
       <div id="writeArea" style="display:none;">
         <div class="input-formula-container">
           <label style="font-weight:bold; font-size:0.9rem; color:#17324d;">Escribe la fórmula de Excel completa:</label>
-          <input type="text" id="manualFormula" class="input-formula" placeholder="" oninput="updateFormulaFromText()" autocomplete="off" />
+          <input type="text" id="manualFormula" class="input-formula" placeholder="Ejemplo: =SI(B2>10;&quot;Aprobado&quot;;&quot;Rechazado&quot;)" oninput="updateFormulaFromText()" autocomplete="off" />
         </div>
       </div>
 
@@ -241,11 +260,11 @@
 </main>
 
 <script>
-/* BANCO DE 3 EJERCICIOS ALEATORIOS POR NIVEL */
+/* BANCO DE EJERCICIOS CON TEXTO DESCRIPTIVO (SIN SÍMBOLOS MATEMÁTICOS EN EL ENUNCIADO) */
 const EXERCISE_BANK = {
   1: [
     {
-      text: "Una cuadrilla se considera completa si tiene más de 10 trabajadores. Si cumple, mostrar “Cuadrilla completa”; de lo contrario, “Cuadrilla incompleta”.",
+      text: "Una cuadrilla se considera completa si la cantidad de personal registrada en B2 supera los 10 trabajadores. Si esto se cumple, mostrar “Cuadrilla completa”; a pesar de todo lo contrario, mostrar “Cuadrilla incompleta”.",
       data: [["B2", "Trabajadores", 12]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:">", type:"op"}, {text:"10", type:"val"},
@@ -253,11 +272,11 @@ const EXERCISE_BANK = {
         {text:'"Cuadrilla incompleta"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>10;"Cuadrilla completa";"Cuadrilla incompleta")',
-      hints: ["Inicia con =SI(B2>10 en la primera fila.", "Usa el separador ; en el casillero cuadrado.", "Fila 2: \"Cuadrilla completa\", Fila 3: \"Cuadrilla incompleta\")"],
+      hints: ["Identifica que 'supera los' se traduce como el operador mayor que (>).", "Usa el separador ; en el casillero cuadrado.", "Respuesta verdadera: \"Cuadrilla completa\". Respuesta para lo contrario: \"Cuadrilla incompleta\"."],
       eval: (d) => d[0][2] > 10 ? 'Cuadrilla completa' : 'Cuadrilla incompleta'
     },
     {
-      text: "En control de calidad, si la lectura del sensor de presión B2 es igual a “Normal”, mostrar “Aprobado”; si no, “Revisión”.",
+      text: "En control de calidad, si la lectura del sensor en B2 es exactamente igual a la palabra “Normal”, reportar “Aprobado”; si se presenta algo distinto, colocar “Revisión”.",
       data: [["B2", "Sensor Presión", "Normal"]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:"=", type:"op"}, {text:'"Normal"', type:"val"},
@@ -265,25 +284,25 @@ const EXERCISE_BANK = {
         {text:'"Revisión"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2="Normal";"Aprobado";"Revisión")',
-      hints: ["Compara B2 con \"Normal\" en la prueba lógica.", "Usa ; en los casilleros compactos de separador.", "Muestra \"Aprobado\" si cumple y \"Revisión\" si no."],
+      hints: ["'Es exactamente igual a' requiere el operador = en la prueba lógica.", "Coloca los separadores ; en las casillas correspondientes.", "Muestra \"Aprobado\" si cumple y \"Revisión\" ante algo distinto."],
       eval: (d) => d[0][2] === 'Normal' ? 'Aprobado' : 'Revisión'
     },
     {
-      text: "Si el estado del casco en B2 es “Conforme”, mostrar “Ingreso permitido”; de lo contrario, “Ingreso denegado”.",
+      text: "Si el estado de la revisión técnica en B2 resulta ser idéntico a “Conforme”, marcar “Ingreso permitido”; de manera contraria, registrar “Ingreso denegado”.",
       data: [["B2", "Estado Casco", "Conforme"]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:"=", type:"op"}, {text:'"Conforme"', type:"val"},
-        {text:";", type:"sep"}, {text:'"Ingreso permitido"', type:"res"}, {text:";", type:"sep"},
+        {text:";", type:"sep"}, {text:'"Ingreso permittedo"', type:"res"}, {text:";", type:"sep"},
         {text:'"Ingreso denegado"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2="Conforme";"Ingreso permitido";"Ingreso denegado")',
-      hints: ["Prueba lógica: B2=\"Conforme\".", "Recuerda colocar el ; en los cuadrados pequeños.", "Respuestas: \"Ingreso permitido\" e \"Ingreso denegado\")."],
+      hints: ["Identifica la comparación de texto idéntico usando =.", "Recuerda separar con ;.", "Usa la respuesta verdadera si coincide y la falsa en caso contrario."],
       eval: (d) => d[0][2] === 'Conforme' ? 'Ingreso permitido' : 'Ingreso denegado'
     }
   ],
   2: [
     {
-      text: "Si un trabajador registra 20 días trabajados o más en B2, obtiene un bono de $50.000. Si registra menos de 20 días, obtiene $0.",
+      text: "Si un colaborador acumula un total de días trabajados en B2 mayor o igual a 20, asignarle un bono de 50000; pero si registra menos de esa cantidad, asignarle 0.",
       data: [["B2", "Días trabajados", 22]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:">=", type:"op"}, {text:"20", type:"val"},
@@ -291,11 +310,11 @@ const EXERCISE_BANK = {
         {text:"0", type:"val"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>=20;50000;0)',
-      hints: ["Prueba lógica con >=20.", "Los números 50000 y 0 no llevan comillas.", "Coloca los ; en los casilleros cuadrados."],
+      hints: ["La frase 'mayor o igual a' requiere el operador compuesto >=.", "Los valores numéricos (50000 y 0) no llevan comillas.", "Separa los bloques con ;."],
       eval: (d) => d[0][2] >= 20 ? 50000 : 0
     },
     {
-      text: "Si las horas extra en B2 son superiores a 15, calcular un pago adicional de 120000. Si no, asignar 0.",
+      text: "Si las horas extraordinarias registradas en la celda B2 sobrepasan las 15 horas, liquidar un pago de 120000; de lo contrario, indicar 0.",
       data: [["B2", "Horas Extra", 18]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:">", type:"op"}, {text:"15", type:"val"},
@@ -303,11 +322,11 @@ const EXERCISE_BANK = {
         {text:"0", type:"val"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>15;120000;0)',
-      hints: ["Evalúa B2>15.", "Asigna 120000 si es verdadero y 0 si es falso.", "Sin comillas en los números."],
+      hints: ["'Sobrepasan' significa estrictamente mayor que (>).", "Verdadero: 120000, Falso: 0.", "Recuerda ingresar el separador ;."],
       eval: (d) => d[0][2] > 15 ? 120000 : 0
     },
     {
-      text: "Si la temperatura en B2 supera los 40 grados, asignar una multa de 25000. De lo contrario, asignar 0.",
+      text: "Si la temperatura reportada en B2 es superior a 40 grados, calcular un recargo de 25000; en caso contrario, registrar 0.",
       data: [["B2", "Temperatura", 42]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:">", type:"op"}, {text:"40", type:"val"},
@@ -315,13 +334,13 @@ const EXERCISE_BANK = {
         {text:"0", type:"val"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>40;25000;0)',
-      hints: ["Prueba lógica: B2>40.", "Valores numéricos 25000 y 0.", "Separa con el ; en la casilla dedicada."],
+      hints: ["'Es superior a' equivale al operador mayor que (>).", "Asegúrate de no usar comillas en los valores numéricos.", "Ubica el ; entre cada sección."],
       eval: (d) => d[0][2] > 40 ? 25000 : 0
     }
   ],
   3: [
     {
-      text: "Clasifica el riesgo en obra: si B2 es <=4 es “Bajo”; si es <=9 es “Medio”; de lo contrario es “Alto”. (Estructura 2 filas).",
+      text: "Clasifica el nivel de riesgo: si el puntaje en B2 es menor o igual a 4, categorizar como “Bajo”; si es menor o igual a 9, categorizar como “Medio”; a pesar de todo lo demás, marcar como “Alto”.",
       data: [["B2", "Puntaje Riesgo", 5]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:"<=", type:"op"}, {text:"4", type:"val"}, {text:";", type:"sep"},
@@ -330,11 +349,11 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Alto"', type:"res"}, {text:")", type:"paren"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2<=4;"Bajo";SI(B2<=9;"Medio";"Alto"))',
-      hints: ["Fila 1: Primer SI hasta \"Bajo\";", "Fila 2: Inicia el segundo SI(B2<=9..."],
+      hints: ["'Menor o igual a' corresponde al símbolo <=.", "En la Fila 1 evalúa la primera condición y en la Fila 2 inicia el segundo SI.", "No olvides cerrar ambos paréntesis al final."],
       eval: (d) => d[0][2] <= 4 ? 'Bajo' : (d[0][2] <= 9 ? 'Medio' : 'Alto')
     },
     {
-      text: "Evalúa la nota B2: si es >=6 es “Excelente”; si es >=4 es “Aprobado”; de lo contrario es “Reprobado”.",
+      text: "Evalúa el desempeño: si la nota en B2 es mayor o igual a 6, calificar como “Excelente”; si alcanza o supera los 4 puntos, calificar como “Aprobado”; si no se logra ninguna, marcar “Reprobado”.",
       data: [["B2", "Nota Final", 5]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:">=", type:"op"}, {text:"6", type:"val"}, {text:";", type:"sep"},
@@ -343,11 +362,11 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Reprobado"', type:"res"}, {text:")", type:"paren"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>=6;"Excelente";SI(B2>=4;"Aprobado";"Reprobado"))',
-      hints: ["Fila 1: =SI(B2>=6;\"Excelente\";", "Fila 2: SI(B2>=4;\"Aprobado\";\"Reprobado\"))"],
+      hints: ["'Mayor o igual a' y 'alcanza o supera' se representan mediante el operador >=.", "Inicia con la nota más exigente.", "Cierra la función anidada con dos paréntesis."],
       eval: (d) => d[0][2] >= 6 ? 'Excelente' : (d[0][2] >= 4 ? 'Aprobado' : 'Reprobado')
     },
     {
-      text: "Categoriza la antigüedad en B2 (años): si es <2 es “Inicial”; si es <5 es “Intermedio”; si no, “Avanzado”.",
+      text: "Clasifica la experiencia: si los años en B2 son inferiores a 2, asigna “Inicial”; si son menores a 5, asigna “Intermedio”; para cualquier otro caso distinto, asigna “Avanzado”.",
       data: [["B2", "Años Antigüedad", 3]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:"<", type:"op"}, {text:"2", type:"val"}, {text:";", type:"sep"},
@@ -356,13 +375,13 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Avanzado"', type:"res"}, {text:")", type:"paren"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2<2;"Inicial";SI(B2<5;"Intermedio";"Avanzado"))',
-      hints: ["Primer nivel: B2<2 para \"Inicial\".", "Segundo nivel: B2<5 para \"Intermedio\".", "Cierra ambos paréntesis al final."],
+      hints: ["'Inferiores a' o 'menores a' equivalen al símbolo menor que (<).", "Establece la primera prueba lógica en Fila 1 y la segunda en Fila 2.", "Cierra correctamente con ))"],
       eval: (d) => d[0][2] < 2 ? 'Inicial' : (d[0][2] < 5 ? 'Intermedio' : 'Avanzado')
     }
   ],
   4: [
     {
-      text: "[SI + Y] Obtiene bono si cumple AMBAS condiciones: días en B2 >= 20 Y asistencia en C2 >= 90%.",
+      text: "[SI + Y] Otorga un beneficio adicional si se cumplen AMBAS condiciones simultáneamente: los días trabajados en B2 son mayores o iguales a 20 Y ADEMÁS el porcentaje en C2 resulta mayor o igual al 90%. En caso afirmativo mostrar “Bono”; de no lograr ambas, mostrar “Sin bono”.",
       data: [["B2", "Días", 21], ["C2", "Asistencia", "95%"]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"Y(", type:"func"}, {text:"B2", type:"var"}, {text:">=", type:"op"}, {text:"20", type:"val"},
@@ -370,11 +389,11 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Bono"', type:"res"}, {text:";", type:"sep"}, {text:'"Sin bono"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(Y(B2>=20;C2>=90%);"Bono";"Sin bono")',
-      hints: ["Utiliza Y(B2>=20;C2>=90%) en la prueba lógica.", "Coloca el ; en la casilla cuadrada.", "Resultados: \"Bono\" y \"Sin bono\"."],
+      hints: ["Al exigir ambas reglas simultáneas, utiliza la función Y() en la prueba lógica.", "Traduce 'mayores o iguales' a los operadores >= correspondientes.", "Muestra \"Bono\" si cumple ambas y \"Sin bono\" si no."],
       eval: (d) => (d[0][2] >= 20 && parseInt(d[1][2]) >= 90) ? 'Bono' : 'Sin bono'
     },
     {
-      text: "[SI + O] Califica para Alerta de Seguridad si la temperatura B2 > 50 O si la presión C2 > 100.",
+      text: "[SI + O] Activa una alerta de emergencia si la temperatura en B2 sobrepasa los 50 grados O BIEN si la presión en C2 es estrictamente mayor a 100. De cumplirse cualquiera de las dos, mostrar “Alerta”; si ninguna se presenta, registrar “Normal”.",
       data: [["B2", "Temperatura", 55], ["C2", "Presión", 90]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"O(", type:"func"}, {text:"B2", type:"var"}, {text:">", type:"op"}, {text:"50", type:"val"},
@@ -382,11 +401,11 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Alerta"', type:"res"}, {text:";", type:"sep"}, {text:'"Normal"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(O(B2>50;C2>100);"Alerta";"Normal")',
-      hints: ["Utiliza la función O(...) para evaluar si se cumple al menos una condición.", "Respuesta verdadera: \"Alerta\", falsa: \"Normal\"."],
+      hints: ["La presencia de 'O BIEN' indica que debes usar la función O() dentro de la prueba lógica.", "Usa el símbolo mayor que (>) para 'sobrepasa' y 'mayor a'.", "Escribe \"Alerta\" para verdadero y \"Normal\" para falso."],
       eval: (d) => (d[0][2] > 50 || d[1][2] > 100) ? 'Alerta' : 'Normal'
     },
     {
-      text: "[SI + Y] Aprueba inspección si Casco B2 = “Sí” Y Chaleco C2 = “Sí”.",
+      text: "[SI + Y] Declara una inspección como aprobada únicamente si el estado de casco en B2 es exactamente igual a “Sí” Y ADEMÁS el estado de chaleco en C2 es idéntico a “Sí”. Si se cumplen ambas, indicar “Apto”; a pesar de cualquier incumplimiento, indicar “No Apto”.",
       data: [["B2", "Casco", "Sí"], ["C2", "Chaleco", "Sí"]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"Y(", type:"func"}, {text:"B2", type:"var"}, {text:"=", type:"op"}, {text:'"Sí"', type:"val"},
@@ -394,7 +413,7 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Apto"', type:"res"}, {text:";", type:"sep"}, {text:'"No Apto"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(Y(B2="Sí";C2="Sí");"Apto";"No Apto")',
-      hints: ["Función Y() con B2=\"Sí\" y C2=\"Sí\".", "Casilleros cuadrados de separador ;.", "Valores: \"Apto\" y \"No Apto\"."],
+      hints: ["Usa Y() para condicionar la igualdad de dos textos con =.", "Coloca los separadores ; en las casillas marcadas.", "Respuestas esperadas: \"Apto\" e \"No Apto\"."],
       eval: (d) => (d[0][2] === 'Sí' && d[1][2] === 'Sí') ? 'Apto' : 'No Apto'
     }
   ]
@@ -484,7 +503,6 @@ function buildRowsUI(lvl) {
       </div>
     `;
   } else {
-    // CASILLEROS DE SEPARADOR CONFIGURADOS COMO CUADRADOS COMPACTOS
     container.innerHTML = `
       <div class="builder-row">
         <div class="row-label">1. Prueba Lógica</div>
@@ -584,6 +602,94 @@ function updateFormulaFromText() {
   document.getElementById('formula').textContent = val || '=SI(...)';
 }
 
+/* MOTOR DE DIAGNÓSTICO Y RETROALIMENTACIÓN DETALLADA DE ERRORES */
+function diagnoseError() {
+  if (activeMode === 'block') {
+    const bank = document.getElementById('bank');
+    if (bank.children.length > 0) {
+      return `Faltan bloques por colocar. Tienes ${bank.children.length} bloque(s) aún en el banco disponible.`;
+    }
+
+    if (currentLevel === 3) {
+      const r1 = Array.from(document.getElementById('row1').children).map(c => c.textContent).join('');
+      const r2 = Array.from(document.getElementById('row2').children).map(c => c.textContent).join('');
+      
+      if (!r1.startsWith('=SI(')) {
+        return "Revisa la Fila 1: La fórmula debe iniciar con '=SI(' en la primera fila.";
+      }
+      if (!r1.includes(';')) {
+        return "Revisa la Fila 1: Falta el separador ';' después del valor verdadero de la primera condición.";
+      }
+      if (!r2.startsWith('SI(')) {
+        return "Revisa la Fila 2: La condición anidada debe comenzar con 'SI(' (sin el signo igual).";
+      }
+      if (!r2.endsWith('))')) {
+        return "Revisa el final de la Fila 2: Recuerda cerrar ambos paréntesis '))' al terminar la función anidada.";
+      }
+      return "Revisa el orden de los criterios o valores en ambas filas. Los bloques están desordenados.";
+    } 
+    else {
+      const r1 = Array.from(document.getElementById('row1').children).map(c => c.textContent).join('');
+      const s1 = Array.from(document.getElementById('sep1').children).map(c => c.textContent).join('');
+      const r2 = Array.from(document.getElementById('row2').children).map(c => c.textContent).join('');
+      const s2 = Array.from(document.getElementById('sep2').children).map(c => c.textContent).join('');
+      const r3 = Array.from(document.getElementById('row3').children).map(c => c.textContent).join('');
+
+      if (!r1) return "La fila '1. Prueba Lógica' está totalmente vacía.";
+      if (!r2) return "La fila '2. Valor Verdadero' está vacía. Debes ingresar el resultado cuando se cumple la condición.";
+      if (!r3) return "La fila '3. Valor Falso' está vacía. Debes colocar la respuesta o cierre en caso de no cumplirse.";
+      
+      if (s1 !== ';' || s2 !== ';') {
+        return "Revisa los separadores en los recuadros amarillos. Asegúrate de colocar el bloque ';' en cada casilla cuadrada de separador.";
+      }
+
+      if (!r1.startsWith('=SI(')) {
+        return "Revisa la 'Prueba Lógica': Debe empezar con '=SI('. Reubica el bloque inicial.";
+      }
+
+      if (currentLevel === 4) {
+        if (!r1.includes('Y(') && !r1.includes('O(')) {
+          return "Revisa la 'Prueba Lógica': Falta la función lógica Y(...) u O(...) requerida para evaluar múltiples condiciones en este nivel.";
+        }
+      }
+
+      if (r1.includes('"') && !r2.includes('"') && isNaN(r2)) {
+        return "Atención: Es posible que hayas colocado un texto o resultado en la zona de Prueba Lógica por error.";
+      }
+
+      if (!r3.endsWith(')')) {
+        return "Revisa el final de la fila '3. Valor Falso': Falta colocar el paréntesis de cierre ')' al final de la fórmula.";
+      }
+
+      return "Los bloques están desordenados. Revisa si colocaste la respuesta verdadera en el lugar de la falsa o si invertiste la prueba lógica.";
+    }
+  } 
+  else {
+    // MODO ESCRITURA MANUAL
+    const txt = document.getElementById('manualFormula').value.trim();
+    if (!txt) return "El campo de texto está vacío. Escribe tu fórmula de Excel completa.";
+    if (!txt.startsWith('=')) return "Toda fórmula en Excel debe comenzar con el signo igual '='.";
+    if (!txt.toUpperCase().startsWith('=SI(')) return "La fórmula debe iniciar con la estructura '=SI('.";
+    
+    const countSemi = (txt.match(/;/g) || []).length;
+    if (countSemi < 2) {
+      return `Revisa los separadores: Una función SI requiere al menos 2 punto y coma ';'. Tu fórmula actualmente tiene ${countSemi}.`;
+    }
+
+    const openParen = (txt.match(/\(/g) || []).length;
+    const closeParen = (txt.match(/\)/g) || []).length;
+    if (openParen !== closeParen) {
+      return `Error en paréntesis: Hay ${openParen} paréntesis abiertos y ${closeParen} cerrados. Asegúrate de cerrar todos los paréntesis.`;
+    }
+
+    if (txt.includes('"') && (txt.match(/"/g) || []).length % 2 !== 0) {
+      return "Falta una comilla: Los valores de texto deben estar encerrados en comillas dobles en pares (ej. \"Texto\").";
+    }
+
+    return "Error de sintaxis o valores: Revisa si el nombre de la celda (ej. B2), el operador de comparación (>, <, =) o los textos requeridos están bien escritos.";
+  }
+}
+
 function checkCurrentPhase() {
   const expected = currentExercise.expected.replace(/\s+/g, '');
   const fb = document.getElementById('feedback');
@@ -599,7 +705,7 @@ function checkCurrentPhase() {
 
   if (currentBuilt === expected) {
     fb.className = 'feedback ok';
-    fb.textContent = '¡Correcto! La sintaxis y la estructura del ejercicio son exactas.';
+    fb.innerHTML = '<b>¡Excelente trabajo!</b> La sintaxis y la estructura lógica de la función son completamente correctas.';
     
     let isNewSolve = false;
     if (activeMode === 'block' && !solvedBlocks.has(currentLevel)) {
@@ -629,8 +735,9 @@ function checkCurrentPhase() {
 
   } else {
     addPoints(-25);
+    const detailMsg = diagnoseError();
     fb.className = 'feedback err';
-    fb.textContent = 'Fórmula incorrecta. Se han descontado -25 Puntos. Revisa los bloques o la sintaxis manual.';
+    fb.innerHTML = `<b>⚠️ Revisa tu fórmula (-25 pts):</b><br>${detailMsg}`;
   }
 }
 
@@ -652,7 +759,7 @@ function updateStats() {
   const totalSolved = solvedBlocks.size + solvedWrites.size;
   const pct = Math.round((totalSolved / 8) * 100);
   document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressText').textContent = pct + '%';
+  document.getElementById('progressText').textContent = `Progreso del curso: ${pct}%`;
 }
 
 function checkBadges() {
