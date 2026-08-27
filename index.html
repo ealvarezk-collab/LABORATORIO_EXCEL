@@ -507,14 +507,17 @@ function load(n, btn) {
     zonesContainer.innerHTML = '';
 
     if (level === 3) {
-      zonesContainer.innerHTML = `
-        <div class="zone">
-          <div class="label">FÓRMULA COMPLETA (usa dos filas para continuar la fórmula)</div>
-          <div id="formula-zone-1" class="drop formula-row"></div>
-          <div style="text-align:center; margin:5px 0; font-weight:bold; color:#687987;">▼ continúa ▼</div>
-          <div id="formula-zone-2" class="drop formula-row"></div>
-        </div>`;
-      setupTwoRowZone();
+  zonesContainer.innerHTML = `
+    <div class="zone">
+      <div class="label">FÓRMULA COMPLETA (arrastra los bloques; se acomodan en filas)</div>
+      <div id="formula-zone-1" class="drop formula-row"></div>
+    </div>
+    <div class="zone">
+      <div class="label">CONTINUAR FÓRMULA</div>
+      <div id="formula-zone-2" class="drop formula-row"></div>
+    </div>`;
+  setupTwoRowZone();
+}
     } else {
       zonesContainer.innerHTML = `
         <div style="display:flex;flex-direction:column;gap:12px;">
