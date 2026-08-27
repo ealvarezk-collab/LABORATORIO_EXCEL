@@ -36,31 +36,31 @@
   .zone{margin:12px 0}
   .label{font-size:12px;font-weight:700;margin-bottom:5px;color:#687987}
   .drop {
-  min-height: 80px;
-  border: 2px dashed #b9c7d3;
-  border-radius: 8px;
-  padding: 10px;
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  background: #fff;
-  align-content: flex-start;
-  overflow: visible;
-}
-.sep-zone {
-  min-height: 80px;
-  border: 2px dashed #f1d39a;
-  border-radius: 8px;
-  padding: 10px;
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  background: #fffbe6;
-  width: 80px;
-  align-items: center;
-  justify-content: center;
-  align-content: center;
-}
+    min-height: 80px;
+    border: 2px dashed #b9c7d3;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    background: #fff;
+    align-content: flex-start;
+    overflow: visible;
+  }
+  .sep-zone {
+    min-height: 80px;
+    border: 2px dashed #f1d39a;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    background: #fffbe6;
+    width: 80px;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+  }
   .bank{display:flex;gap:6px;flex-wrap:wrap;background:#f8fafc;padding:12px;border-radius:8px;border:1px solid var(--border)}
   .block{padding:8px 10px;border-radius:6px;border:1px solid #c9d8e4;background:#edf3f8;cursor:grab;user-select:none;font-family:Consolas,monospace}
   .var{background:#e9f2fb}
@@ -774,7 +774,6 @@ function changeData() {
   renderDataTable();
   updateResult();
 
-  // Registro del evento
   registrarEvento({
     nombre: playerName,
     nivel: level,
@@ -818,64 +817,61 @@ function load(n, btn) {
   document.getElementById('text').textContent = l.text;
   initData();
 
- if (mode === 'blocks') {
-  document.getElementById('blocksMode').style.display = '';
-  document.getElementById('writeMode').style.display = 'none';
-  const zonesContainer = document.getElementById('zonesContainer');
-  zonesContainer.innerHTML = '';
+  if (mode === 'blocks') {
+    document.getElementById('blocksMode').style.display = '';
+    document.getElementById('writeMode').style.display = 'none';
+    const zonesContainer = document.getElementById('zonesContainer');
+    zonesContainer.innerHTML = '';
 
-  if (level === 3) {
-    zonesContainer.innerHTML = `
-      <div class="zone">
-        <div class="label">FÓRMULA COMPLETA (arrastra los bloques en orden horizontal)</div>
-        <div id="formula-zone" class="drop" style="flex-wrap:nowrap; overflow-x:auto; min-height:80px; align-items:center;"></div>
-      </div>`;
-    setupSingleZone();
-  } else {
-    // Zonas separadas apiladas verticalmente para evitar confusiones
-    zonesContainer.innerHTML = `
-      <div style="display:flex;flex-direction:column;gap:20px;">
+    if (level === 3) {
+      zonesContainer.innerHTML = `
         <div class="zone">
-          <div class="label">PRUEBA LÓGICA</div>
-          <div id="test" class="drop"></div>
-        </div>
-        <div class="zone" style="display:flex;align-items:center;gap:15px;">
-          <div class="label" style="margin:0;">SEPARADOR 1</div>
-          <div id="sep1" class="sep-zone"></div>
-        </div>
-        <div class="zone">
-          <div class="label">VALOR SI ES VERDADERO</div>
-          <div id="true" class="drop"></div>
-        </div>
-        <div class="zone" style="display:flex;align-items:center;gap:15px;">
-          <div class="label" style="margin:0;">SEPARADOR 2</div>
-          <div id="sep2" class="sep-zone"></div>
-        </div>
-        <div class="zone">
-          <div class="label">VALOR SI ES FALSO</div>
-          <div id="false" class="drop"></div>
-        </div>
-      </div>`;
-    setupSeparatedZones();
-  }
+          <div class="label">FÓRMULA COMPLETA (arrastra los bloques en orden horizontal)</div>
+          <div id="formula-zone" class="drop" style="flex-wrap:nowrap; overflow-x:auto; min-height:80px; align-items:center;"></div>
+        </div>`;
+      setupSingleZone();
+    } else {
+      zonesContainer.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div class="zone">
+            <div class="label">PRUEBA LÓGICA</div>
+            <div id="test" class="drop"></div>
+          </div>
+          <div class="zone" style="display:flex;align-items:center;gap:15px;">
+            <div class="label" style="margin:0;">SEPARADOR 1</div>
+            <div id="sep1" class="sep-zone"></div>
+          </div>
+          <div class="zone">
+            <div class="label">VALOR SI ES VERDADERO</div>
+            <div id="true" class="drop"></div>
+          </div>
+          <div class="zone" style="display:flex;align-items:center;gap:15px;">
+            <div class="label" style="margin:0;">SEPARADOR 2</div>
+            <div id="sep2" class="sep-zone"></div>
+          </div>
+          <div class="zone">
+            <div class="label">VALOR SI ES FALSO</div>
+            <div id="false" class="drop"></div>
+          </div>
+        </div>`;
+      setupSeparatedZones();
+    }
 
-  // El resto del código de llenado del banco se mantiene igual...
-  const shuffled = [...l.blocks].sort(() => Math.random() - 0.5);
-  const bank = document.getElementById('bank');
-  bank.innerHTML = '';
-  shuffled.forEach((block, i) => {
-    const e = document.createElement('div');
-    e.className = 'block ' + block.type;
-    e.textContent = block.text;
-    e.draggable = true;
-    e.dataset.i = i;
-    e.ondragstart = ev => {
-      ev.dataTransfer.setData('text/plain', i);
-      ev.dataTransfer.effectAllowed = 'move';
-    };
-    bank.appendChild(e);
-  });
-}
+    const shuffled = [...l.blocks].sort(() => Math.random() - 0.5);
+    const bank = document.getElementById('bank');
+    bank.innerHTML = '';
+    shuffled.forEach((block, i) => {
+      const e = document.createElement('div');
+      e.className = 'block ' + block.type;
+      e.textContent = block.text;
+      e.draggable = true;
+      e.dataset.i = i;
+      e.ondragstart = ev => {
+        ev.dataTransfer.setData('text/plain', i);
+        ev.dataTransfer.effectAllowed = 'move';
+      };
+      bank.appendChild(e);
+    });
   } else {
     document.getElementById('blocksMode').style.display = 'none';
     document.getElementById('writeMode').style.display = '';
@@ -890,7 +886,6 @@ function load(n, btn) {
   updateStats();
   updateWriteButton();
 
-  // Registro de inicio de nivel
   registrarEvento({
     nombre: playerName,
     nivel: n,
@@ -905,10 +900,9 @@ function load(n, btn) {
 
 // ===================== INSERCIÓN HORIZONTAL =====================
 function insertBlockAtPosition(zone, el, clientX, clientY) {
-  // Verificar que el punto de caída esté dentro de la zona
   const rect = zone.getBoundingClientRect();
   if (clientY < rect.top || clientY > rect.bottom || clientX < rect.left || clientX > rect.right) {
-    return; // No hacer nada si está fuera de la zona
+    return;
   }
 
   if (el.parentNode) {
@@ -947,7 +941,7 @@ function setupSingleZone() {
     const i = parseInt(ev.dataTransfer.getData('text/plain'), 10);
     const el = document.querySelector(`[data-i="${i}"]`);
     if (el) {
-      insertBlockAtPosition(zone, el, ev.clientX);
+      insertBlockAtPosition(zone, el, ev.clientX, ev.clientY);
       updateFormula();
       updateResult();
       document.getElementById('feedback').className = 'feedback';
@@ -977,9 +971,9 @@ function setupSeparatedZones() {
       const el = document.querySelector(`[data-i="${i}"]`);
       if (!el) return;
       if (zoneId.startsWith('sep') && zone.children.length >= 1) {
-       const sepName = zoneId === 'sep1' ? 'SEPARADOR 1' : 'SEPARADOR 2';
-  showFeedback('err', `⚠️ La zona ${sepName} ya tiene un separador.`);
-  return;
+        const sepName = zoneId === 'sep1' ? 'SEPARADOR 1' : 'SEPARADOR 2';
+        showFeedback('err', `⚠️ La zona ${sepName} ya tiene un separador.`);
+        return;
       }
       insertBlockAtPosition(zone, el, ev.clientX, ev.clientY);
       updateFormula();
@@ -1128,29 +1122,29 @@ function check() {
         ok = false;
       }
     } else {
-  const expected = l.zones;
-  const zoneNames = {
-    test: "PRUEBA LÓGICA",
-    true: "VALOR SI ES VERDADERO",
-    false: "VALOR SI ES FALSO",
-    sep1: "SEPARADOR 1",
-    sep2: "SEPARADOR 2"
-  };
-  const zonesToCheck = ['test', 'true', 'false', 'sep1', 'sep2'];
-  for (const zoneId of zonesToCheck) {
-    const actual = getZoneBlocks(zoneId);
-    const exp = expected[zoneId].blocks;
-    if (JSON.stringify(actual) !== JSON.stringify(exp)) {
-      ok = false;
-      if (actual.length === 0) errors.push(`La zona ${zoneNames[zoneId]} está vacía.`);
-      else errors.push(`La zona ${zoneNames[zoneId]} no coincide: tiene "${actual.join(' ')}" y se esperaba "${exp.join(' ')}".`);
+      const expected = l.zones;
+      const zoneNames = {
+        test: "PRUEBA LÓGICA",
+        true: "VALOR SI ES VERDADERO",
+        false: "VALOR SI ES FALSO",
+        sep1: "SEPARADOR 1",
+        sep2: "SEPARADOR 2"
+      };
+      const zonesToCheck = ['test', 'true', 'false', 'sep1', 'sep2'];
+      for (const zoneId of zonesToCheck) {
+        const actual = getZoneBlocks(zoneId);
+        const exp = expected[zoneId].blocks;
+        if (JSON.stringify(actual) !== JSON.stringify(exp)) {
+          ok = false;
+          if (actual.length === 0) errors.push(`La zona ${zoneNames[zoneId]} está vacía.`);
+          else errors.push(`La zona ${zoneNames[zoneId]} no coincide: tiene "${actual.join(' ')}" y se esperaba "${exp.join(' ')}".`);
+        }
+      }
+      if (document.getElementById('bank').children.length > 0) {
+        errors.push('Aún hay bloques sin usar en el banco.');
+        ok = false;
+      }
     }
-  }
-  if (document.getElementById('bank').children.length > 0) {
-    errors.push('Aún hay bloques sin usar en el banco.');
-    ok = false;
-  }
-}
   } else {
     const userFormula = document.getElementById('formulaInput').value.trim().toLowerCase().replace(/\s/g,'');
     const accepted = [l.f, ...(l.accepted || [])];
@@ -1159,7 +1153,6 @@ function check() {
     if (!ok) errors.push('La fórmula escrita no es correcta. Revisa la sintaxis.');
   }
 
-  // Registro del evento de comprobación
   registrarEvento({
     nombre: playerName,
     nivel: level,
@@ -1238,7 +1231,6 @@ function hint() {
     document.getElementById('hint').textContent = '💡 ' + h[hi++];
     document.getElementById('hint').style.display = 'block';
 
-    // Registro del uso de pista
     registrarEvento({
       nombre: playerName,
       nivel: level,
