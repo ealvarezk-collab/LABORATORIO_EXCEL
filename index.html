@@ -35,7 +35,12 @@
   .data-table th{background:#eef3f7}
   .zone{margin:12px 0}
   .label{font-size:12px;font-weight:700;margin-bottom:5px;color:#687987}
- .drop {
+ .drop {   .test-wrap {
+  flex-wrap: wrap;
+  max-height: 120px;          /* Limita la altura a unas 2 filas */
+  overflow-y: auto;           /* Scroll vertical si se excede */
+  align-content: flex-start;
+}
   min-height: 45px;
   border: 2px dashed #b9c7d3;
   border-radius: 8px;
@@ -831,29 +836,29 @@ function load(n, btn) {
   </div>`;
       setupSingleZone();
     } else {
-      zonesContainer.innerHTML = `
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <div class="zone">
-            <div class="label">PRUEBA LÓGICA</div>
-            <div id="test" class="drop"></div>
-          </div>
-          <div class="zone" style="display:flex;align-items:center;gap:15px;">
-            <div class="label" style="margin:0;">SEPARADOR 1</div>
-            <div id="sep1" class="sep-zone"></div>
-          </div>
-          <div class="zone">
-            <div class="label">VALOR SI ES VERDADERO</div>
-            <div id="true" class="drop"></div>
-          </div>
-          <div class="zone" style="display:flex;align-items:center;gap:15px;">
-            <div class="label" style="margin:0;">SEPARADOR 2</div>
-            <div id="sep2" class="sep-zone"></div>
-          </div>
-          <div class="zone">
-            <div class="label">VALOR SI ES FALSO</div>
-            <div id="false" class="drop"></div>
-          </div>
-        </div>`;
+     zonesContainer.innerHTML = `
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    <div class="zone">
+      <div class="label">PRUEBA LÓGICA</div>
+      <div id="test" class="drop ${level === 4 ? 'test-wrap' : ''}"></div>
+    </div>
+    <div class="zone" style="display:flex;align-items:center;gap:15px;">
+      <div class="label" style="margin:0;">SEPARADOR 1</div>
+      <div id="sep1" class="sep-zone"></div>
+    </div>
+    <div class="zone">
+      <div class="label">VALOR SI ES VERDADERO</div>
+      <div id="true" class="drop"></div>
+    </div>
+    <div class="zone" style="display:flex;align-items:center;gap:15px;">
+      <div class="label" style="margin:0;">SEPARADOR 2</div>
+      <div id="sep2" class="sep-zone"></div>
+    </div>
+    <div class="zone">
+      <div class="label">VALOR SI ES FALSO</div>
+      <div id="false" class="drop"></div>
+    </div>
+  </div>`;
       setupSeparatedZones();
     }
 
@@ -975,7 +980,11 @@ function setupSeparatedZones() {
         showFeedback('err', `⚠️ La zona ${sepName} ya tiene un separador.`);
         return;
       }
-      insertBlockAtPosition(zone, el, ev.clientX, ev.clientY);
+      if (level === 4 && zoneId === 'test') {
+  zone.appendChild(el);   // Agrega al final; flexbox lo coloca en la fila correcta
+} else {
+  insertBlockAtPosition(zone, el, ev.clientX, ev.clientY);
+}
       updateFormula();
       updateResult();
       document.getElementById('feedback').className = 'feedback';
