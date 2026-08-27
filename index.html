@@ -6,147 +6,193 @@
   <title>Laboratorio Interactivo de Fórmulas SI - Excel</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --card-border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-sub: #64748b;
       --accent: #2563eb;
       --accent-hover: #1d4ed8;
-      --success: #10b981;
-      --danger: #ef4444;
-      --warning: #f59e0b;
-      --text: #f8fafc;
-      --subtext: #94a3b8;
-      --border: #334155;
+      --success: #16a34a;
+      --success-bg: #f0fdf4;
+      --danger: #dc2626;
+      --danger-bg: #fef2f2;
+      --warning: #d97706;
+      --warning-bg: #fffbeb;
+      --info-bg: #eff6ff;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
-    .container { max-width: 900px; width: 100%; display: flex; flex-direction: column; gap: 20px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    body { background-color: var(--bg); color: var(--text-main); padding: 24px 16px; display: flex; justify-content: center; min-height: 100vh; }
+    .container { max-width: 920px; width: 100%; display: flex; flex-direction: column; gap: 20px; }
 
     /* Modales */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(15, 23, 42, 0.9); display: flex; justify-content: center; align-items: center; z-index: 1000;
+      background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+      display: flex; justify-content: center; align-items: center; z-index: 1000;
     }
     .modal-card {
-      background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
-      padding: 30px; max-width: 450px; width: 90%; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px;
+      padding: 32px; max-width: 460px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
     }
     .modal-card input {
-      width: 100%; padding: 12px; margin: 15px 0; border-radius: 6px; border: 1px solid var(--border);
-      background: #0f172a; color: white; font-size: 16px;
+      width: 100%; padding: 12px 16px; margin: 18px 0; border-radius: 8px; border: 1.5px solid var(--card-border);
+      background: #f1f5f9; color: var(--text-main); font-size: 16px; outline: none; transition: border 0.2s;
     }
+    .modal-card input:focus { border-color: var(--accent); background: #ffffff; }
 
-    /* Encabezado y Estadísticas */
-    header { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
-    .stats-bar { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 15px; background: #0f172a; padding: 12px; border-radius: 8px; }
-    .stat-item { font-size: 14px; font-weight: bold; }
-    .stat-value { color: var(--warning); font-size: 16px; }
+    /* Encabezado y Estadísticas (Tema Claro) */
+    header {
+      background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+    }
+    .header-title-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    h1 { font-size: 22px; color: var(--text-main); font-weight: 700; }
+    
+    .stats-bar {
+      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 16px;
+      background: #f1f5f9; padding: 14px 18px; border-radius: 12px; border: 1px solid #e2e8f0;
+    }
+    .stat-item { font-size: 13px; font-weight: 600; color: var(--text-sub); }
+    .stat-value { color: var(--accent); font-size: 15px; font-weight: 700; }
 
-    /* Navegación y Niveles */
-    .nav-section { display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
-    .btn-group { display: flex; gap: 8px; }
+    /* Navegación */
+    .nav-section { display: flex; gap: 12px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+    .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    
     button {
-      background: var(--accent); color: white; border: none; padding: 10px 16px; border-radius: 6px;
-      cursor: pointer; font-weight: 600; transition: all 0.2s;
+      background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 8px;
+      cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(37,99,235,0.15);
     }
-    button:hover { background: var(--accent-hover); }
-    button.secondary { background: #475569; }
-    button.secondary:hover { background: #334155; }
-    .level-btn.active { background: var(--warning); color: #000; }
-    .mode-btn.active { background: var(--success); }
+    button:hover { background: var(--accent-hover); transform: translateY(-1px); }
+    button.secondary { background: #e2e8f0; color: var(--text-main); box-shadow: none; }
+    button.secondary:hover { background: #cbd5e1; }
+    
+    .level-btn { background: #ffffff; color: var(--text-main); border: 1.5px solid var(--card-border); box-shadow: none; }
+    .level-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+    .level-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+    
+    .mode-btn { background: #ffffff; color: var(--text-main); border: 1.5px solid var(--card-border); box-shadow: none; }
+    .mode-btn.active { background: var(--success); color: white; border-color: var(--success); }
     .mode-btn.locked { opacity: 0.5; cursor: not-allowed; }
 
-    /* Tarjeta de Ejercicio */
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
-    .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    .data-table th, .data-table td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; font-size: 14px; }
-    .data-table th { background: #0f172a; color: var(--subtext); }
+    /* Tarjetas principales */
+    .card {
+      background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+    }
+    
+    .data-table { width: 100%; border-collapse: collapse; margin-top: 12px; border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); }
+    .data-table th, .data-table td { padding: 10px 14px; text-align: left; font-size: 14px; }
+    .data-table th { background: #f1f5f9; color: var(--text-sub); font-weight: 600; border-bottom: 1px solid var(--card-border); }
+    .data-table td { background: #ffffff; border-bottom: 1px solid #f1f5f9; }
 
-    /* Área de Construcción de Bloques */
-    .builder-row { margin-bottom: 12px; }
-    .row-label { font-size: 12px; color: var(--subtext); margin-bottom: 4px; }
+    /* Área de Construcción de Bloques por Filas */
+    .builder-row { margin-bottom: 14px; }
+    .row-label { font-size: 13px; font-weight: 600; color: var(--text-sub); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
     .drop-zone-row {
-      min-height: 48px; background: #0f172a; border: 2px dashed var(--border); border-radius: 8px;
-      padding: 6px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; transition: background 0.2s;
+      min-height: 52px; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 10px;
+      padding: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; transition: all 0.2s;
     }
-    .drop-zone-row.drag-over { background: #1e3a8a; border-color: var(--accent); }
-    .sep-row-container { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
-    .sep-box { min-width: 60px; height: 40px; min-height: 40px; }
+    .drop-zone-row.drag-over { background: #eff6ff; border-color: var(--accent); }
+    
+    .sep-row-container { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+    .sep-box { min-width: 70px; height: 46px; min-height: 46px; }
 
-    /* Bloques Arrastrables */
-    .bank-area { min-height: 70px; background: #0f172a; border: 1px solid var(--border); border-radius: 8px; padding: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
-    .block {
-      padding: 8px 14px; border-radius: 6px; font-family: monospace; font-weight: bold; cursor: grab;
-      user-select: none; box-shadow: 0 2px 4px rgba(0,0,0,0.3); font-size: 14px;
+    /* Banco de Bloques Arrastrables */
+    .bank-area {
+      min-height: 80px; background: #f8fafc; border: 1.5px solid var(--card-border); border-radius: 12px;
+      padding: 12px; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;
     }
-    .block:active { cursor: grabbing; }
+    .block {
+      padding: 8px 16px; border-radius: 8px; font-family: 'Segoe UI Mono', monospace; font-weight: 700; cursor: grab;
+      user-select: none; box-shadow: 0 2px 4px rgba(0,0,0,0.06); font-size: 14px; transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .block:active { cursor: grabbing; transform: scale(1.03); }
+    
+    /* Colores por Categoría de Bloque */
     .block.func { background: #8b5cf6; color: white; }
     .block.var { background: #0284c7; color: white; }
     .block.op { background: #ea580c; color: white; }
     .block.val { background: #16a34a; color: white; }
-    .block.sep { background: #ca8a04; color: white; }
+    .block.sep { background: #d97706; color: white; }
     .block.res { background: #db2777; color: white; }
-    .block.paren { background: #475569; color: white; }
+    .block.paren { background: #64748b; color: white; }
 
     /* Entrada Manual */
     .manual-input {
-      width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--border);
-      border-radius: 6px; color: white; font-family: monospace; font-size: 16px; margin-top: 10px;
+      width: 100%; padding: 14px 16px; background: #f8fafc; border: 1.5px solid var(--card-border);
+      border-radius: 10px; color: var(--text-main); font-family: monospace; font-size: 16px; margin-top: 10px; outline: none;
+    }
+    .manual-input:focus { border-color: var(--accent); background: #ffffff; }
+
+    /* Vista previa de fórmula y evaluación */
+    .formula-preview {
+      background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 14px 18px;
+      font-family: monospace; color: #38bdf8; font-size: 16px; word-break: break-all;
+    }
+    .result-box {
+      display: flex; align-items: center; justify-content: space-between; background: #f1f5f9;
+      padding: 14px 18px; border-radius: 10px; border: 1px solid var(--card-border); margin-top: 16px;
     }
 
-    /* Vista previa de fórmula y resultado */
-    .formula-preview { background: #000; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: monospace; color: #38bdf8; font-size: 16px; word-break: break-all; }
-    .result-box { display: flex; align-items: center; justify-content: space-between; background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid var(--border); }
-
     /* Barra de Progreso e Insignias */
-    .progress-bar-container { background: #0f172a; border-radius: 8px; height: 12px; width: 100%; overflow: hidden; margin-top: 8px; }
-    .progress-fill { background: var(--success); height: 100%; width: 0%; transition: width 0.3s; }
-    .badges-container { display: flex; gap: 10px; margin-top: 10px; }
-    .badge { opacity: 0.3; filter: grayscale(1); transition: all 0.3s; font-size: 24px; }
-    .badge.unlocked { opacity: 1; filter: grayscale(0); }
+    .progress-bar-container { background: #e2e8f0; border-radius: 20px; height: 10px; width: 100%; overflow: hidden; margin-top: 8px; }
+    .progress-fill { background: var(--success); height: 100%; width: 0%; transition: width 0.4s ease; }
+    .badges-container { display: flex; gap: 12px; margin-top: 12px; }
+    .badge { opacity: 0.25; filter: grayscale(1); transition: all 0.3s; font-size: 26px; }
+    .badge.unlocked { opacity: 1; filter: grayscale(0); transform: scale(1.1); }
 
-    /* Feedback y Pistas */
-    .feedback { padding: 12px; border-radius: 6px; font-weight: bold; display: none; margin-top: 10px; }
-    .feedback.ok { background: #064e3b; color: #6ee7b7; border: 1px solid #047857; }
-    .feedback.err { background: #7f1d1d; color: #fca5a5; border: 1px solid #dc2626; }
-    .hint-box { background: #78350f; color: #fde68a; border: 1px solid #d97706; padding: 10px; border-radius: 6px; display: none; margin-top: 10px; font-size: 14px; }
+    /* Retroalimentación Granular y Pistas */
+    .feedback { padding: 16px; border-radius: 12px; font-weight: 500; display: none; margin-top: 14px; line-height: 1.5; font-size: 14px; }
+    .feedback.ok { background: var(--success-bg); color: #14532d; border: 1.5px solid #bbf7d0; }
+    .feedback.err { background: var(--danger-bg); color: #7f1d1d; border: 1.5px solid #fecaca; }
+    
+    .diagnostic-list { margin-top: 8px; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+    .hint-box { background: var(--warning-bg); color: #78350f; border: 1.5px solid #fde68a; padding: 14px; border-radius: 10px; display: none; margin-top: 14px; font-size: 14px; }
   </style>
 </head>
 <body>
 
-<!-- Modal Registro Estudiante -->
+<!-- Modal Registro -->
 <div class="modal-overlay" id="registroModal">
   <div class="modal-card">
     <h2>Bienvenido al Laboratorio</h2>
-    <p style="color: var(--subtext); margin-top: 8px;">Ingresa tu nombre para comenzar la práctica de fórmulas en Excel.</p>
-    <input type="text" id="studentNameInput" placeholder="Nombre completo..." />
-    <button onclick="registrarEstudiante()">Ingresar al Sistema</button>
+    <p style="color: var(--text-sub); margin-top: 8px; font-size: 14px;">Ingresa tu nombre completo para guardar tus logros de práctica de Excel.</p>
+    <input type="text" id="studentNameInput" placeholder="Tu nombre..." />
+    <button onclick="registrarEstudiante()" style="width: 100%;">Comenzar Práctica</button>
   </div>
 </div>
 
-<!-- Modal Resultados / Overlay -->
+<!-- Modal Mensajes / Overlay -->
 <div class="modal-overlay" id="overlay" style="display: none;">
   <div class="modal-card">
     <div id="overlayIcon" style="font-size: 48px; margin-bottom: 10px;">🎉</div>
     <h2 id="overlayTitle">¡Excelente trabajo!</h2>
-    <p id="overlayMsg" style="color: var(--subtext); margin: 15px 0;"></p>
-    <button onclick="closeOverlay()">Continuar</button>
+    <p id="overlayMsg" style="color: var(--text-sub); margin: 15px 0; font-size: 14px;"></p>
+    <button onclick="closeOverlay()" style="width: 100%;">Continuar</button>
   </div>
 </div>
 
 <div class="container">
-  <!-- Header con estadísticas -->
+  <!-- Encabezado con estadísticas y progreso -->
   <header>
-    <h1>Laboratorio de Fórmulas Excel (=SI)</h1>
-    <div class="stats-bar">
-      <div class="stat-item">Puntos: <span class="stat-value" id="points">0</span></div>
-      <div class="stat-item">Estrellas: <span class="stat-value" id="stars">0 ⭐</span></div>
-      <div class="stat-item">Bloques: <span class="stat-value" id="blockProg">0/4</span></div>
-      <div class="stat-item">Escritura: <span class="stat-value" id="writeProg">0/4</span></div>
-      <div class="stat-item">Tiempo: <span class="stat-value" id="timer">00:00</span></div>
+    <div class="header-title-bar">
+      <h1>Laboratorio de Fórmulas Excel (=SI)</h1>
+      <span id="userDisplayName" style="font-weight: 600; color: var(--accent); font-size: 14px;">Estudiante</span>
     </div>
-    <div style="margin-top: 15px;">
-      <div id="progressText" style="font-size: 12px; color: var(--subtext);">Progreso del curso: 0%</div>
+    
+    <div class="stats-bar">
+      <div class="stat-item">PUNTOS: <span class="stat-value" id="points">0</span></div>
+      <div class="stat-item">ESTRELLAS: <span class="stat-value" id="stars">0 ⭐</span></div>
+      <div class="stat-item">BLOQUES: <span class="stat-value" id="blockProg">0/4</span></div>
+      <div class="stat-item">ESCRITURA: <span class="stat-value" id="writeProg">0/4</span></div>
+      <div class="stat-item">TIEMPO: <span class="stat-value" id="timer">00:00</span></div>
+    </div>
+    
+    <div style="margin-top: 16px;">
+      <div id="progressText" style="font-size: 12px; font-weight: 600; color: var(--text-sub);">Progreso Global del Curso: 0%</div>
       <div class="progress-bar-container">
         <div class="progress-fill" id="progressFill"></div>
       </div>
@@ -174,42 +220,45 @@
     </div>
   </div>
 
-  <!-- Enunciado y Datos del Ejercicio -->
+  <!-- Enunciado y Tabla de Datos -->
   <div class="card">
-    <h3 style="color: var(--subtext); font-size: 14px;">ENUNCIADO DEL CASO</h3>
-    <p id="text" style="font-size: 16px; margin-top: 8px; font-weight: 500;"></p>
-    <div id="data" style="margin-top: 12px;"></div>
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3 style="color: var(--text-sub); font-size: 12px; letter-spacing: 0.5px; font-weight: 700;">ENUNCIADO DEL CASO</h3>
+      <button class="secondary" onclick="loadRandomExercise()" style="padding: 4px 10px; font-size: 12px;">🔀 Otro ejercicio</button>
+    </div>
+    <p id="text" style="font-size: 16px; margin-top: 10px; font-weight: 500; color: var(--text-main); line-height: 1.5;"></p>
+    <div id="data" style="margin-top: 14px;"></div>
   </div>
 
-  <!-- Área interactiva (Bloques o Escritura) -->
+  <!-- Área interactiva (Bloques por filas o Escritura) -->
   <div class="card">
-    <h3 id="phaseTitle">2. Construcción por Filas (Bloques)</h3>
+    <h3 id="phaseTitle" style="font-size: 15px; color: var(--text-main);">Construcción por Filas (Bloques)</h3>
 
     <!-- Modo Bloques -->
-    <div id="blockArea" style="margin-top: 15px;">
+    <div id="blockArea" style="margin-top: 16px;">
       <div id="builderRows"></div>
-      <p style="font-size: 12px; color: var(--subtext); margin: 12px 0 6px 0;">BANCO DE BLOQUES (Arrastra los elementos hacia las filas):</p>
+      <p style="font-size: 12px; font-weight: 600; color: var(--text-sub); margin: 16px 0 8px 0;">BANCO DE BLOQUES (Arrastra los elementos a las casillas superiores):</p>
       <div class="bank-area" id="bank" ondrop="dropToBank(event)" ondragover="allowDrop(event)"></div>
     </div>
 
     <!-- Modo Escritura Manual -->
-    <div id="writeArea" style="display: none; margin-top: 15px;">
-      <p style="font-size: 14px; color: var(--subtext);">Escribe la fórmula completa manualmente respetando la sintaxis exacta:</p>
+    <div id="writeArea" style="display: none; margin-top: 16px;">
+      <p style="font-size: 14px; color: var(--text-sub);">Escribe la fórmula completa manualmente respetando la sintaxis exacta de Excel:</p>
       <input type="text" id="manualFormula" class="manual-input" placeholder='=SI(B2>10;"Cuadrilla completa";"Cuadrilla incompleta")' oninput="updateFormulaFromText()" />
     </div>
   </div>
 
-  <!-- Vista previa de la fórmula y acciones -->
+  <!-- Vista previa, evaluación y retroalimentación granular -->
   <div class="card">
-    <div style="font-size: 12px; color: var(--subtext); margin-bottom: 6px;">VISTA PREVIA DE LA FÓRMULA GENERADA:</div>
+    <div style="font-size: 12px; font-weight: 600; color: var(--text-sub); margin-bottom: 8px;">VISTA PREVIA DE LA FÓRMULA GENERADA:</div>
     <div class="formula-preview" id="formula">=SI(...)</div>
 
-    <div class="result-box" style="margin-top: 15px;">
-      <span>Resultado Evaluado en Celda:</span>
+    <div class="result-box">
+      <span style="font-size: 14px; font-weight: 600; color: var(--text-sub);">Resultado Evaluado en Celda:</span>
       <b id="resultDisplay" style="color: var(--success); font-size: 18px;">—</b>
     </div>
 
-    <div style="display: flex; gap: 10px; margin-top: 15px;">
+    <div style="display: flex; gap: 10px; margin-top: 16px;">
       <button onclick="checkCurrentPhase()" style="flex: 2;">Verificar Respuesta</button>
       <button class="secondary" onclick="showHint()" style="flex: 1;">Pista 💡</button>
       <button class="secondary" onclick="clearCurrentPhase()" style="flex: 1;">Limpiar</button>
@@ -221,15 +270,24 @@
 </div>
 
 <script>
-// CONFIGURACIÓN DE EXPORTACIÓN A GOOGLE SHEETS
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTNt780x1-Hg_hD7RzVL1OY5GlSm7bLY3nssmxKFNBR6o8ZoR1QsupDj9qIlRVlyt9vQ/exec";
 
 let studentName = "";
+let activeMode = 'block'; 
+let currentLevel = 1;
+let currentExercise = null;
+let points = 0;
+let stars = 0;
+let solvedBlocks = new Set();
+let solvedWrites = new Set();
+let hintIndex = 0;
+let timerInterval, seconds = 0;
 
+// BANCO COMPLETO CON 3 EJERCICIOS POR NIVEL
 const EXERCISE_BANK = {
   1: [
     {
-      text: "Una cuadrilla se considera completa si la cantidad de personal registrada en B2 supera los 10 trabajadores. Si esto se cumple, mostrar “Cuadrilla completa”; a pesar de todo lo contrario, mostrar “Cuadrilla incompleta”.",
+      text: "Una cuadrilla se considera completa si la cantidad de personal registrada en B2 supera los 10 trabajadores. Si esto se cumple, mostrar “Cuadrilla completa”; de lo contrario, mostrar “Cuadrilla incompleta”.",
       data: [["B2", "Trabajadores", 12]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:">", type:"op"}, {text:"10", type:"val"},
@@ -237,7 +295,8 @@ const EXERCISE_BANK = {
         {text:'"Cuadrilla incompleta"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>10;"Cuadrilla completa";"Cuadrilla incompleta")',
-      hints: ["Identifica que 'supera los' se traduce como el operador mayor que (>).", "Usa el separador ; en el casillero cuadrado.", "Respuesta verdadera: \"Cuadrilla completa\". Respuesta para lo contrario: \"Cuadrilla incompleta\"."],
+      expectedParts: { prueba: "B2>10", vVerdadero: '"Cuadrilla completa"', vFalso: '"Cuadrilla incompleta"' },
+      hints: ["Identifica que 'supera los' se traduce como el operador mayor que (>).", "Usa el separador ; entre cada argumento.", "Respuesta verdadera: \"Cuadrilla completa\". Respuesta falsa: \"Cuadrilla incompleta\"."],
       eval: (d) => d[0][2] > 10 ? 'Cuadrilla completa' : 'Cuadrilla incompleta'
     },
     {
@@ -249,20 +308,22 @@ const EXERCISE_BANK = {
         {text:'"Revisión"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2="Normal";"Aprobado";"Revisión")',
-      hints: ["'Es exactamente igual a' requiere el operador = en la prueba lógica.", "Coloca los separadores ; en las casillas correspondientes.", "Muestra \"Aprobado\" si cumple y \"Revisión\" ante algo distinto."],
+      expectedParts: { prueba: 'B2="Normal"', vVerdadero: '"Aprobado"', vFalso: '"Revisión"' },
+      hints: ["'Es exactamente igual a' requiere el operador = en la prueba lógica.", "Recuerda que los textos se comparan entre comillas.", "Separadores ; en los casilleros correspondientes."],
       eval: (d) => d[0][2] === 'Normal' ? 'Aprobado' : 'Revisión'
     },
     {
-      text: "Si el estado de la revisión técnica en B2 resulta ser idéntico a “Conforme”, marcar “Ingreso permitido”; de manera contraria, registrar “Ingreso denegado”.",
-      data: [["B2", "Estado Casco", "Conforme"]],
+      text: "Si el estado del equipo en B2 resulta ser idéntico a “Operativo”, marcar “Ingreso permitido”; de manera contraria, registrar “Ingreso denegado”.",
+      data: [["B2", "Estado Equipo", "Operativo"]],
       blocks: [
-        {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:"=", type:"op"}, {text:'"Conforme"', type:"val"},
+        {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:"=", type:"op"}, {text:'"Operativo"', type:"val"},
         {text:";", type:"sep"}, {text:'"Ingreso permitido"', type:"res"}, {text:";", type:"sep"},
         {text:'"Ingreso denegado"', type:"res"}, {text:")", type:"paren"}
       ],
-      expected: '=SI(B2="Conforme";"Ingreso permitido";"Ingreso denegado")',
-      hints: ["Identifica la comparación de texto idéntico usando =.", "Recuerda separar con ;.", "Usa la respuesta verdadera si coincide y la falsa en caso contrario."],
-      eval: (d) => d[0][2] === 'Conforme' ? 'Ingreso permitido' : 'Ingreso denegado'
+      expected: '=SI(B2="Operativo";"Ingreso permitido";"Ingreso denegado")',
+      expectedParts: { prueba: 'B2="Operativo"', vVerdadero: '"Ingreso permitido"', vFalso: '"Ingreso denegado"' },
+      hints: ["Compara B2 con \"Operativo\" usando el signo =.", "Comprueba que la respuesta verdadera y falsa coincidan con el texto exacto del enunciado."],
+      eval: (d) => d[0][2] === 'Operativo' ? 'Ingreso permitido' : 'Ingreso denegado'
     }
   ],
   2: [
@@ -275,7 +336,8 @@ const EXERCISE_BANK = {
         {text:"0", type:"val"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>=20;50000;0)',
-      hints: ["La frase 'mayor o igual a' requiere el operador compuesto >=.", "Los valores numéricos (50000 y 0) no llevan comillas.", "Separa los bloques con ;."],
+      expectedParts: { prueba: "B2>=20", vVerdadero: "50000", vFalso: "0" },
+      hints: ["La frase 'mayor o igual a' requiere el operador >=.", "Los valores numéricos (50000 y 0) no llevan comillas.", "Separa los argumentos con ;."],
       eval: (d) => d[0][2] >= 20 ? 50000 : 0
     },
     {
@@ -287,7 +349,8 @@ const EXERCISE_BANK = {
         {text:"0", type:"val"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>15;120000;0)',
-      hints: ["'Sobrepasan' significa estrictamente mayor que (>).", "Verdadero: 120000, Falso: 0.", "Recuerda ingresar el separador ;."],
+      expectedParts: { prueba: "B2>15", vVerdadero: "120000", vFalso: "0" },
+      hints: ["'Sobrepasan' significa estrictamente mayor que (>).", "Verdadero: 120000, Falso: 0.", "Recuerda no colocar comillas a los números."],
       eval: (d) => d[0][2] > 15 ? 120000 : 0
     },
     {
@@ -299,13 +362,14 @@ const EXERCISE_BANK = {
         {text:"0", type:"val"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>40;25000;0)',
-      hints: ["'Es superior a' equivale al operador mayor que (>).", "Asegúrate de no usar comillas en los valores numéricos.", "Ubica el ; entre cada sección."],
+      expectedParts: { prueba: "B2>40", vVerdadero: "25000", vFalso: "0" },
+      hints: ["'Es superior a' equivale al operador mayor que (>).", "Números sin comillas.", "Verifica ubicar el punto y coma en las cajas separadoras."],
       eval: (d) => d[0][2] > 40 ? 25000 : 0
     }
   ],
   3: [
     {
-      text: "Clasifica el nivel de riesgo: si el puntaje en B2 es menor o igual a 4, categorizar como “Bajo”; si es menor o igual a 9, categorizar como “Medio”; a pesar de todo lo demás, marcar como “Alto”.",
+      text: "Clasifica el riesgo: si el puntaje en B2 es menor o igual a 4, categorizar como “Bajo”; si es menor o igual a 9, categorizar como “Medio”; para cualquier otro valor, marcar como “Alto”.",
       data: [["B2", "Puntaje Riesgo", 5]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:"<=", type:"op"}, {text:"4", type:"val"}, {text:";", type:"sep"},
@@ -314,11 +378,12 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Alto"', type:"res"}, {text:")", type:"paren"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2<=4;"Bajo";SI(B2<=9;"Medio";"Alto"))',
-      hints: ["'Menor o igual a' corresponde al símbolo <=.", "En la Fila 1 evalúa la primera condición y en la Fila 2 inicia el segundo SI.", "No olvides cerrar ambos paréntesis al final."],
+      expectedParts: { prueba: "B2<=4", vVerdadero: '"Bajo"', vFalso: 'SI(B2<=9;"Medio";"Alto")' },
+      hints: ["'Menor o igual a' corresponde al símbolo <=.", "En la Fila 1 evalúa la primera condición y en la Fila 2 inicia el segundo SI.", "Recuerda cerrar ambos paréntesis al final."],
       eval: (d) => d[0][2] <= 4 ? 'Bajo' : (d[0][2] <= 9 ? 'Medio' : 'Alto')
     },
     {
-      text: "Evalúa el desempeño: si la nota en B2 es mayor o igual a 6, calificar como “Excelente”; si alcanza o supera los 4 puntos, calificar como “Aprobado”; si no se logra ninguna, marcar “Reprobado”.",
+      text: "Evalúa desempeño: si la nota en B2 es mayor o igual a 6, calificar como “Excelente”; si alcanza o supera los 4 puntos, calificar como “Aprobado”; si no, marcar “Reprobado”.",
       data: [["B2", "Nota Final", 5]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:">=", type:"op"}, {text:"6", type:"val"}, {text:";", type:"sep"},
@@ -327,11 +392,12 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Reprobado"', type:"res"}, {text:")", type:"paren"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>=6;"Excelente";SI(B2>=4;"Aprobado";"Reprobado"))',
-      hints: ["'Mayor o igual a' y 'alcanza o supera' se representan mediante el operador >=.", "Inicia con la nota más exigente.", "Cierra la función anidada con dos paréntesis."],
+      expectedParts: { prueba: "B2>=6", vVerdadero: '"Excelente"', vFalso: 'SI(B2>=4;"Aprobado";"Reprobado")' },
+      hints: ["Inicia evaluando la nota máxima (>=6).", "El segundo SI anidado evalúa >=4.", "Comprueba cerrar con dos paréntesis final ))."],
       eval: (d) => d[0][2] >= 6 ? 'Excelente' : (d[0][2] >= 4 ? 'Aprobado' : 'Reprobado')
     },
     {
-      text: "Clasifica la experiencia: si los años en B2 son inferiores a 2, asigna “Inicial”; si son menores a 5, asigna “Intermedio”; para cualquier otro caso distinto, asigna “Avanzado”.",
+      text: "Clasifica antigüedad: si los años en B2 son inferiores a 2, asigna “Inicial”; si son menores a 5, asigna “Intermedio”; para cualquier otro caso, asigna “Avanzado”.",
       data: [["B2", "Años Antigüedad", 3]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:"<", type:"op"}, {text:"2", type:"val"}, {text:";", type:"sep"},
@@ -340,13 +406,14 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Avanzado"', type:"res"}, {text:")", type:"paren"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2<2;"Inicial";SI(B2<5;"Intermedio";"Avanzado"))',
-      hints: ["'Inferiores a' o 'menores a' equivalen al símbolo menor que (<).", "Establece la primera prueba lógica en Fila 1 y la segunda en Fila 2.", "Cierra correctamente con ))"],
+      expectedParts: { prueba: "B2<2", vVerdadero: '"Inicial"', vFalso: 'SI(B2<5;"Intermedio";"Avanzado")' },
+      hints: ["'Inferiores a' o 'menores a' es el operador menor que (<).", "Ubica el segundo SI dentro de la respuesta falsa del primer SI."],
       eval: (d) => d[0][2] < 2 ? 'Inicial' : (d[0][2] < 5 ? 'Intermedio' : 'Avanzado')
     }
   ],
   4: [
     {
-      text: "[SI + Y] Otorga un beneficio adicional si se cumplen AMBAS condiciones simultáneamente: los días trabajados en B2 son mayores o iguales a 20 Y ADEMÁS el porcentaje en C2 resulta mayor o igual al 90%. En caso afirmativo mostrar “Bono”; de no lograr ambas, mostrar “Sin bono”.",
+      text: "[SI + Y] Otorga un beneficio si se cumplen AMBAS condiciones: los días en B2 son mayores o iguales a 20 Y ADEMÁS la asistencia en C2 es mayor o igual a 90%. Mostrar “Bono”; de lo contrario “Sin bono”.",
       data: [["B2", "Días", 21], ["C2", "Asistencia", "95%"]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"Y(", type:"func"}, {text:"B2", type:"var"}, {text:">=", type:"op"}, {text:"20", type:"val"},
@@ -354,11 +421,12 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Bono"', type:"res"}, {text:";", type:"sep"}, {text:'"Sin bono"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(Y(B2>=20;C2>=90%);"Bono";"Sin bono")',
-      hints: ["Al exigir ambas reglas simultáneas, utiliza la función Y() en la prueba lógica.", "Traduce 'mayores o iguales' a los operadores >= correspondientes.", "Muestra \"Bono\" si cumple ambas y \"Sin bono\" si no."],
+      expectedParts: { prueba: "Y(B2>=20;C2>=90%)", vVerdadero: '"Bono"', vFalso: '"Sin bono"' },
+      hints: ["Al requerir dos condiciones obligatorias simultáneas, usa la función Y().", "Cierra la función Y() con su paréntesis antes del primer punto y coma."],
       eval: (d) => (d[0][2] >= 20 && parseInt(d[1][2]) >= 90) ? 'Bono' : 'Sin bono'
     },
     {
-      text: "[SI + O] Activa una alerta de emergencia si la temperatura en B2 sobrepasa los 50 grados O BIEN si la presión en C2 es estrictamente mayor a 100. De cumplirse cualquiera de las dos, mostrar “Alerta”; si ninguna se presenta, registrar “Normal”.",
+      text: "[SI + O] Activa una alerta si la temperatura en B2 sobrepasa los 50 grados O BIEN si la presión en C2 es mayor a 100. De cumplirse cualquiera, mostrar “Alerta”; si ninguna se presenta, registrar “Normal”.",
       data: [["B2", "Temperatura", 55], ["C2", "Presión", 90]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"O(", type:"func"}, {text:"B2", type:"var"}, {text:">", type:"op"}, {text:"50", type:"val"},
@@ -366,11 +434,12 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Alerta"', type:"res"}, {text:";", type:"sep"}, {text:'"Normal"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(O(B2>50;C2>100);"Alerta";"Normal")',
-      hints: ["La presencia de 'O BIEN' indica que debes usar la función O() dentro de la prueba lógica.", "Usa el símbolo mayor que (>) para 'sobrepasa' y 'mayor a'.", "Escribe \"Alerta\" para verdadero y \"Normal\" para falso."],
+      expectedParts: { prueba: "O(B2>50;C2>100)", vVerdadero: '"Alerta"', vFalso: '"Normal"' },
+      hints: ["La presencia de 'O BIEN' exige utilizar la función lógica O() en la prueba.", "Verifica que ambas comparaciones usen el operador mayor que (>)."],
       eval: (d) => (d[0][2] > 50 || d[1][2] > 100) ? 'Alerta' : 'Normal'
     },
     {
-      text: "[SI + Y] Declara una inspección como aprobada únicamente si el estado de casco en B2 es exactamente igual a “Sí” Y ADEMÁS el estado de chaleco en C2 es idéntico a “Sí”. Si se cumplen ambas, indicar “Apto”; a pesar de cualquier incumplimiento, indicar “No Apto”.",
+      text: "[SI + Y] Declara una inspección como aprobada únicamente si el casco en B2 es igual a “Sí” Y ADEMÁS el chaleco en C2 es igual a “Sí”. Si se cumplen ambas, indicar “Apto”; caso contrario “No Apto”.",
       data: [["B2", "Casco", "Sí"], ["C2", "Chaleco", "Sí"]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"Y(", type:"func"}, {text:"B2", type:"var"}, {text:"=", type:"op"}, {text:'"Sí"', type:"val"},
@@ -378,34 +447,26 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Apto"', type:"res"}, {text:";", type:"sep"}, {text:'"No Apto"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(Y(B2="Sí";C2="Sí");"Apto";"No Apto")',
-      hints: ["Usa Y() para condicionar la igualdad de dos textos con =.", "Coloca los separadores ; en las casillas marcadas.", "Respuestas esperadas: \"Apto\" y \"No Apto\"."],
+      expectedParts: { prueba: 'Y(B2="Sí";C2="Sí")', vVerdadero: '"Apto"', vFalso: '"No Apto"' },
+      hints: ["Utiliza Y() conteniendo las dos igualdades de texto.", "Asegúrate de incluir comillas en \"Sí\"."],
       eval: (d) => (d[0][2] === 'Sí' && d[1][2] === 'Sí') ? 'Apto' : 'No Apto'
     }
   ]
 };
 
-let activeMode = 'block'; 
-let currentLevel = 1;
-let currentExercise = null;
-let points = 0;
-let stars = 0;
-let solvedBlocks = new Set();
-let solvedWrites = new Set();
-let hintIndex = 0;
-let timerInterval, seconds = 0;
+// Inicialización al cargar el DOM
+window.addEventListener('DOMContentLoaded', () => {
+  loadLevel(1);
+});
 
 function registrarEstudiante() {
   const input = document.getElementById('studentNameInput');
   const name = input.value.trim();
-  if (!name) {
-    alert("Por favor ingresa tu nombre completo para comenzar.");
-    return;
-  }
+  if (!name) { alert("Por favor ingresa tu nombre para comenzar."); return; }
   studentName = name;
+  document.getElementById('userDisplayName').textContent = studentName;
   document.getElementById('registroModal').style.display = 'none';
-  
-  enviarDatosAGoogleSheets("Inicio de Sesión", "El estudiante inició el laboratorio");
-  loadLevel(1, document.querySelectorAll('.level-btn')[0]);
+  enviarDatosAGoogleSheets("Inicio", "Sesión iniciada");
 }
 
 function startTimer() {
@@ -421,7 +482,7 @@ function startTimer() {
 
 function switchMode(mode) {
   if (mode === 'write' && solvedBlocks.size < 4) {
-    showOverlay('🔒 Modo Bloqueado', 'Debes completar los 4 niveles en la Fase de Bloques antes de acceder al Modo Escritura.', '⚠️');
+    showOverlay('🔒 Modo Bloqueado', 'Debes completar los 4 niveles en el Modo Bloques antes de acceder al Modo Escritura.', '⚠️');
     return;
   }
   activeMode = mode;
@@ -430,7 +491,7 @@ function switchMode(mode) {
   
   document.getElementById('blockArea').style.display = mode === 'block' ? 'block' : 'none';
   document.getElementById('writeArea').style.display = mode === 'write' ? 'block' : 'none';
-  document.getElementById('phaseTitle').textContent = mode === 'block' ? '2. Construcción por Filas (Bloques)' : '2. Escritura Manual Libre';
+  document.getElementById('phaseTitle').textContent = mode === 'block' ? 'Construcción por Filas (Bloques)' : 'Escritura Manual Libre';
   
   clearCurrentPhase();
   document.getElementById('feedback').style.display = 'none';
@@ -447,11 +508,10 @@ function loadLevel(lvl, btn) {
 
 function loadRandomExercise() {
   hintIndex = 0;
-  const list = EXERCISE_BANK[currentLevel];
+  const list = EXERCISE_BANK[currentLevel] || EXERCISE_BANK[1];
   currentExercise = list[Math.floor(Math.random() * list.length)];
   
   document.getElementById('text').textContent = currentExercise.text;
-  
   let html = '<table class="data-table"><tr><th>Celda</th><th>Concepto</th><th>Valor</th></tr>';
   currentExercise.data.forEach(r => html += `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td></tr>`);
   html += '</table>';
@@ -468,39 +528,37 @@ function loadRandomExercise() {
 
 function buildRowsUI(lvl) {
   const container = document.getElementById('builderRows');
-  container.innerHTML = '';
-
   if (lvl === 3) {
     container.innerHTML = `
       <div class="builder-row">
-        <div class="row-label">Fila 1: Nivel 1 SI</div>
+        <div class="row-label"><span>1. Primera Condición y Respuesta Verdadero</span></div>
         <div class="drop-zone-row" id="row1" ondrop="dropBlock(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
       </div>
       <div class="builder-row">
-        <div class="row-label">Fila 2: SI Anidado</div>
+        <div class="row-label"><span>2. SI Anidado (Segunda Condición, Verdadero y Falso)</span></div>
         <div class="drop-zone-row" id="row2" ondrop="dropBlock(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
       </div>
     `;
   } else {
     container.innerHTML = `
       <div class="builder-row">
-        <div class="row-label">1. Prueba Lógica</div>
+        <div class="row-label"><span>1. Prueba Lógica (Condición)</span></div>
         <div class="drop-zone-row" id="row1" ondrop="dropBlock(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
       </div>
       <div class="sep-row-container">
-        <span style="font-size:11px; font-weight:bold; color:#f59e0b;">Separador:</span>
+        <span style="font-size:12px; font-weight:700; color:var(--warning);">Separador:</span>
         <div class="drop-zone-row sep-box" id="sep1" ondrop="dropBlock(event)" ondragover="allowDrop(event)"></div>
       </div>
       <div class="builder-row">
-        <div class="row-label">2. Valor Verdadero</div>
+        <div class="row-label"><span>2. Valor si es Verdadero</span></div>
         <div class="drop-zone-row" id="row2" ondrop="dropBlock(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
       </div>
       <div class="sep-row-container">
-        <span style="font-size:11px; font-weight:bold; color:#f59e0b;">Separador:</span>
+        <span style="font-size:12px; font-weight:700; color:var(--warning);">Separador:</span>
         <div class="drop-zone-row sep-box" id="sep2" ondrop="dropBlock(event)" ondragover="allowDrop(event)"></div>
       </div>
       <div class="builder-row">
-        <div class="row-label">3. Valor Falso</div>
+        <div class="row-label"><span>3. Valor si es Falso</span></div>
         <div class="drop-zone-row" id="row3" ondrop="dropBlock(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
       </div>
     `;
@@ -540,10 +598,10 @@ function dropBlock(e) {
 
   const id = e.dataTransfer.getData('text/plain');
   const el = document.getElementById(id);
-  if (!el || !zone) return;
-
-  zone.appendChild(el);
-  updateFormulaFromRows();
+  if (el && zone) {
+    zone.appendChild(el);
+    updateFormulaFromRows();
+  }
 }
 
 function dropToBank(e) {
@@ -552,28 +610,27 @@ function dropToBank(e) {
   bank.classList.remove('drag-over');
   const id = e.dataTransfer.getData('text/plain');
   const el = document.getElementById(id);
-  if (!el) return;
-  bank.appendChild(el);
-  updateFormulaFromRows();
+  if (el) {
+    bank.appendChild(el);
+    updateFormulaFromRows();
+  }
 }
 
 function updateFormulaFromRows() {
   if (activeMode !== 'block') return;
-  
   let fullFormula = '';
   if (currentLevel === 3) {
-    const r1 = Array.from(document.getElementById('row1').children).map(c => c.textContent).join('');
-    const r2 = Array.from(document.getElementById('row2').children).map(c => c.textContent).join('');
+    const r1 = Array.from(document.getElementById('row1')?.children || []).map(c => c.textContent).join('');
+    const r2 = Array.from(document.getElementById('row2')?.children || []).map(c => c.textContent).join('');
     fullFormula = r1 + r2;
   } else {
-    const r1 = Array.from(document.getElementById('row1').children).map(c => c.textContent).join('');
-    const s1 = document.getElementById('sep1') ? document.getElementById('sep1').textContent : '';
-    const r2 = Array.from(document.getElementById('row2').children).map(c => c.textContent).join('');
-    const s2 = document.getElementById('sep2') ? document.getElementById('sep2').textContent : '';
-    const r3 = Array.from(document.getElementById('row3').children).map(c => c.textContent).join('');
+    const r1 = Array.from(document.getElementById('row1')?.children || []).map(c => c.textContent).join('');
+    const s1 = document.getElementById('sep1')?.textContent || '';
+    const r2 = Array.from(document.getElementById('row2')?.children || []).map(c => c.textContent).join('');
+    const s2 = document.getElementById('sep2')?.textContent || '';
+    const r3 = Array.from(document.getElementById('row3')?.children || []).map(c => c.textContent).join('');
     fullFormula = r1 + s1 + r2 + s2 + r3;
   }
-  
   document.getElementById('formula').textContent = fullFormula || '=SI(...)';
 }
 
@@ -603,6 +660,7 @@ function showHint() {
   hintIndex++;
 }
 
+// SISTEMA DE RETROALIMENTACIÓN GRANULAR Y POSITIVA
 function checkCurrentPhase() {
   const currentFormula = document.getElementById('formula').textContent.replace(/\s+/g, '');
   const expectedFormula = currentExercise.expected.replace(/\s+/g, '');
@@ -611,7 +669,7 @@ function checkCurrentPhase() {
 
   if (currentFormula === expectedFormula) {
     fb.className = 'feedback ok';
-    fb.textContent = '🎉 ¡Correcto! Has construido la fórmula de manera perfecta.';
+    fb.innerHTML = `<b>🎉 ¡Excelente trabajo!</b><br>Has construido la fórmula perfectamente con la sintaxis exacta de Excel.`;
     
     const res = currentExercise.eval(currentExercise.data);
     document.getElementById('resultDisplay').textContent = res;
@@ -631,13 +689,56 @@ function checkCurrentPhase() {
     enviarDatosAGoogleSheets("Acierto", `Nivel ${currentLevel} (${activeMode}) completado`);
 
     if (solvedBlocks.size === 4 && activeMode === 'block') {
-      showOverlay('🏆 ¡Fase de Bloques Completada!', 'Has desbloqueado la Fase 2: Modo Escritura Manual.', '👑');
+      showOverlay('🏆 ¡Fase de Bloques Completada!', 'Has desbloqueado el Modo Escritura Manual.', '👑');
       document.getElementById('btnModeWrite').classList.remove('locked');
     }
   } else {
     fb.className = 'feedback err';
-    fb.textContent = '❌ Revisa la estructura. Asegúrate de que los bloques y separadores estén en el orden correcto.';
-    enviarDatosAGoogleSheets("Error", `Fallo en Nivel ${currentLevel} (${activeMode}). Intento: ${currentFormula}`);
+    
+    // Diagnóstico detallado por partes
+    let diagHTML = '<b>🔍 Diagnóstico y retroalimentación:</b><ul class="diagnostic-list">';
+    
+    if (activeMode === 'block' && currentLevel !== 3) {
+      const pLógica = Array.from(document.getElementById('row1')?.children || []).map(c => c.textContent).join('');
+      const s1 = document.getElementById('sep1')?.textContent || '';
+      const vVerd = Array.from(document.getElementById('row2')?.children || []).map(c => c.textContent).join('');
+      const s2 = document.getElementById('sep2')?.textContent || '';
+      const vFals = Array.from(document.getElementById('row3')?.children || []).map(c => c.textContent).join('');
+
+      // 1. Verificar Prueba Lógica
+      if (pLógica === "=SI(" + currentExercise.expectedParts.prueba) {
+        diagHTML += '<li>✅ <b>Prueba Lógica:</b> ¡Muy bien! Está correctamente formulada.</li>';
+      } else {
+        diagHTML += '<li>💡 <b>Prueba Lógica:</b> Revisa los elementos en la primera fila (función, celda variable, operador o valor).</li>';
+      }
+
+      // 2. Verificar Separadores
+      if (s1 === ';' && s2 === ';') {
+        diagHTML += '<li>✅ <b>Separadores (;):</b> Colocados correctamente.</li>';
+      } else {
+        diagHTML += '<li>💡 <b>Separadores (;):</b> Asegúrate de ubicar el bloque punto y coma <code>;</code> en los casilleros amarillos.</li>';
+      }
+
+      // 3. Verificar Valor Verdadero
+      if (vVerd === currentExercise.expectedParts.vVerdadero) {
+        diagHTML += '<li>✅ <b>Valor Verdadero:</b> Correcto.</li>';
+      } else {
+        diagHTML += '<li>💡 <b>Valor Verdadero:</b> Revisa qué debe devolver Excel si la condición se cumple.</li>';
+      }
+
+      // 4. Verificar Valor Falso
+      if (vFals === currentExercise.expectedParts.vFalso + ")") {
+        diagHTML += '<li>✅ <b>Valor Falso y Cierre:</b> Correcto.</li>';
+      } else {
+        diagHTML += '<li>💡 <b>Valor Falso / Cierre:</b> Verifica el resultado alternativo y no olvides cerrar con el paréntesis <code>)</code>.</li>';
+      }
+    } else {
+      diagHTML += '<li>💡 Revisa la sintaxis general, el orden de los argumentos y que los textos estén entre comillas dobles.</li>';
+    }
+
+    diagHTML += '</ul>';
+    fb.innerHTML = diagHTML;
+    enviarDatosAGoogleSheets("Error", `Fallo en Nivel ${currentLevel}. Intento: ${currentFormula}`);
   }
 }
 
@@ -645,7 +746,7 @@ function updateProgressAndBadges() {
   const totalSolved = solvedBlocks.size + solvedWrites.size;
   const pct = Math.round((totalSolved / 8) * 100);
   document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressText').textContent = `Progreso del curso: ${pct}%`;
+  document.getElementById('progressText').textContent = `Progreso Global del Curso: ${pct}%`;
 
   if (totalSolved >= 1) document.getElementById('badge1').classList.add('unlocked');
   if (solvedBlocks.size >= 4) document.getElementById('badge2').classList.add('unlocked');
@@ -678,7 +779,7 @@ function resetAll() {
   document.getElementById('blockProg').textContent = '0/4';
   document.getElementById('writeProg').textContent = '0/4';
   document.getElementById('progressFill').style.width = '0%';
-  document.getElementById('progressText').textContent = 'Progreso del curso: 0%';
+  document.getElementById('progressText').textContent = 'Progreso Global del Curso: 0%';
   document.querySelectorAll('.badge').forEach(b => b.classList.remove('unlocked'));
   switchMode('block');
   loadLevel(1, document.querySelectorAll('.level-btn')[0]);
@@ -686,7 +787,6 @@ function resetAll() {
 
 function enviarDatosAGoogleSheets(accion, detalle) {
   if (!GOOGLE_SCRIPT_URL) return;
-
   const params = new URLSearchParams({
     estudiante: studentName || "Anónimo",
     puntos: points,
@@ -702,9 +802,7 @@ function enviarDatosAGoogleSheets(accion, detalle) {
   fetch(`${GOOGLE_SCRIPT_URL}?${params.toString()}`, {
     method: 'GET',
     mode: 'no-cors'
-  })
-  .then(() => console.log("Datos registrados con éxito en Sheets."))
-  .catch(err => console.error("Error al enviar datos:", err));
+  }).catch(err => console.error("Error al enviar datos:", err));
 }
 </script>
 </body>
