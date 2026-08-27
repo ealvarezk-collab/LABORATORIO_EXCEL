@@ -1,3 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laboratorio Interactivo de Fórmulas SI - Excel</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --text: #f8fafc;
+      --subtext: #94a3b8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
+    .container { max-width: 900px; width: 100%; display: flex; flex-direction: column; gap: 20px; }
+
+    /* Modales */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.9); display: flex; justify-content: center; align-items: center; z-index: 1000;
+    }
+    .modal-card {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px;
+      padding: 30px; max-width: 450px; width: 90%; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    .modal-card input {
+      width: 100%; padding: 12px; margin: 15px 0; border-radius: 6px; border: 1px solid var(--border);
+      background: #0f172a; color: white; font-size: 16px;
+    }
+
+    /* Encabezado y Estadísticas */
+    header { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .stats-bar { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 15px; background: #0f172a; padding: 12px; border-radius: 8px; }
+    .stat-item { font-size: 14px; font-weight: bold; }
+    .stat-value { color: var(--warning); font-size: 16px; }
+
+    /* Navegación y Niveles */
+    .nav-section { display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+    .btn-group { display: flex; gap: 8px; }
+    button {
+      background: var(--accent); color: white; border: none; padding: 10px 16px; border-radius: 6px;
+      cursor: pointer; font-weight: 600; transition: all 0.2s;
+    }
+    button:hover { background: var(--accent-hover); }
+    button.secondary { background: #475569; }
+    button.secondary:hover { background: #334155; }
+    .level-btn.active { background: var(--warning); color: #000; }
+    .mode-btn.active { background: var(--success); }
+    .mode-btn.locked { opacity: 0.5; cursor: not-allowed; }
+
+    /* Tarjeta de Ejercicio */
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+    .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .data-table th, .data-table td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; font-size: 14px; }
+    .data-table th { background: #0f172a; color: var(--subtext); }
+
+    /* Área de Construcción de Bloques */
+    .builder-row { margin-bottom: 12px; }
+    .row-label { font-size: 12px; color: var(--subtext); margin-bottom: 4px; }
+    .drop-zone-row {
+      min-height: 48px; background: #0f172a; border: 2px dashed var(--border); border-radius: 8px;
+      padding: 6px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; transition: background 0.2s;
+    }
+    .drop-zone-row.drag-over { background: #1e3a8a; border-color: var(--accent); }
+    .sep-row-container { display: flex; align-items: center; gap: 10px; margin: 8px 0; }
+    .sep-box { min-width: 60px; height: 40px; min-height: 40px; }
+
+    /* Bloques Arrastrables */
+    .bank-area { min-height: 70px; background: #0f172a; border: 1px solid var(--border); border-radius: 8px; padding: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+    .block {
+      padding: 8px 14px; border-radius: 6px; font-family: monospace; font-weight: bold; cursor: grab;
+      user-select: none; box-shadow: 0 2px 4px rgba(0,0,0,0.3); font-size: 14px;
+    }
+    .block:active { cursor: grabbing; }
+    .block.func { background: #8b5cf6; color: white; }
+    .block.var { background: #0284c7; color: white; }
+    .block.op { background: #ea580c; color: white; }
+    .block.val { background: #16a34a; color: white; }
+    .block.sep { background: #ca8a04; color: white; }
+    .block.res { background: #db2777; color: white; }
+    .block.paren { background: #475569; color: white; }
+
+    /* Entrada Manual */
+    .manual-input {
+      width: 100%; padding: 12px; background: #0f172a; border: 1px solid var(--border);
+      border-radius: 6px; color: white; font-family: monospace; font-size: 16px; margin-top: 10px;
+    }
+
+    /* Vista previa de fórmula y resultado */
+    .formula-preview { background: #000; border: 1px solid var(--border); border-radius: 6px; padding: 12px; font-family: monospace; color: #38bdf8; font-size: 16px; word-break: break-all; }
+    .result-box { display: flex; align-items: center; justify-content: space-between; background: #0f172a; padding: 12px; border-radius: 8px; border: 1px solid var(--border); }
+
+    /* Barra de Progreso e Insignias */
+    .progress-bar-container { background: #0f172a; border-radius: 8px; height: 12px; width: 100%; overflow: hidden; margin-top: 8px; }
+    .progress-fill { background: var(--success); height: 100%; width: 0%; transition: width 0.3s; }
+    .badges-container { display: flex; gap: 10px; margin-top: 10px; }
+    .badge { opacity: 0.3; filter: grayscale(1); transition: all 0.3s; font-size: 24px; }
+    .badge.unlocked { opacity: 1; filter: grayscale(0); }
+
+    /* Feedback y Pistas */
+    .feedback { padding: 12px; border-radius: 6px; font-weight: bold; display: none; margin-top: 10px; }
+    .feedback.ok { background: #064e3b; color: #6ee7b7; border: 1px solid #047857; }
+    .feedback.err { background: #7f1d1d; color: #fca5a5; border: 1px solid #dc2626; }
+    .hint-box { background: #78350f; color: #fde68a; border: 1px solid #d97706; padding: 10px; border-radius: 6px; display: none; margin-top: 10px; font-size: 14px; }
+  </style>
+</head>
+<body>
+
+<!-- Modal Registro Estudiante -->
+<div class="modal-overlay" id="registroModal">
+  <div class="modal-card">
+    <h2>Bienvenido al Laboratorio</h2>
+    <p style="color: var(--subtext); margin-top: 8px;">Ingresa tu nombre para comenzar la práctica de fórmulas en Excel.</p>
+    <input type="text" id="studentNameInput" placeholder="Nombre completo..." />
+    <button onclick="registrarEstudiante()">Ingresar al Sistema</button>
+  </div>
+</div>
+
+<!-- Modal Resultados / Overlay -->
+<div class="modal-overlay" id="overlay" style="display: none;">
+  <div class="modal-card">
+    <div id="overlayIcon" style="font-size: 48px; margin-bottom: 10px;">🎉</div>
+    <h2 id="overlayTitle">¡Excelente trabajo!</h2>
+    <p id="overlayMsg" style="color: var(--subtext); margin: 15px 0;"></p>
+    <button onclick="closeOverlay()">Continuar</button>
+  </div>
+</div>
+
+<div class="container">
+  <!-- Header con estadísticas -->
+  <header>
+    <h1>Laboratorio de Fórmulas Excel (=SI)</h1>
+    <div class="stats-bar">
+      <div class="stat-item">Puntos: <span class="stat-value" id="points">0</span></div>
+      <div class="stat-item">Estrellas: <span class="stat-value" id="stars">0 ⭐</span></div>
+      <div class="stat-item">Bloques: <span class="stat-value" id="blockProg">0/4</span></div>
+      <div class="stat-item">Escritura: <span class="stat-value" id="writeProg">0/4</span></div>
+      <div class="stat-item">Tiempo: <span class="stat-value" id="timer">00:00</span></div>
+    </div>
+    <div style="margin-top: 15px;">
+      <div id="progressText" style="font-size: 12px; color: var(--subtext);">Progreso del curso: 0%</div>
+      <div class="progress-bar-container">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="badges-container">
+        <span class="badge" id="badge1" title="Primer Acierto">🌱</span>
+        <span class="badge" id="badge2" title="Maestro de Bloques">🧩</span>
+        <span class="badge" id="badge3" title="Sintaxis Perfecta">✍️</span>
+        <span class="badge" id="badge4" title="Experto Excel">🏆</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navegación de Niveles y Modos -->
+  <div class="nav-section">
+    <div class="btn-group">
+      <button class="level-btn active" onclick="loadLevel(1, this)">Nivel 1</button>
+      <button class="level-btn" onclick="loadLevel(2, this)">Nivel 2</button>
+      <button class="level-btn" onclick="loadLevel(3, this)">Nivel 3</button>
+      <button class="level-btn" onclick="loadLevel(4, this)">Nivel 4</button>
+    </div>
+    <div class="btn-group">
+      <button id="btnModeBlock" class="mode-btn active" onclick="switchMode('block')">Modo Bloques</button>
+      <button id="btnModeWrite" class="mode-btn locked" onclick="switchMode('write')">Modo Escritura</button>
+      <button class="secondary" onclick="resetAll()">Reiniciar</button>
+    </div>
+  </div>
+
+  <!-- Enunciado y Datos del Ejercicio -->
+  <div class="card">
+    <h3 style="color: var(--subtext); font-size: 14px;">ENUNCIADO DEL CASO</h3>
+    <p id="text" style="font-size: 16px; margin-top: 8px; font-weight: 500;"></p>
+    <div id="data" style="margin-top: 12px;"></div>
+  </div>
+
+  <!-- Área interactiva (Bloques o Escritura) -->
+  <div class="card">
+    <h3 id="phaseTitle">2. Construcción por Filas (Bloques)</h3>
+
+    <!-- Modo Bloques -->
+    <div id="blockArea" style="margin-top: 15px;">
+      <div id="builderRows"></div>
+      <p style="font-size: 12px; color: var(--subtext); margin: 12px 0 6px 0;">BANCO DE BLOQUES (Arrastra los elementos hacia las filas):</p>
+      <div class="bank-area" id="bank" ondrop="dropToBank(event)" ondragover="allowDrop(event)"></div>
+    </div>
+
+    <!-- Modo Escritura Manual -->
+    <div id="writeArea" style="display: none; margin-top: 15px;">
+      <p style="font-size: 14px; color: var(--subtext);">Escribe la fórmula completa manualmente respetando la sintaxis exacta:</p>
+      <input type="text" id="manualFormula" class="manual-input" placeholder='=SI(B2>10;"Cuadrilla completa";"Cuadrilla incompleta")' oninput="updateFormulaFromText()" />
+    </div>
+  </div>
+
+  <!-- Vista previa de la fórmula y acciones -->
+  <div class="card">
+    <div style="font-size: 12px; color: var(--subtext); margin-bottom: 6px;">VISTA PREVIA DE LA FÓRMULA GENERADA:</div>
+    <div class="formula-preview" id="formula">=SI(...)</div>
+
+    <div class="result-box" style="margin-top: 15px;">
+      <span>Resultado Evaluado en Celda:</span>
+      <b id="resultDisplay" style="color: var(--success); font-size: 18px;">—</b>
+    </div>
+
+    <div style="display: flex; gap: 10px; margin-top: 15px;">
+      <button onclick="checkCurrentPhase()" style="flex: 2;">Verificar Respuesta</button>
+      <button class="secondary" onclick="showHint()" style="flex: 1;">Pista 💡</button>
+      <button class="secondary" onclick="clearCurrentPhase()" style="flex: 1;">Limpiar</button>
+    </div>
+
+    <div id="hint" class="hint-box"></div>
+    <div id="feedback" class="feedback"></div>
+  </div>
+</div>
+
 <script>
 // CONFIGURACIÓN DE EXPORTACIÓN A GOOGLE SHEETS
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTNt780x1-Hg_hD7RzVL1OY5GlSm7bLY3nssmxKFNBR6o8ZoR1QsupDj9qIlRVlyt9vQ/exec";
@@ -38,7 +260,7 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Ingreso permitido"', type:"res"}, {text:";", type:"sep"},
         {text:'"Ingreso denegado"', type:"res"}, {text:")", type:"paren"}
       ],
-      expected: '=SI(B2="Conforme";"Ingreso permitted";"Ingreso denegado")',
+      expected: '=SI(B2="Conforme";"Ingreso permitido";"Ingreso denegado")',
       hints: ["Identifica la comparación de texto idéntico usando =.", "Recuerda separar con ;.", "Usa la respuesta verdadera si coincide y la falsa en caso contrario."],
       eval: (d) => d[0][2] === 'Conforme' ? 'Ingreso permitido' : 'Ingreso denegado'
     }
@@ -136,7 +358,7 @@ const EXERCISE_BANK = {
       eval: (d) => (d[0][2] >= 20 && parseInt(d[1][2]) >= 90) ? 'Bono' : 'Sin bono'
     },
     {
-      text: "[SI + O] Activa una alerta de emergencia si la temperatura en B2 sobrepasa los 50 grados O BIEN si la presión en C2 es strictly mayor a 100. De cumplirse cualquiera de las dos, mostrar “Alerta”; si ninguna se presenta, registrar “Normal”.",
+      text: "[SI + O] Activa una alerta de emergencia si la temperatura en B2 sobrepasa los 50 grados O BIEN si la presión en C2 es estrictamente mayor a 100. De cumplirse cualquiera de las dos, mostrar “Alerta”; si ninguna se presenta, registrar “Normal”.",
       data: [["B2", "Temperatura", 55], ["C2", "Presión", 90]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"O(", type:"func"}, {text:"B2", type:"var"}, {text:">", type:"op"}, {text:"50", type:"val"},
@@ -182,9 +404,7 @@ function registrarEstudiante() {
   studentName = name;
   document.getElementById('registroModal').style.display = 'none';
   
-  // Enviar evento de inicio a Google Sheets
   enviarDatosAGoogleSheets("Inicio de Sesión", "El estudiante inició el laboratorio");
-  
   loadLevel(1, document.querySelectorAll('.level-btn')[0]);
 }
 
@@ -304,12 +524,12 @@ function renderBank(blocks) {
 
 function allowDrop(e) {
   e.preventDefault();
-  const zone = e.target.closest('.drop-zone-row');
+  const zone = e.target.closest('.drop-zone-row') || e.target.closest('.bank-area');
   if(zone) zone.classList.add('drag-over');
 }
 
 function dragLeave(e) {
-  const zone = e.target.closest('.drop-zone-row');
+  const zone = e.target.closest('.drop-zone-row') || e.target.closest('.bank-area');
   if(zone) zone.classList.remove('drag-over');
 }
 
@@ -328,10 +548,12 @@ function dropBlock(e) {
 
 function dropToBank(e) {
   e.preventDefault();
+  const bank = document.getElementById('bank');
+  bank.classList.remove('drag-over');
   const id = e.dataTransfer.getData('text/plain');
   const el = document.getElementById(id);
   if (!el) return;
-  document.getElementById('bank').appendChild(el);
+  bank.appendChild(el);
   updateFormulaFromRows();
 }
 
@@ -391,11 +613,9 @@ function checkCurrentPhase() {
     fb.className = 'feedback ok';
     fb.textContent = '🎉 ¡Correcto! Has construido la fórmula de manera perfecta.';
     
-    // Calcular resultado en pantalla
     const res = currentExercise.eval(currentExercise.data);
     document.getElementById('resultDisplay').textContent = res;
     
-    // Puntos
     points += 100;
     document.getElementById('points').textContent = points;
     
@@ -408,8 +628,6 @@ function checkCurrentPhase() {
     }
     
     updateProgressAndBadges();
-    
-    // Enviar acierto a Google Sheets
     enviarDatosAGoogleSheets("Acierto", `Nivel ${currentLevel} (${activeMode}) completado`);
 
     if (solvedBlocks.size === 4 && activeMode === 'block') {
@@ -419,8 +637,6 @@ function checkCurrentPhase() {
   } else {
     fb.className = 'feedback err';
     fb.textContent = '❌ Revisa la estructura. Asegúrate de que los bloques y separadores estén en el orden correcto.';
-    
-    // Enviar fallo a Google Sheets
     enviarDatosAGoogleSheets("Error", `Fallo en Nivel ${currentLevel} (${activeMode}). Intento: ${currentFormula}`);
   }
 }
@@ -468,7 +684,6 @@ function resetAll() {
   loadLevel(1, document.querySelectorAll('.level-btn')[0]);
 }
 
-// FUNCIÓN DE COMUNICACIÓN VÍA GET CON GOOGLE APPS SCRIPT
 function enviarDatosAGoogleSheets(accion, detalle) {
   if (!GOOGLE_SCRIPT_URL) return;
 
