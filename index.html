@@ -472,17 +472,27 @@ function resetAll() {
 function enviarDatosAGoogleSheets(accion, detalle) {
   if (!GOOGLE_SCRIPT_URL) return;
 
-  const payload = {
-    estudiante: studentName,
+  // Construir los datos como parámetros de URL
+  const params = new URLSearchParams({
+    estudiante: studentName || "Anónimo",
     puntos: points,
     estrellas: stars,
     tiempo: document.getElementById('timer') ? document.getElementById('timer').textContent : "00:00",
-    nivelActual: currentLevel,
-    modoActual: activeMode,
+    nivel: currentLevel,
+    modo: activeMode,
     accion: accion || "Registro",
     detalle: detalle || "",
     fecha: new Date().toLocaleString('es-ES')
-  };
+  });
+
+  // Enviar mediante petición GET silenciosa (sin bloquear el juego)
+  fetch(`${GOOGLE_SCRIPT_URL}?${params.toString()}`, {
+    method: 'GET',
+    mode: 'no-cors'
+  })
+  .then(() => console.log("Datos registrados con éxito en Sheets."))
+  .catch(err => console.error("Error al enviar datos:", err));
+}
 
   fetch(GOOGLE_SCRIPT_URL, {
     method: 'POST',
