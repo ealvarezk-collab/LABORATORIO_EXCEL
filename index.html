@@ -825,10 +825,10 @@ function load(n, btn) {
 
     if (level === 3) {
       zonesContainer.innerHTML = `
-        <div class="zone">
-          <div class="label">FÓRMULA COMPLETA (arrastra los bloques en orden horizontal)</div>
-          <div id="formula-zone" class="drop" style="flex-wrap:nowrap; overflow-x:auto; min-height:80px; align-items:center;"></div>
-        </div>`;
+  <div class="zone">
+    <div class="label">FÓRMULA COMPLETA (arrastra los bloques; se acomodan en filas)</div>
+    <div id="formula-zone" class="drop" style="flex-wrap:wrap; overflow-y:auto; max-height:150px; align-items:flex-start;"></div>
+  </div>`;
       setupSingleZone();
     } else {
       zonesContainer.innerHTML = `
@@ -937,16 +937,16 @@ function setupSingleZone() {
   const zone = document.getElementById('formula-zone');
   zone.ondragover = ev => { ev.preventDefault(); ev.dataTransfer.dropEffect = 'move'; };
   zone.ondrop = ev => {
-    ev.preventDefault();
-    const i = parseInt(ev.dataTransfer.getData('text/plain'), 10);
-    const el = document.querySelector(`[data-i="${i}"]`);
-    if (el) {
-      insertBlockAtPosition(zone, el, ev.clientX, ev.clientY);
-      updateFormula();
-      updateResult();
-      document.getElementById('feedback').className = 'feedback';
-    }
-  };
+  ev.preventDefault();
+  const i = parseInt(ev.dataTransfer.getData('text/plain'), 10);
+  const el = document.querySelector(`[data-i="${i}"]`);
+  if (el) {
+    zone.appendChild(el); // simplemente agrega al final
+    updateFormula();
+    updateResult();
+    document.getElementById('feedback').className = 'feedback';
+  }
+};
 
   const bank = document.getElementById('bank');
   bank.ondragover = ev => { ev.preventDefault(); ev.dataTransfer.dropEffect = 'move'; };
