@@ -12,8 +12,8 @@
   }
   *{box-sizing:border-box}
   body{font-family:'Segoe UI',Arial,sans-serif;margin:0;background:var(--bg);color:#263746}
-  header{background:var(--dark);color:#fff;padding:22px;text-align:center}
-  header h1{margin:0 0 8px;font-size:1.6rem}
+  header{background:var(--dark);color:#fff;padding:20px;text-align:center}
+  header h1{margin:0 0 5px;font-size:1.6rem}
   header p{margin:0;opacity:.9}
   main{max-width:1200px;margin:20px auto;padding:0 16px}
   .top-bar{display:flex;flex-wrap:wrap;gap:15px;align-items:center;justify-content:space-between;margin-bottom:15px}
@@ -22,9 +22,16 @@
   .stat span:first-child{font-size:12px;color:#687987;font-weight:600}
   .stat span:last-child{font-size:20px;font-weight:bold}
   
-  .mode-selector{display:flex;gap:10px;margin-bottom:15px;background:#e2e9f0;padding:5px;border-radius:8px;width:fit-content}
-  .mode-btn{padding:8px 16px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-weight:bold;color:#506273}
-  .mode-btn.active{background:var(--primary);color:white}
+  /* BANDEROLA DE INDICADOR DE FASE / PASO */
+  .phase-tracker {
+    display: flex; gap: 10px; margin-bottom: 15px; background: #e2e9f0; padding: 6px; border-radius: 8px; align-items: center;
+  }
+  .phase-step {
+    flex: 1; text-align: center; padding: 10px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; color: #687987; background: #d3dde6;
+    transition: all 0.3s ease;
+  }
+  .phase-step.active { background: var(--primary); color: white; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+  .phase-step.completed { background: #28a745; color: white; }
 
   .levels{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
   .level-btn{padding:9px 13px;border-radius:7px;border:1px solid #ccd7e0;background:#fff;cursor:pointer;font-weight:600}
@@ -39,30 +46,20 @@
   .data-table td,.data-table th{border:1px solid var(--border);padding:7px;text-align:left}
   .data-table th{background:#eef3f7}
   
-  /* CASILLA DE SOLTAR CON REORGANIZACIÓN DINÁMICA */
+  /* CASILLA DE SOLTAR E INSERCIÓN DERECHA */
   .drop {
-    min-height: 60px;
-    border: 2px dashed #2f5f85;
-    border-radius: 8px;
-    padding: 8px;
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    background: #ffffff;
-    align-items: center;
-    margin-bottom: 12px;
-    transition: background 0.2s;
+    min-height: 60px; border: 2px dashed #2f5f85; border-radius: 8px; padding: 8px;
+    display: flex; gap: 6px; flex-wrap: wrap; background: #ffffff; align-items: center; margin-bottom: 12px;
   }
-  .drop.drag-over { background: #f0f7ff; }
-
+  .drop.drag-over { background: #eef6ff; }
   .bank{display:flex;gap:6px;flex-wrap:wrap;background:#f8fafc;padding:12px;border-radius:8px;border:1px solid var(--border);min-height:60px}
   
-  /* CROMÁTICA DE BLOQUES */
+  /* CROMÁTICA DE BLOQUES DE COLORES */
   .block{
     padding:8px 12px;border-radius:6px;border:1px solid #c9d8e4;cursor:grab;user-select:none;
-    font-family:Consolas,monospace;font-weight:bold;font-size:14px;transition:transform 0.15s, box-shadow 0.15s;
+    font-family:Consolas,monospace;font-weight:bold;font-size:14px;transition:transform 0.15s;
   }
-  .block:active{cursor:grabbing; transform:scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.15);}
+  .block:active{cursor:grabbing; transform:scale(1.05);}
   .block.var{background:#e9f2fb; border-color:#9ec5fe; color:#0a58ca}
   .block.op{background:#f1eefb; border-color:#c5b3e6; color:#59359a}
   .block.val{background:#f6f2e9; border-color:#e2d3b7; color:#856404}
@@ -71,17 +68,13 @@
   .block.paren{background:#e2f0fb; border-color:#b6d4fe; color:#084298}
   .block.sep{background:#fff3cd; border-color:#ffeeba; color:#856404}
 
-  /* INDICADOR DE INSERCIÓN DERECHA/IZQUIERDA */
-  .drop-indicator {
-    width: 4px; background: #2f5f85; height: 35px; border-radius: 2px;
-    animation: pulse 0.5s infinite alternate;
+  /* FASE DE ESCRITURA */
+  .input-formula-container {
+    background: #f0f4f8; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 12px;
   }
-  @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
-
-  .text-mode-area{display:none;}
   .input-formula{
     width: 100%; padding: 12px; font-family: Consolas, monospace; font-size: 15px;
-    border: 2px solid var(--primary); border-radius: 8px; margin-bottom: 10px;
+    border: 2px solid var(--primary); border-radius: 6px; margin-top: 8px;
   }
 
   .feedback{display:none;margin-top:14px;padding:12px;border-radius:8px;line-height:1.45}
@@ -120,13 +113,13 @@
   <div class="overlay-content">
     <div class="crown">👑</div>
     <div id="overlayMsg">¡Nivel Completado!</div>
-    <button class="primary" onclick="closeOverlay()" style="margin-top:15px;">Continuar</button>
+    <button class="primary" onclick="closeOverlay()" style="margin-top:15px;">Continuar al Siguiente Nivel</button>
   </div>
 </div>
 
 <header>
   <h1>🏗️ Laboratorio Interactivo: Lógica de funciones SI</h1>
-  <p>Excel aplicado a seguridad y construcción · ¡Supera los desafíos y gana insignias!</p>
+  <p>Excel aplicado a seguridad y construcción · Completa ambas fases de cada ejercicio</p>
 </header>
 <main>
   <div class="top-bar">
@@ -143,13 +136,13 @@
   </div>
 
   <div class="character-msg">
-    <span id="charText">¡Bienvenido! Selecciona el modo de trabajo y construye o escribe la fórmula de Excel.</span>
+    <span id="charText">¡Bienvenido! Primero arma la fórmula con bloques (Fase 1) para desbloquear la fase de escritura (Fase 2).</span>
   </div>
 
-  <!-- SELECTOR DE MODO BARRAS DE HERRAMIENTAS -->
-  <div class="mode-selector">
-    <button class="mode-btn active" id="btnBlockMode" onclick="setMode('blocks')">🧩 Modo Bloques</button>
-    <button class="mode-btn" id="btnTextMode" onclick="setMode('text')">✍️ Modo Escritura Manual</button>
+  <!-- INDICADOR DE FASE SECUENCIAL OBLIGATORIA -->
+  <div class="phase-tracker">
+    <div class="phase-step active" id="phase1Tag">🧩 Paso 1: Armar con Bloques de Colores</div>
+    <div class="phase-step" id="phase2Tag">✍️ Paso 2: Escritura Manual en Sintaxis Real</div>
   </div>
 
   <div class="levels">
@@ -180,26 +173,28 @@
     </section>
 
     <section class="card">
-      <h2>2. Construye o escribe la fórmula</h2>
+      <h2 id="phaseTitle">2. Paso 1: Construye la fórmula con bloques</h2>
       
-      <!-- CONTENEDOR MODO BLOQUES -->
-      <div id="blockModeArea">
-        <div class="stat-title" style="font-size:12px; font-weight:bold; color:#687987; margin-bottom:5px;">CASILLA DE CONSTRUCCIÓN (Puedes soltar e insertar entre casillas):</div>
+      <!-- FASE 1: BLOQUES DE COLORES -->
+      <div id="blockPhaseArea">
+        <div style="font-size:12px; font-weight:bold; color:#687987; margin-bottom:5px;">CASILLA DE CONSTRUCCIÓN (Puedes soltar e insertar entre bloques):</div>
         <div id="dropZone" class="drop" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
         
-        <h3>Bloques disponibles</h3>
+        <div style="font-size:12px; font-weight:bold; color:#687987; margin-bottom:5px;">BLOQUES DISPONIBLES:</div>
         <div id="bank" class="bank" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
       </div>
 
-      <!-- CONTENEDOR MODO ESCRITURA MANUAL -->
-      <div id="textModeArea" class="text-mode-area">
-        <div class="stat-title" style="font-size:12px; font-weight:bold; color:#687987; margin-bottom:5px;">ESCRIBE LA FÓRMULA DIRECTAMENTE:</div>
-        <input type="text" id="manualFormula" class="input-formula" placeholder='Ej: =SI(B2>10;"Completa";"Incompleta")' oninput="updateFormulaFromText()" />
+      <!-- FASE 2: ESCRITURA MANUAL (BLOQUEADA HASTA APROBAR FASE 1) -->
+      <div id="textPhaseArea" style="display:none;">
+        <div class="input-formula-container">
+          <label style="font-weight:bold; font-size:0.9rem; color:#17324d;">Escribe la fórmula completa en formato Excel:</label>
+          <input type="text" id="manualFormula" class="input-formula" placeholder='Ej: =SI(B2>10;"Cuadrilla completa";"Cuadrilla incompleta")' oninput="updateFormulaFromText()" />
+        </div>
       </div>
 
       <p style="margin-top:15px;">
-        <button class="primary" onclick="check()">Comprobar</button>
-        <button onclick="clearBuild()">Limpiar Casilla / Texto</button>
+        <button class="primary" onclick="checkPhase()">Comprobar Paso Actual</button>
+        <button onclick="clearBuild()">Limpiar</button>
       </p>
       <div id="feedback" class="feedback"></div>
       
@@ -288,22 +283,7 @@ const BLOCK_LEVELS = {
 };
 
 let currentLevel = 1, points = 0, stars = 0, solvedLevels = new Set(), hintIndex = 0, timerInterval, seconds = 0;
-let currentMode = 'blocks';
-
-function setMode(mode) {
-  currentMode = mode;
-  document.getElementById('btnBlockMode').classList.toggle('active', mode === 'blocks');
-  document.getElementById('btnTextMode').classList.toggle('active', mode === 'text');
-  
-  document.getElementById('blockModeArea').style.display = (mode === 'blocks') ? 'block' : 'none';
-  document.getElementById('textModeArea').style.display = (mode === 'text') ? 'block' : 'none';
-  
-  if(mode === 'text') {
-    updateFormulaFromText();
-  } else {
-    updateFormula();
-  }
-}
+let currentPhase = 1; // 1: Bloques, 2: Escritura Manual
 
 function startTimer() {
   clearInterval(timerInterval);
@@ -318,11 +298,14 @@ function startTimer() {
 
 function load(lvl, btn) {
   currentLevel = lvl;
+  currentPhase = 1;
   hintIndex = 0;
+  
   if(btn) {
     document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
   }
+  
   const ex = BLOCK_LEVELS[lvl];
   document.getElementById('text').textContent = ex.text;
   
@@ -331,12 +314,37 @@ function load(lvl, btn) {
   html += '</table>';
   document.getElementById('data').innerHTML = html;
 
+  updatePhaseUI();
   clearBuild();
   renderBank(ex.blocks);
   document.getElementById('hint').style.display = 'none';
   document.getElementById('feedback').style.display = 'none';
   document.getElementById('resultDisplay').textContent = '—';
   startTimer();
+}
+
+function updatePhaseUI() {
+  const p1Tag = document.getElementById('phase1Tag');
+  const p2Tag = document.getElementById('phase2Tag');
+  const blockArea = document.getElementById('blockPhaseArea');
+  const textArea = document.getElementById('textPhaseArea');
+  const title = document.getElementById('phaseTitle');
+
+  if(currentPhase === 1) {
+    p1Tag.className = 'phase-step active';
+    p2Tag.className = 'phase-step';
+    blockArea.style.display = 'block';
+    textArea.style.display = 'none';
+    title.textContent = '2. Paso 1: Construye la fórmula con bloques';
+    document.getElementById('charText').textContent = '¡Paso 1! Ordena los bloques de colores en la casilla superior.';
+  } else {
+    p1Tag.className = 'phase-step completed';
+    p2Tag.className = 'phase-step active';
+    blockArea.style.display = 'none';
+    textArea.style.display = 'block';
+    title.textContent = '2. Paso 2: Escribe la fórmula manualmente';
+    document.getElementById('charText').textContent = '¡Paso 1 Superado! Ahora escribe la fórmula en el cuadro usando sintaxis de Excel.';
+  }
 }
 
 function renderBank(blocks) {
@@ -354,13 +362,12 @@ function renderBank(blocks) {
   });
 }
 
-/* LÓGICA DE REORGANIZACIÓN E INSERCIÓN ENTRE CASILLAS */
+/* DRAG & DROP CON INSERCIÓN DERECHA */
 function allowDrop(e) {
   e.preventDefault();
   const dropZone = document.getElementById('dropZone');
   dropZone.classList.add('drag-over');
   
-  // Si arrastra sobre un bloque existente en la casilla
   if (e.target.classList.contains('block') && e.target.parentNode.id === 'dropZone') {
     const rect = e.target.getBoundingClientRect();
     const midX = rect.left + rect.width / 2;
@@ -375,11 +382,9 @@ function allowDrop(e) {
 }
 
 function dragLeave(e) {
-  const dropZone = document.getElementById('dropZone');
-  dropZone.classList.remove('drag-over');
+  document.getElementById('dropZone').classList.remove('drag-over');
   document.querySelectorAll('#dropZone .block').forEach(b => {
-    b.style.borderLeft = '';
-    b.style.borderRight = '';
+    b.style.borderLeft = ''; b.style.borderRight = '';
   });
 }
 
@@ -388,78 +393,84 @@ function drop(e) {
   const dropZone = document.getElementById('dropZone');
   dropZone.classList.remove('drag-over');
   
-  // Limpiar estilos de borde indicativos
   document.querySelectorAll('#dropZone .block').forEach(b => {
-    b.style.borderLeft = '';
-    b.style.borderRight = '';
+    b.style.borderLeft = ''; b.style.borderRight = '';
   });
 
   const id = e.dataTransfer.getData('text/plain');
   const el = document.getElementById(id);
   if (!el) return;
 
-  if (e.target.id === 'bank') {
-    e.target.appendChild(el);
-  } else if (e.target.id === 'dropZone') {
+  if (e.target.id === 'bank' || e.target.id === 'dropZone') {
     e.target.appendChild(el);
   } else if (e.target.classList.contains('block') && e.target.parentNode.id === 'dropZone') {
-    // Insertar antes o después según la posición del cursor (Desplazamiento a la derecha)
     const rect = e.target.getBoundingClientRect();
     const midX = rect.left + rect.width / 2;
-    if (e.clientX < midX) {
-      dropZone.insertBefore(el, e.target);
-    } else {
-      dropZone.insertBefore(el, e.target.nextSibling);
-    }
+    if (e.clientX < midX) dropZone.insertBefore(el, e.target);
+    else dropZone.insertBefore(el, e.target.nextSibling);
   }
   updateFormula();
 }
 
 function updateFormula() {
-  if(currentMode !== 'blocks') return;
+  if(currentPhase !== 1) return;
   const zone = document.getElementById('dropZone');
   const blocks = Array.from(zone.children).map(c => c.textContent);
   document.getElementById('formula').textContent = blocks.join('') || '=SI(...)';
 }
 
 function updateFormulaFromText() {
-  if(currentMode !== 'text') return;
+  if(currentPhase !== 2) return;
   const val = document.getElementById('manualFormula').value.trim();
   document.getElementById('formula').textContent = val || '=SI(...)';
 }
 
-function check() {
-  let built = '';
-  if (currentMode === 'blocks') {
-    const zone = document.getElementById('dropZone');
-    built = Array.from(zone.children).map(c => c.textContent).join('');
-  } else {
-    built = document.getElementById('manualFormula').value.replace(/\s+/g, '');
-  }
-
+function checkPhase() {
   const ex = BLOCK_LEVELS[currentLevel];
   const expected = ex.f.replace(/\s+/g, '');
-
   const fb = document.getElementById('feedback');
   fb.style.display = 'block';
 
-  if (built === expected) {
-    fb.className = 'feedback ok';
-    fb.textContent = '¡Correcto! Has construido/escrito la sintaxis perfecta.';
-    
-    if(!solvedLevels.has(currentLevel)) {
-      solvedLevels.add(currentLevel);
-      points += 100;
-      stars = Math.min(12, stars + 1);
-      updateStats();
-      checkBadges();
+  if (currentPhase === 1) {
+    // EVALUACIÓN FASE 1 (BLOQUES)
+    const zone = document.getElementById('dropZone');
+    const built = Array.from(zone.children).map(c => c.textContent).join('').replace(/\s+/g, '');
+
+    if (built === expected) {
+      fb.className = 'feedback ok';
+      fb.textContent = '¡Excelente! Los bloques están en el orden perfecto. ¡Fase 1 Superada!';
+      setTimeout(() => {
+        currentPhase = 2;
+        updatePhaseUI();
+        fb.style.display = 'none';
+      }, 1200);
+    } else {
+      fb.className = 'feedback err';
+      fb.textContent = 'Revisa el orden de los bloques de colores. Asegúrate de cerrar los paréntesis y colocar el punto y coma.';
     }
-    
-    document.getElementById('resultDisplay').textContent = ex.eval(ex.data);
-    showOverlay(`¡Felicidades! Superaste el Nivel ${currentLevel}`);
+
   } else {
-    fb.className = 'feedback err';
-    fb.textContent = 'La estructura no coincide con la fórmula esperada. Revisa el orden, comillas o paréntesis.';
+    // EVALUACIÓN FASE 2 (ESCRITURA MANUAL)
+    const built = document.getElementById('manualFormula').value.replace(/\s+/g, '');
+
+    if (built === expected) {
+      fb.className = 'feedback ok';
+      fb.textContent = '¡Fantástico! Has escrito la sintaxis exacta. ¡Ejercicio completado!';
+      
+      if(!solvedLevels.has(currentLevel)) {
+        solvedLevels.add(currentLevel);
+        points += 100;
+        stars = Math.min(12, stars + 1);
+        updateStats();
+        checkBadges();
+      }
+      
+      document.getElementById('resultDisplay').textContent = ex.eval(ex.data);
+      showOverlay(`¡Felicidades! Superaste ambas fases del Nivel ${currentLevel}`);
+    } else {
+      fb.className = 'feedback err';
+      fb.textContent = 'Error de sintaxis en el texto. Verifica las comillas, puntos y comas (;) y paréntesis.';
+    }
   }
 }
 
@@ -474,7 +485,7 @@ function updateStats() {
 
 function checkBadges() {
   if (solvedLevels.size >= 1) document.getElementById('badge1').classList.add('unlocked');
-  if (seconds <= 45 && solvedLevels.size >= 1) document.getElementById('badge2').classList.add('unlocked');
+  if (seconds <= 60 && solvedLevels.size >= 1) document.getElementById('badge2').classList.add('unlocked');
   if (solvedLevels.size === 4) document.getElementById('badge3').classList.add('unlocked');
 }
 
@@ -487,12 +498,15 @@ function showHint() {
 }
 
 function clearBuild() {
-  const zone = document.getElementById('dropZone');
-  const bank = document.getElementById('bank');
-  while (zone.firstChild) bank.appendChild(zone.firstChild);
-  document.getElementById('manualFormula').value = '';
-  if(currentMode === 'blocks') updateFormula();
-  else updateFormulaFromText();
+  if(currentPhase === 1) {
+    const zone = document.getElementById('dropZone');
+    const bank = document.getElementById('bank');
+    while (zone.firstChild) bank.appendChild(zone.firstChild);
+    updateFormula();
+  } else {
+    document.getElementById('manualFormula').value = '';
+    updateFormulaFromText();
+  }
 }
 
 function showOverlay(msg) {
@@ -502,6 +516,9 @@ function showOverlay(msg) {
 
 function closeOverlay() {
   document.getElementById('overlay').style.display = 'none';
+  if(currentLevel < 4) {
+    load(currentLevel + 1, document.querySelectorAll('.level-btn')[currentLevel]);
+  }
 }
 
 function resetAll() {
