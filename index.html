@@ -1,278 +1,5 @@
-<!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Laboratorio Interactivo: Función SI con retroalimentación avanzada</title>
-<style>
-  :root{
-    --bg:#f4f7fa; --card:#fff; --border:#d9e2ea; --dark:#17324d; --primary:#2f5f85;
-    --ok:#eaf6ef; --ok-border:#b8ddc7; --err-bg:#fff0f0; --err-border:#efb5b5;
-    --hint-bg:#fff7e6; --hint-border:#f1d39a;
-  }
-  *{box-sizing:border-box}
-  body{font-family:'Segoe UI',Arial,sans-serif;margin:0;background:var(--bg);color:#263746}
-  header{background:var(--dark);color:#fff;padding:20px;text-align:center}
-  header h1{margin:0 0 5px;font-size:1.6rem}
-  header p{margin:0;opacity:.9}
-  main{max-width:1200px;margin:20px auto;padding:0 16px}
-
-  /* BARRA SUPERIOR DE ESTADÍSTICAS Y BARRA DE PROGRESO */
-  .top-bar{display:flex;gap:15px;align-items:center;justify-content:space-between;margin-bottom:15px;flex-wrap:nowrap}
-  .stats{display:flex;gap:20px;background:var(--card);border:1px solid var(--border);padding:10px 15px;border-radius:8px;flex:0 0 auto}
-  .stat{display:flex;flex-direction:column;align-items:center}
-  .stat span:first-child{font-size:12px;color:#687987;font-weight:600}
-  .stat span:last-child{font-size:20px;font-weight:bold}
-  .stat-change { font-size: 11px; font-weight: bold; transition: all 0.3s; }
-  .stat-plus { color: #28a745; }
-  .stat-minus { color: #dc3545; }
-
-  /* PROGRESO EXPANDIDO */
-  .progress-container { 
-    flex: 1 1 auto; 
-    background: #e2e8f0; 
-    border-radius: 12px; 
-    height: 32px; 
-    position: relative; 
-    overflow: hidden; 
-    border: 1px solid #cbd5e1;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
-    margin: 0 10px;
-  }
-  .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #3b82f6, #2563eb); transition: width 0.5s ease; }
-  .progress-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 13px; font-weight: bold; color: #1e293b; text-shadow: 0 0 2px #fff; }
-
-  /* SELECTOR DE MODOS */
-  .mode-selector { display: flex; gap: 10px; margin-bottom: 15px; background: #dce5ed; padding: 6px; border-radius: 8px; }
-  .mode-btn {
-    flex: 1; text-align: center; padding: 12px; border-radius: 6px; font-weight: bold; font-size: 0.95rem;
-    color: #536471; background: #cdd8e2; border: none; cursor: pointer; transition: all 0.3s;
-  }
-  .mode-btn.active { background: var(--primary); color: white; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-  .mode-btn.locked { opacity: 0.6; cursor: not-allowed; background: #b0c0ce; color: #666; }
-
-  .levels{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
-  .level-btn{padding:9px 13px;border-radius:7px;border:1px solid #ccd7e0;background:#fff;cursor:pointer;font-weight:600}
-  .level-btn.active{background:var(--dark);color:#fff}
-  
-  .grid{display:grid;grid-template-columns:1fr 1.4fr;gap:18px}
-  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px}
-  .card h2{margin-top:0;font-size:1.2rem}
-  button.primary{background:var(--primary);color:white;border:none}
-  button{padding:9px 13px;border-radius:7px;border:1px solid #ccd7e0;background:#fff;cursor:pointer;font-weight:600}
-  
-  .enunciado{background:#f8fafc;border-left:4px solid var(--primary);padding:14px;line-height:1.5}
-  .data-table{width:100%;border-collapse:collapse;margin-top:12px}
-  .data-table td,.data-table th{border:1px solid var(--border);padding:7px;text-align:left}
-  .data-table th{background:#eef3f7}
-
-  /* ESTRUCTURA POR FILAS */
-  .formula-builder-container {
-    background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 12px;
-  }
-  .builder-row {
-    display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap;
-  }
-  .row-label {
-    font-size: 11px; font-weight: bold; color: #475569; min-width: 120px; background: #e2e8f0; padding: 6px 8px; border-radius: 4px;
-  }
-  .drop-zone-row {
-    min-height: 48px; flex: 1; border: 2px dashed #94a3b8; border-radius: 6px; padding: 4px;
-    display: flex; gap: 4px; flex-wrap: wrap; background: #ffffff; align-items: center;
-  }
-  .drop-zone-row.drag-over { background: #e2e8f0; border-color: #2f5f85; }
-  
-  .sep-row-container {
-    display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-left: 128px;
-  }
-  .sep-box {
-    width: 44px !important; height: 44px !important; flex: none !important; min-height: 44px !important;
-    border: 2px dashed #f59e0b; background: #fef3c7; border-radius: 6px;
-    display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; padding: 0 !important;
-  }
-
-  /* BANCO DE BLOQUES */
-  .bank{display:flex;gap:6px;flex-wrap:wrap;background:#f8fafc;padding:12px;border-radius:8px;border:1px solid var(--border);min-height:60px}
-  .block{
-    padding:8px 10px;border-radius:6px;border:1px solid #c9d8e4;cursor:grab;user-select:none;
-    font-family:Consolas,monospace;font-weight:bold;font-size:13px;transition:transform 0.15s;
-  }
-  .block:active{cursor:grabbing; transform:scale(1.05);}
-  .block.var{background:#e9f2fb; border-color:#9ec5fe; color:#0a58ca}
-  .block.op{background:#f1eefb; border-color:#c5b3e6; color:#59359a}
-  .block.val{background:#f6f2e9; border-color:#e2d3b7; color:#856404}
-  .block.res{background:#edf6ef; border-color:#b1dfbb; color:#155724}
-  .block.func{background:#fde2e2; border-color:#f5c6cb; color:#721c24}
-  .block.paren{background:#e2f0fb; border-color:#b6d4fe; color:#084298}
-  .block.sep{background:#fff3cd; border-color:#ffeeba; color:#856404}
-
-  /* ESCRITURA MANUAL */
-  .input-formula-container {
-    background: #f0f4f8; padding: 15px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 12px;
-  }
-  .input-formula{
-    width: 100%; padding: 12px; font-family: Consolas, monospace; font-size: 15px;
-    border: 2px solid var(--primary); border-radius: 6px; margin-top: 8px; background: #fff;
-  }
-
-  .feedback{display:none;margin-top:14px;padding:14px;border-radius:8px;line-height:1.5;font-size:0.95rem}
-  .ok{display:block;background:var(--ok);border:1px solid var(--ok-border);color:#155724}
-  .err{display:block;background:var(--err-bg);border:1px solid var(--err-border);color:#721c24}
-  .hint{display:block;background:var(--hint-bg);border:1px solid var(--hint-border);color:#856404}
-  .formula{font-family:Consolas,monospace;background:#17212b;color:#7cd5ff;padding:13px;border-radius:7px;min-height:24px;white-space:pre-wrap;word-break:break-all}
-  .result-area{margin-top:10px;padding:10px;background:#eef3f7;border-radius:6px;font-weight:bold}
-  
-  .achievements{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-  .badge{background:#f0f0f0;border:1px solid #ccc;padding:6px 12px;border-radius:20px;font-size:12px;display:flex;align-items:center;gap:5px;opacity:0.4;transition:all 0.3s}
-  .badge.unlocked{background:#d4edda;border-color:#28a745;color:#155724;opacity:1;font-weight:bold;transform:scale(1.03)}
-
-  /* VENTANAS MODALES */
-  .overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center;
-    z-index: 10000; animation: fadeIn 0.3s;
-  }
-  .overlay-content {
-    background: white; padding: 30px; border-radius: 20px; text-align: center;
-    font-size: 1.1rem; box-shadow: 0 0 30px rgba(0,0,0,0.3); animation: bounceIn 0.5s; max-width: 450px; width: 90%;
-  }
-  .crown { font-size: 3.5rem; margin-bottom: 10px; }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes bounceIn { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
-  
-  @media(max-width:900px){
-    .top-bar{flex-wrap:wrap;}
-    .progress-container{width:100%;margin:5px 0;}
-    .grid{grid-template-columns:1fr} 
-    .sep-row-container{padding-left:0;}
-  }
-</style>
-</head>
-<body>
-
-<!-- VENTANA FLOTANTE PARA REGISTRO DEL ESTUDIANTE -->
-<div id="registroModal" class="overlay" style="z-index: 20000;">
-  <div class="overlay-content">
-    <div style="font-size: 3rem; margin-bottom: 10px;">📋</div>
-    <h2 style="margin-top:0; color:var(--dark);">Registro de Estudiante</h2>
-    <p style="font-size:0.95rem; color:#475569;">Ingresa tu nombre para iniciar el laboratorio y sincronizar tus avances:</p>
-    <input type="text" id="studentNameInput" placeholder="Nombre y Apellido" style="width:100%; padding:12px; font-size:1rem; border:2px solid var(--primary); border-radius:6px; margin:15px 0;" />
-    <button class="primary" style="width:100%; font-size:1rem; padding:12px;" onclick="registrarEstudiante()">Comenzar Laboratorio</button>
-  </div>
-</div>
-
-<!-- VENTANA FLOTANTE DE NOTIFICACIONES Y LOGROS -->
-<div id="overlay" class="overlay" style="display:none;">
-  <div class="overlay-content">
-    <div class="crown" id="overlayIcon">👑</div>
-    <div id="overlayTitle" style="font-weight:bold; margin-bottom:10px;">¡Nivel Completado!</div>
-    <div id="overlayMsg" style="font-size:1rem; color:#475569;">Avanzaste en el laboratorio.</div>
-    <button class="primary" onclick="closeOverlay()" style="margin-top:20px; width:100%;">Continuar</button>
-  </div>
-</div>
-
-<header>
-  <h1>🏗️ Laboratorio Interactivo: Lógica de Funciones SI</h1>
-  <p>Construcción guiada con diagnóstico detallado de errores y sintaxis directa</p>
-</header>
-<main>
-  <div class="top-bar">
-    <div class="stats">
-      <div class="stat">
-        <span>Puntos</span>
-        <span id="points">0</span>
-        <span id="pointChange" class="stat-change"></span>
-      </div>
-      <div class="stat">
-        <span>Estrellas</span>
-        <span id="stars">0 ⭐</span>
-      </div>
-      <div class="stat"><span>Tiempo</span><span id="timer">00:00</span></div>
-      <div class="stat"><span>Bloques</span><span id="blockProg">0/4</span></div>
-      <div class="stat"><span>Escritura</span><span id="writeProg">0/4</span></div>
-    </div>
-    
-    <div class="progress-container">
-      <div class="progress-fill" id="progressFill"></div>
-      <span class="progress-text" id="progressText">Progreso del curso: 0%</span>
-    </div>
-  </div>
-
-  <div class="mode-selector">
-    <button class="mode-btn active" id="btnModeBlock" onclick="switchMode('block')">🧩 FASE 1: MODO BLOQUES (ESTRUCTURADO)</button>
-    <button class="mode-btn locked" id="btnModeWrite" onclick="switchMode('write')">🔒 FASE 2: MODO ESCRITURA MANUAL</button>
-  </div>
-
-  <div class="levels">
-    <button class="level-btn active" onclick="loadLevel(1,this)">Nivel 1 · SI Simple</button>
-    <button class="level-btn" onclick="loadLevel(2,this)">Nivel 2 · SI Numérico</button>
-    <button class="level-btn" onclick="loadLevel(3,this)">Nivel 3 · SI Anidado (2 Filas)</button>
-    <button class="level-btn" onclick="loadLevel(4,this)">Nivel 4 · SI + Y / SI + O</button>
-    <button onclick="resetAll()">Reiniciar todo</button>
-  </div>
-
-  <div class="grid">
-    <section class="card">
-      <h2>1. Enunciado del Problema</h2>
-      <div id="text" class="enunciado"></div>
-      <div id="data"></div>
-      <button onclick="loadRandomExercise()" style="margin-top:10px">🎲 Generar otro ejercicio aleatorio</button>
-      
-      <h3>Pistas Progresivas</h3>
-      <button onclick="showHint()">💡 Solicitar Pista</button>
-      <div id="hint" class="feedback hint"></div>
-      
-      <h3>Insignias y Logros</h3>
-      <div class="achievements" id="achievements">
-        <div class="badge" id="badge1">🥉 Primer Acierto</div>
-        <div class="badge" id="badge2">🧱 Maestro de Bloques (4/4)</div>
-        <div class="badge" id="badge3">✍️ Experto en Sintaxis</div>
-        <div class="badge" id="badge4">🏆 Dominio Total</div>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2 id="phaseTitle">2. Construcción por Filas</h2>
-      
-      <div id="blockArea">
-        <div style="font-size:12px; font-weight:bold; color:#687987; margin-bottom:8px;">
-          ARMA LA FÓRMULA ARRASTRANDO LOS BLOQUES A SU RESPECTIVA FILA:
-        </div>
-        
-        <div id="builderRows" class="formula-builder-container"></div>
-        
-        <div style="font-size:12px; font-weight:bold; color:#687987; margin-bottom:5px;">BLOQUES DISPONIBLES:</div>
-        <div id="bank" class="bank" ondrop="dropToBank(event)" ondragover="allowDrop(event)"></div>
-      </div>
-
-      <div id="writeArea" style="display:none;">
-        <div class="input-formula-container">
-          <label style="font-weight:bold; font-size:0.9rem; color:#17324d;">Escribe la fórmula de Excel completa:</label>
-          <input type="text" id="manualFormula" class="input-formula" placeholder='Ejemplo: =SI(B2>10;"Aprobado";"Rechazado")' oninput="updateFormulaFromText()" autocomplete="off" />
-        </div>
-      </div>
-
-      <p style="margin-top:15px;">
-        <button class="primary" onclick="checkCurrentPhase()">Comprobar Respuesta</button>
-        <button onclick="clearCurrentPhase()">Limpiar</button>
-      </p>
-      
-      <div id="feedback" class="feedback"></div>
-      
-      <h3>Fórmula Resultante</h3>
-      <div id="formula" class="formula">=SI(...)</div>
-      
-      <h3>Resultado Calculado</h3>
-      <div class="result-area">
-        <span id="resultDisplay">—</span>
-      </div>
-    </section>
-  </div>
-</main>
-
 <script>
 // CONFIGURACIÓN DE EXPORTACIÓN A GOOGLE SHEETS
-// Reemplaza esta URL con la Web App publicada desde Google Apps Script:
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTNt780x1-Hg_hD7RzVL1OY5GlSm7bLY3nssmxKFNBR6o8ZoR1QsupDj9qIlRVlyt9vQ/exec";
 
 let studentName = "";
@@ -618,9 +345,9 @@ function updateFormulaFromRows() {
     fullFormula = r1 + r2;
   } else {
     const r1 = Array.from(document.getElementById('row1').children).map(c => c.textContent).join('');
-    const s1 = Array.from(document.getElementById('sep1').children).map(c => c.textContent).join('');
+    const s1 = document.getElementById('sep1') ? document.getElementById('sep1').textContent : '';
     const r2 = Array.from(document.getElementById('row2').children).map(c => c.textContent).join('');
-    const s2 = Array.from(document.getElementById('sep2').children).map(c => c.textContent).join('');
+    const s2 = document.getElementById('sep2') ? document.getElementById('sep2').textContent : '';
     const r3 = Array.from(document.getElementById('row3').children).map(c => c.textContent).join('');
     fullFormula = r1 + s1 + r2 + s2 + r3;
   }
@@ -629,111 +356,8 @@ function updateFormulaFromRows() {
 }
 
 function updateFormulaFromText() {
-  if (activeMode !== 'write') return;
-  const val = document.getElementById('manualFormula').value.trim();
-  document.getElementById('formula').textContent = val || '=SI(...)';
-}
-
-/* MOTOR DE DIAGNÓSTICO DE ERRORES */
-function diagnoseError() {
-  const currentFormula = document.getElementById('formula').textContent.trim();
-  
-  if (activeMode === 'block') {
-    const bank = document.getElementById('bank');
-    if (bank.children.length > 0) {
-      return `Faltan bloques por colocar. Tienes ${bank.children.length} bloque(s) aún en el banco disponible.`;
-    }
-  }
-
-  if (currentFormula === '=SI(...)' || !currentFormula) {
-    return "Debes construir o escribir una fórmula antes de comprobar.";
-  }
-
-  if (!currentFormula.startsWith('=')) {
-    return "Toda fórmula en Excel debe comenzar con el signo igual (=).";
-  }
-
-  if (!currentFormula.toUpperCase().startsWith('=SI(')) {
-    return "La fórmula debe comenzar con la función =SI(";
-  }
-
-  if (currentFormula !== currentExercise.expected) {
-    return `Sintaxis o estructura incorrecta.\nTu fórmula: ${currentFormula}\nEsperada: ${currentExercise.expected}`;
-  }
-
-  return null;
-}
-
-function checkCurrentPhase() {
-  const err = diagnoseError();
-  const fb = document.getElementById('feedback');
-  const resDisp = document.getElementById('resultDisplay');
-
-  if (err) {
-    fb.className = 'feedback err';
-    fb.textContent = '❌ ' + err;
-    fb.style.display = 'block';
-
-    points = Math.max(0, points - 5);
-    showPointChange('-5');
-    updateStats();
-    return;
-  }
-
-  // Si la respuesta es correcta:
-  fb.className = 'feedback ok';
-  fb.textContent = '🎉 ¡Excelente! La fórmula es 100% correcta y ha sido evaluada correctamente.';
-  fb.style.display = 'block';
-
-  try {
-    const val = currentExercise.eval(currentExercise.data);
-    resDisp.textContent = val;
-  } catch(e) {
-    resDisp.textContent = 'OK';
-  }
-
-  points += 50;
-  stars += 1;
-  showPointChange('+50');
-
-  if (activeMode === 'block') {
-    solvedBlocks.add(currentLevel);
-  } else {
-    solvedWrites.add(currentLevel);
-  }
-
-  updateStats();
-  checkBadges();
-
-  // Enviar datos de respuesta correcta a Google Sheets
-  enviarDatosAGoogleSheets("Ejercicio Correcto", `Nivel ${currentLevel} (${activeMode.toUpperCase()}): ${currentExercise.expected}`);
-
-  if (solvedBlocks.size === 4 && activeMode === 'block') {
-    document.getElementById('btnModeWrite').classList.remove('locked');
-    showOverlay('🏆 ¡Fase 1 Completada!', 'Has completado los 4 niveles en Modo Bloques. Se ha desbloqueado la FASE 2: MODO ESCRITURA MANUAL.', '👑');
-  } else if (solvedWrites.size === 4 && activeMode === 'write') {
-    showOverlay('🎓 ¡DOMINIO TOTAL!', '¡Felicitaciones! Has completado con éxito la Fase de Escritura Manual. ¡Eres un experto en Funciones SI!', '🌟');
-  } else {
-    showOverlay('¡Acierto Correcto!', `Avanzaste correctamente en el Nivel ${currentLevel}. +50 Puntos`, '⭐');
-  }
-}
-
-function showPointChange(val) {
-  const el = document.getElementById('pointChange');
-  el.textContent = val;
-  el.className = 'stat-change ' + (val.startsWith('+') ? 'stat-plus' : 'stat-minus');
-  setTimeout(() => { el.textContent = ''; }, 2000);
-}
-
-function updateStats() {
-  document.getElementById('points').textContent = points;
-  document.getElementById('stars').textContent = stars + ' ⭐';
-  document.getElementById('blockProg').textContent = `${solvedBlocks.size}/4`;
-  document.getElementById('writeProg').textContent = `${solvedWrites.size}/4`;
-
-  const totalProg = Math.round(((solvedBlocks.size + solvedWrites.size) / 8) * 100);
-  document.getElementById('progressFill').style.width = totalProg + '%';
-  document.getElementById('progressText').textContent = `Progreso del curso: ${totalProg}%`;
+  const inputVal = document.getElementById('manualFormula').value;
+  document.getElementById('formula').textContent = inputVal || '=SI(...)';
 }
 
 function clearCurrentPhase() {
@@ -747,44 +371,80 @@ function clearCurrentPhase() {
     document.getElementById('manualFormula').value = '';
     updateFormulaFromText();
   }
-  document.getElementById('feedback').style.display = 'none';
-  document.getElementById('resultDisplay').textContent = '—';
 }
 
 function showHint() {
   if (!currentExercise || !currentExercise.hints) return;
-  const hBox = document.getElementById('hint');
-  if (hintIndex < currentExercise.hints.length) {
-    hBox.textContent = `💡 Pista ${hintIndex + 1}: ${currentExercise.hints[hintIndex]}`;
-    hBox.style.display = 'block';
-    hintIndex++;
-    points = Math.max(0, points - 2);
-    showPointChange('-2');
-    updateStats();
+  const hintBox = document.getElementById('hint');
+  hintBox.style.display = 'block';
+  hintBox.textContent = `💡 Pista ${hintIndex + 1}: ${currentExercise.hints[hintIndex % currentExercise.hints.length]}`;
+  hintIndex++;
+}
+
+function checkCurrentPhase() {
+  const currentFormula = document.getElementById('formula').textContent.replace(/\s+/g, '');
+  const expectedFormula = currentExercise.expected.replace(/\s+/g, '');
+  const fb = document.getElementById('feedback');
+  fb.style.display = 'block';
+
+  if (currentFormula === expectedFormula) {
+    fb.className = 'feedback ok';
+    fb.textContent = '🎉 ¡Correcto! Has construido la fórmula de manera perfecta.';
+    
+    // Calcular resultado en pantalla
+    const res = currentExercise.eval(currentExercise.data);
+    document.getElementById('resultDisplay').textContent = res;
+    
+    // Puntos
+    points += 100;
+    document.getElementById('points').textContent = points;
+    
+    if (activeMode === 'block') {
+      solvedBlocks.add(currentLevel);
+      document.getElementById('blockProg').textContent = `${solvedBlocks.size}/4`;
+    } else {
+      solvedWrites.add(currentLevel);
+      document.getElementById('writeProg').textContent = `${solvedWrites.size}/4`;
+    }
+    
+    updateProgressAndBadges();
+    
+    // Enviar acierto a Google Sheets
+    enviarDatosAGoogleSheets("Acierto", `Nivel ${currentLevel} (${activeMode}) completado`);
+
+    if (solvedBlocks.size === 4 && activeMode === 'block') {
+      showOverlay('🏆 ¡Fase de Bloques Completada!', 'Has desbloqueado la Fase 2: Modo Escritura Manual.', '👑');
+      document.getElementById('btnModeWrite').classList.remove('locked');
+    }
   } else {
-    hBox.textContent = "💡 Ya se han mostrado todas las pistas para este ejercicio.";
+    fb.className = 'feedback err';
+    fb.textContent = '❌ Revisa la estructura. Asegúrate de que los bloques y separadores estén en el orden correcto.';
+    
+    // Enviar fallo a Google Sheets
+    enviarDatosAGoogleSheets("Error", `Fallo en Nivel ${currentLevel} (${activeMode}). Intento: ${currentFormula}`);
   }
 }
 
-function checkBadges() {
-  if (solvedBlocks.size >= 1 || solvedWrites.size >= 1) {
-    document.getElementById('badge1').classList.add('unlocked');
-  }
-  if (solvedBlocks.size === 4) {
-    document.getElementById('badge2').classList.add('unlocked');
-  }
-  if (solvedWrites.size >= 1) {
-    document.getElementById('badge3').classList.add('unlocked');
-  }
-  if (solvedBlocks.size === 4 && solvedWrites.size === 4) {
+function updateProgressAndBadges() {
+  const totalSolved = solvedBlocks.size + solvedWrites.size;
+  const pct = Math.round((totalSolved / 8) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = `Progreso del curso: ${pct}%`;
+
+  if (totalSolved >= 1) document.getElementById('badge1').classList.add('unlocked');
+  if (solvedBlocks.size >= 4) document.getElementById('badge2').classList.add('unlocked');
+  if (solvedWrites.size >= 4) document.getElementById('badge3').classList.add('unlocked');
+  if (totalSolved === 8) {
     document.getElementById('badge4').classList.add('unlocked');
+    stars = 5;
+    document.getElementById('stars').textContent = '5 ⭐';
   }
 }
 
-function showOverlay(title, msg, icon = '👑') {
-  document.getElementById('overlayIcon').textContent = icon;
+function showOverlay(title, msg, icon) {
   document.getElementById('overlayTitle').textContent = title;
   document.getElementById('overlayMsg').textContent = msg;
+  document.getElementById('overlayIcon').textContent = icon || '🎉';
   document.getElementById('overlay').style.display = 'flex';
 }
 
@@ -793,45 +453,45 @@ function closeOverlay() {
 }
 
 function resetAll() {
-  if (confirm("¿Estás seguro de reiniciar todo tu avance?")) {
-    points = 0;
-    stars = 0;
-    solvedBlocks.clear();
-    solvedWrites.clear();
-    updateStats();
-    document.querySelectorAll('.badge').forEach(b => b.classList.remove('unlocked'));
-    switchMode('block');
-    loadLevel(1, document.querySelectorAll('.level-btn')[0]);
-  }
+  points = 0;
+  stars = 0;
+  solvedBlocks.clear();
+  solvedWrites.clear();
+  document.getElementById('points').textContent = '0';
+  document.getElementById('stars').textContent = '0 ⭐';
+  document.getElementById('blockProg').textContent = '0/4';
+  document.getElementById('writeProg').textContent = '0/4';
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('progressText').textContent = 'Progreso del curso: 0%';
+  document.querySelectorAll('.badge').forEach(b => b.classList.remove('unlocked'));
+  switchMode('block');
+  loadLevel(1, document.querySelectorAll('.level-btn')[0]);
 }
 
-/* ENVÍO DE DATOS A GOOGLE SHEETS VIA FETCH */
+// FUNCIÓN PARA COMUNICAR CON GOOGLE APPS SCRIPT
 function enviarDatosAGoogleSheets(accion, detalle) {
-  if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("AQUI_TU_URL")) {
-    console.warn("Falta configurar la URL de Google Apps Script.");
-    return;
-  }
+  if (!GOOGLE_SCRIPT_URL) return;
 
   const payload = {
     estudiante: studentName,
     puntos: points,
     estrellas: stars,
-    tiempo: document.getElementById('timer').textContent,
+    tiempo: document.getElementById('timer') ? document.getElementById('timer').textContent : "00:00",
     nivelActual: currentLevel,
     modoActual: activeMode,
-    accion: accion,
-    detalle: detalle,
+    accion: accion || "Registro",
+    detalle: detalle || "",
     fecha: new Date().toLocaleString('es-ES')
   };
 
   fetch(GOOGLE_SCRIPT_URL, {
     method: 'POST',
     mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     body: JSON.stringify(payload)
   })
-  .then(() => console.log('Datos exportados exitosamente a Google Sheets.'))
-  .catch(err => console.error('Error al exportar datos:', err));
+  .then(() => console.log("Datos enviados correctamente a Google Sheets."))
+  .catch(err => console.error("Error enviando datos:", err));
 }
 </script>
 </body>
