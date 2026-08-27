@@ -38,7 +38,7 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Ingreso permitido"', type:"res"}, {text:";", type:"sep"},
         {text:'"Ingreso denegado"', type:"res"}, {text:")", type:"paren"}
       ],
-      expected: '=SI(B2="Conforme";"Ingreso permitido";"Ingreso denegado")',
+      expected: '=SI(B2="Conforme";"Ingreso permitted";"Ingreso denegado")',
       hints: ["Identifica la comparación de texto idéntico usando =.", "Recuerda separar con ;.", "Usa la respuesta verdadera si coincide y la falsa en caso contrario."],
       eval: (d) => d[0][2] === 'Conforme' ? 'Ingreso permitido' : 'Ingreso denegado'
     }
@@ -468,11 +468,10 @@ function resetAll() {
   loadLevel(1, document.querySelectorAll('.level-btn')[0]);
 }
 
-// FUNCIÓN PARA COMUNICAR CON GOOGLE APPS SCRIPT
+// FUNCIÓN DE COMUNICACIÓN VÍA GET CON GOOGLE APPS SCRIPT
 function enviarDatosAGoogleSheets(accion, detalle) {
   if (!GOOGLE_SCRIPT_URL) return;
 
-  // Construir los datos como parámetros de URL
   const params = new URLSearchParams({
     estudiante: studentName || "Anónimo",
     puntos: points,
@@ -485,23 +484,12 @@ function enviarDatosAGoogleSheets(accion, detalle) {
     fecha: new Date().toLocaleString('es-ES')
   });
 
-  // Enviar mediante petición GET silenciosa (sin bloquear el juego)
   fetch(`${GOOGLE_SCRIPT_URL}?${params.toString()}`, {
     method: 'GET',
     mode: 'no-cors'
   })
   .then(() => console.log("Datos registrados con éxito en Sheets."))
   .catch(err => console.error("Error al enviar datos:", err));
-}
-
-  fetch(GOOGLE_SCRIPT_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload)
-  })
-  .then(() => console.log("Datos enviados correctamente a Google Sheets."))
-  .catch(err => console.error("Error enviando datos:", err));
 }
 </script>
 </body>
