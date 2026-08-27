@@ -17,7 +17,7 @@
   header p{margin:0;opacity:.9}
   main{max-width:1200px;margin:20px auto;padding:0 16px}
 
-  /* BARRA SUPERIOR DE ESTADÍSTICAS REESTRUCTURADA Y BARRA DE PROGRESO EXPANDIDA */
+  /* BARRA SUPERIOR DE ESTADÍSTICAS Y BARRA DE PROGRESO */
   .top-bar{display:flex;gap:15px;align-items:center;justify-content:space-between;margin-bottom:15px;flex-wrap:nowrap}
   .stats{display:flex;gap:20px;background:var(--card);border:1px solid var(--border);padding:10px 15px;border-radius:8px;flex:0 0 auto}
   .stat{display:flex;flex-direction:column;align-items:center}
@@ -82,7 +82,6 @@
   }
   .drop-zone-row.drag-over { background: #e2e8f0; border-color: #2f5f85; }
   
-  /* CONTENEDOR Y CASILLA SEPARADORA CUADRADA COMPACTA */
   .sep-row-container {
     display: flex; align-items: center; gap: 8px; margin-bottom: 8px; padding-left: 128px;
   }
@@ -127,6 +126,7 @@
   .badge{background:#f0f0f0;border:1px solid #ccc;padding:6px 12px;border-radius:20px;font-size:12px;display:flex;align-items:center;gap:5px;opacity:0.4;transition:all 0.3s}
   .badge.unlocked{background:#d4edda;border-color:#28a745;color:#155724;opacity:1;font-weight:bold;transform:scale(1.03)}
 
+  /* VENTANAS MODALES */
   .overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center;
@@ -134,7 +134,7 @@
   }
   .overlay-content {
     background: white; padding: 30px; border-radius: 20px; text-align: center;
-    font-size: 1.3rem; box-shadow: 0 0 30px rgba(255,215,0,0.8); animation: bounceIn 0.5s; max-width: 450px;
+    font-size: 1.1rem; box-shadow: 0 0 30px rgba(0,0,0,0.3); animation: bounceIn 0.5s; max-width: 450px; width: 90%;
   }
   .crown { font-size: 3.5rem; margin-bottom: 10px; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -150,6 +150,18 @@
 </head>
 <body>
 
+<!-- VENTANA FLOTANTE PARA REGISTRO DEL ESTUDIANTE -->
+<div id="registroModal" class="overlay" style="z-index: 20000;">
+  <div class="overlay-content">
+    <div style="font-size: 3rem; margin-bottom: 10px;">📋</div>
+    <h2 style="margin-top:0; color:var(--dark);">Registro de Estudiante</h2>
+    <p style="font-size:0.95rem; color:#475569;">Ingresa tu nombre para iniciar el laboratorio y sincronizar tus avances:</p>
+    <input type="text" id="studentNameInput" placeholder="Nombre y Apellido" style="width:100%; padding:12px; font-size:1rem; border:2px solid var(--primary); border-radius:6px; margin:15px 0;" />
+    <button class="primary" style="width:100%; font-size:1rem; padding:12px;" onclick="registrarEstudiante()">Comenzar Laboratorio</button>
+  </div>
+</div>
+
+<!-- VENTANA FLOTANTE DE NOTIFICACIONES Y LOGROS -->
 <div id="overlay" class="overlay" style="display:none;">
   <div class="overlay-content">
     <div class="crown" id="overlayIcon">👑</div>
@@ -236,7 +248,7 @@
       <div id="writeArea" style="display:none;">
         <div class="input-formula-container">
           <label style="font-weight:bold; font-size:0.9rem; color:#17324d;">Escribe la fórmula de Excel completa:</label>
-          <input type="text" id="manualFormula" class="input-formula" placeholder="Ejemplo: =SI(B2>10;&quot;Aprobado&quot;;&quot;Rechazado&quot;)" oninput="updateFormulaFromText()" autocomplete="off" />
+          <input type="text" id="manualFormula" class="input-formula" placeholder='Ejemplo: =SI(B2>10;"Aprobado";"Rechazado")' oninput="updateFormulaFromText()" autocomplete="off" />
         </div>
       </div>
 
@@ -259,6 +271,12 @@
 </main>
 
 <script>
+// CONFIGURACIÓN DE EXPORTACIÓN A GOOGLE SHEETS
+// Reemplaza esta URL con la Web App publicada desde Google Apps Script:
+const GOOGLE_SCRIPT_URL = "AQUI_TU_URL_DE_GOOGLE_APPS_SCRIPT";
+
+let studentName = "";
+
 const EXERCISE_BANK = {
   1: [
     {
@@ -391,7 +409,7 @@ const EXERCISE_BANK = {
       eval: (d) => (d[0][2] >= 20 && parseInt(d[1][2]) >= 90) ? 'Bono' : 'Sin bono'
     },
     {
-      text: "[SI + O] Activa una alerta de emergencia si la temperatura en B2 sobrepasa los 50 grados O BIEN si la presión en C2 es estrictamente mayor a 100. De cumplirse cualquiera de las dos, mostrar “Alerta”; si ninguna se presenta, registrar “Normal”.",
+      text: "[SI + O] Activa una alerta de emergencia si la temperatura en B2 sobrepasa los 50 grados O BIEN si la presión en C2 es strictly mayor a 100. De cumplirse cualquiera de las dos, mostrar “Alerta”; si ninguna se presenta, registrar “Normal”.",
       data: [["B2", "Temperatura", 55], ["C2", "Presión", 90]],
       blocks: [
         {text:"=SI(", type:"func"}, {text:"O(", type:"func"}, {text:"B2", type:"var"}, {text:">", type:"op"}, {text:"50", type:"val"},
@@ -427,6 +445,22 @@ let solvedWrites = new Set();
 let hintIndex = 0;
 let timerInterval, seconds = 0;
 
+function registrarEstudiante() {
+  const input = document.getElementById('studentNameInput');
+  const name = input.value.trim();
+  if (!name) {
+    alert("Por favor ingresa tu nombre completo para comenzar.");
+    return;
+  }
+  studentName = name;
+  document.getElementById('registroModal').style.display = 'none';
+  
+  // Enviar evento de inicio a Google Sheets
+  enviarDatosAGoogleSheets("Inicio de Sesión", "El estudiante inició el laboratorio");
+  
+  loadLevel(1, document.querySelectorAll('.level-btn')[0]);
+}
+
 function startTimer() {
   clearInterval(timerInterval);
   seconds = 0;
@@ -440,7 +474,7 @@ function startTimer() {
 
 function switchMode(mode) {
   if (mode === 'write' && solvedBlocks.size < 4) {
-    showOverlay('🔒 Modo Bloqueado', 'Debes completar y aprobar los 4 niveles en la Fase de Bloques antes de acceder al Modo Escritura.', '⚠️');
+    showOverlay('🔒 Modo Bloqueado', 'Debes completar los 4 niveles en la Fase de Bloques antes de acceder al Modo Escritura.', '⚠️');
     return;
   }
   activeMode = mode;
@@ -600,7 +634,7 @@ function updateFormulaFromText() {
   document.getElementById('formula').textContent = val || '=SI(...)';
 }
 
-/* MOTOR DE DIAGNÓSTICO Y RETROALIMENTACIÓN DETALLADA DE ERRORES */
+/* MOTOR DE DIAGNÓSTICO DE ERRORES */
 function diagnoseError() {
   const currentFormula = document.getElementById('formula').textContent.trim();
   
@@ -609,132 +643,109 @@ function diagnoseError() {
     if (bank.children.length > 0) {
       return `Faltan bloques por colocar. Tienes ${bank.children.length} bloque(s) aún en el banco disponible.`;
     }
-
-    if (currentLevel === 3) {
-      const r1 = Array.from(document.getElementById('row1').children).map(c => c.textContent).join('');
-      const r2 = Array.from(document.getElementById('row2').children).map(c => c.textContent).join('');
-
-      if (!r1.startsWith('=SI(')) {
-        return "Revisa la Fila 1: Debe iniciar obligatoriamente con la función '=SI('.";
-      }
-      if (!r1.endsWith(';')) {
-        return "Revisa el final de la Fila 1: Debe terminar con un punto y coma ';' para dar paso al SI anidado.";
-      }
-      if (!r2.startsWith('SI(')) {
-        return "Revisa la Fila 2: Debe comenzar con la función anidada 'SI('.";
-      }
-      if (!r2.endsWith('))')) {
-        return "Revisa los paréntesis de cierre en la Fila 2: Una función anidada con dos SI requiere cerrar con '))'.";
-      }
-    } else {
-      const sep1 = Array.from(document.getElementById('sep1').children).map(c => c.textContent).join('');
-      const sep2 = Array.from(document.getElementById('sep2').children).map(c => c.textContent).join('');
-
-      if (sep1 !== ';' || sep2 !== ';') {
-        return "Asegúrate de colocar las casillas separadoras ';' entre cada una de las tres partes de la función.";
-      }
-      const r1 = Array.from(document.getElementById('row1').children).map(c => c.textContent).join('');
-      if (!r1.startsWith('=SI(')) {
-        return "La primera casilla/fila debe iniciar con la estructura '=SI('.";
-      }
-      const r3 = Array.from(document.getElementById('row3').children).map(c => c.textContent).join('');
-      if (!r3.endsWith(')')) {
-        return "La última casilla/fila debe finalizar cerrando el paréntesis de la función ')'.";
-      }
-    }
-  } else {
-    if (!currentFormula.startsWith('=')) {
-      return "Toda fórmula en Excel debe comenzar obligatoriamente con el signo igual '='.";
-    }
-    if (!currentFormula.toUpperCase().startsWith('=SI(')) {
-      return "Sintaxis incorrecta. La fórmula principal debe ser la función SI, comenzando por '=SI('.";
-    }
-    const openParen = (currentFormula.match(/\(/g) || []).length;
-    const closeParen = (currentFormula.match(/\)/g) || []).length;
-    if (openParen !== closeParen) {
-      return `Error de paréntesis: Tienes ${openParen} paréntesis abierto(s) y ${closeParen} cerrado(s).`;
-    }
-    if (!currentFormula.includes(';')) {
-      return "Recuerda separar los argumentos de la función utilizando punto y coma ';'.";
-    }
   }
 
-  return "La estructura o los valores colocados no coinciden con la respuesta esperada. Revisa el orden de las expresiones e inténtalo de nuevo.";
+  if (currentFormula === '=SI(...)' || !currentFormula) {
+    return "Debes construir o escribir una fórmula antes de comprobar.";
+  }
+
+  if (!currentFormula.startsWith('=')) {
+    return "Toda fórmula en Excel debe comenzar con el signo igual (=).";
+  }
+
+  if (!currentFormula.toUpperCase().startsWith('=SI(')) {
+    return "La fórmula debe comenzar con la función =SI(";
+  }
+
+  if (currentFormula !== currentExercise.expected) {
+    return `Sintaxis o estructura incorrecta.\nTu fórmula: ${currentFormula}\nEsperada: ${currentExercise.expected}`;
+  }
+
+  return null;
 }
 
 function checkCurrentPhase() {
-  const formulaStr = document.getElementById('formula').textContent.trim();
-  const feedbackEl = document.getElementById('feedback');
-  
-  if (!formulaStr || formulaStr === '=SI(...)') {
-    feedbackEl.className = 'feedback err';
-    feedbackEl.style.display = 'block';
-    feedbackEl.textContent = 'Debes armar o escribir una fórmula antes de comprobar.';
+  const err = diagnoseError();
+  const fb = document.getElementById('feedback');
+  const resDisp = document.getElementById('resultDisplay');
+
+  if (err) {
+    fb.className = 'feedback err';
+    fb.textContent = '❌ ' + err;
+    fb.style.display = 'block';
+
+    points = Math.max(0, points - 5);
+    showPointChange('-5');
+    updateStats();
     return;
   }
 
-  const expectedClean = currentExercise.expected.replace(/\s+/g, '');
-  const userClean = formulaStr.replace(/\s+/g, '');
+  // Si la respuesta es correcta:
+  fb.className = 'feedback ok';
+  fb.textContent = '🎉 ¡Excelente! La fórmula es 100% correcta y ha sido evaluada correctamente.';
+  fb.style.display = 'block';
 
-  if (userClean === expectedClean) {
-    feedbackEl.className = 'feedback ok';
-    feedbackEl.style.display = 'block';
-    
-    const calculated = currentExercise.eval(currentExercise.data);
-    feedbackEl.innerHTML = `<strong>¡Excelente! Respuesta Correcta.</strong><br>La sintaxis es perfectamente válida.`;
-    document.getElementById('resultDisplay').textContent = calculated;
-
-    if (activeMode === 'block') {
-      if (!solvedBlocks.has(currentLevel)) {
-        solvedBlocks.add(currentLevel);
-        addPoints(100);
-        updateProgress();
-      }
-      if (solvedBlocks.size === 4) {
-        unlockBadge('badge2');
-        document.getElementById('btnModeWrite').classList.remove('locked');
-        showOverlay('🏆 ¡Fase 1 Completada!', 'Has dominado la estructura de bloques en los 4 niveles. Se ha desbloqueado la Fase 2: Modo Escritura Manual.', '🥇');
-      } else {
-        showOverlay('¡Nivel Superado!', `Completaste correctamente el Nivel ${currentLevel} en Modo Bloques.`, '⭐');
-      }
-    } else {
-      if (!solvedWrites.has(currentLevel)) {
-        solvedWrites.add(currentLevel);
-        addPoints(150);
-        updateProgress();
-      }
-      if (solvedWrites.size === 4) {
-        unlockBadge('badge3');
-        unlockBadge('badge4');
-        showOverlay('👑 ¡Dominio Total!', '¡Felicidades! Has completado con éxito la Fase de Escritura Manual y has dominado las Funciones SI.', '👑');
-      } else {
-        showOverlay('¡Sintaxis Perfecta!', `Escribiste correctamente la fórmula para el Nivel ${currentLevel}.`, '✍️');
-      }
-    }
-
-    if (solvedBlocks.size > 0 || solvedWrites.size > 0) {
-      unlockBadge('badge1');
-    }
-
-  } else {
-    const errorMsg = diagnoseError();
-    feedbackEl.className = 'feedback err';
-    feedbackEl.style.display = 'block';
-    feedbackEl.innerHTML = `<strong>Error detectado:</strong> ${errorMsg}`;
-    document.getElementById('resultDisplay').textContent = '—';
+  try {
+    const val = currentExercise.eval(currentExercise.data);
+    resDisp.textContent = val;
+  } catch(e) {
+    resDisp.textContent = 'OK';
   }
+
+  points += 50;
+  stars += 1;
+  showPointChange('+50');
+
+  if (activeMode === 'block') {
+    solvedBlocks.add(currentLevel);
+  } else {
+    solvedWrites.add(currentLevel);
+  }
+
+  updateStats();
+  checkBadges();
+
+  // Enviar datos de respuesta correcta a Google Sheets
+  enviarDatosAGoogleSheets("Ejercicio Correcto", `Nivel ${currentLevel} (${activeMode.toUpperCase()}): ${currentExercise.expected}`);
+
+  if (solvedBlocks.size === 4 && activeMode === 'block') {
+    document.getElementById('btnModeWrite').classList.remove('locked');
+    showOverlay('🏆 ¡Fase 1 Completada!', 'Has completado los 4 niveles en Modo Bloques. Se ha desbloqueado la FASE 2: MODO ESCRITURA MANUAL.', '👑');
+  } else if (solvedWrites.size === 4 && activeMode === 'write') {
+    showOverlay('🎓 ¡DOMINIO TOTAL!', '¡Felicitaciones! Has completado con éxito la Fase de Escritura Manual. ¡Eres un experto en Funciones SI!', '🌟');
+  } else {
+    showOverlay('¡Acierto Correcto!', `Avanzaste correctamente en el Nivel ${currentLevel}. +50 Puntos`, '⭐');
+  }
+}
+
+function showPointChange(val) {
+  const el = document.getElementById('pointChange');
+  el.textContent = val;
+  el.className = 'stat-change ' + (val.startsWith('+') ? 'stat-plus' : 'stat-minus');
+  setTimeout(() => { el.textContent = ''; }, 2000);
+}
+
+function updateStats() {
+  document.getElementById('points').textContent = points;
+  document.getElementById('stars').textContent = stars + ' ⭐';
+  document.getElementById('blockProg').textContent = `${solvedBlocks.size}/4`;
+  document.getElementById('writeProg').textContent = `${solvedWrites.size}/4`;
+
+  const totalProg = Math.round(((solvedBlocks.size + solvedWrites.size) / 8) * 100);
+  document.getElementById('progressFill').style.width = totalProg + '%';
+  document.getElementById('progressText').textContent = `Progreso del curso: ${totalProg}%`;
 }
 
 function clearCurrentPhase() {
   if (activeMode === 'block') {
-    renderBank(currentExercise ? currentExercise.blocks : []);
-    const rows = document.querySelectorAll('.drop-zone-row');
-    rows.forEach(r => r.innerHTML = '');
-    document.getElementById('formula').textContent = '=SI(...)';
+    const bank = document.getElementById('bank');
+    document.querySelectorAll('.drop-zone-row').forEach(zone => {
+      Array.from(zone.children).forEach(child => bank.appendChild(child));
+    });
+    updateFormulaFromRows();
   } else {
-    const input = document.getElementById('manualFormula');
-    if (input) input.value = '';
-    document.getElementById('formula').textContent = '=SI(...)';
+    document.getElementById('manualFormula').value = '';
+    updateFormulaFromText();
   }
   document.getElementById('feedback').style.display = 'none';
   document.getElementById('resultDisplay').textContent = '—';
@@ -742,45 +753,38 @@ function clearCurrentPhase() {
 
 function showHint() {
   if (!currentExercise || !currentExercise.hints) return;
-  const hintEl = document.getElementById('hint');
-  hintEl.style.display = 'block';
-  hintEl.textContent = `Pista ${hintIndex + 1}: ${currentExercise.hints[hintIndex]}`;
-  hintIndex = (hintIndex + 1) % currentExercise.hints.length;
+  const hBox = document.getElementById('hint');
+  if (hintIndex < currentExercise.hints.length) {
+    hBox.textContent = `💡 Pista ${hintIndex + 1}: ${currentExercise.hints[hintIndex]}`;
+    hBox.style.display = 'block';
+    hintIndex++;
+    points = Math.max(0, points - 2);
+    showPointChange('-2');
+    updateStats();
+  } else {
+    hBox.textContent = "💡 Ya se han mostrado todas las pistas para este ejercicio.";
+  }
 }
 
-function addPoints(val) {
-  points += val;
-  stars = Math.floor(points / 100);
-  document.getElementById('points').textContent = points;
-  document.getElementById('stars').textContent = `${stars} ⭐`;
-  
-  const ptChange = document.getElementById('pointChange');
-  ptChange.textContent = `+${val}`;
-  ptChange.className = 'stat-change stat-plus';
-  setTimeout(() => { ptChange.textContent = ''; }, 2000);
+function checkBadges() {
+  if (solvedBlocks.size >= 1 || solvedWrites.size >= 1) {
+    document.getElementById('badge1').classList.add('unlocked');
+  }
+  if (solvedBlocks.size === 4) {
+    document.getElementById('badge2').classList.add('unlocked');
+  }
+  if (solvedWrites.size >= 1) {
+    document.getElementById('badge3').classList.add('unlocked');
+  }
+  if (solvedBlocks.size === 4 && solvedWrites.size === 4) {
+    document.getElementById('badge4').classList.add('unlocked');
+  }
 }
 
-function updateProgress() {
-  const totalTasks = 8;
-  const completed = solvedBlocks.size + solvedWrites.size;
-  const pct = Math.round((completed / totalTasks) * 100);
-  
-  document.getElementById('progressFill').style.width = `${pct}%`;
-  document.getElementById('progressText').textContent = `Progreso del curso: ${pct}%`;
-  
-  document.getElementById('blockProg').textContent = `${solvedBlocks.size}/4`;
-  document.getElementById('writeProg').textContent = `${solvedWrites.size}/4`;
-}
-
-function unlockBadge(id) {
-  const b = document.getElementById(id);
-  if (b) b.classList.add('unlocked');
-}
-
-function showOverlay(title, msg, icon) {
+function showOverlay(title, msg, icon = '👑') {
+  document.getElementById('overlayIcon').textContent = icon;
   document.getElementById('overlayTitle').textContent = title;
   document.getElementById('overlayMsg').textContent = msg;
-  document.getElementById('overlayIcon').textContent = icon || '👑';
   document.getElementById('overlay').style.display = 'flex';
 }
 
@@ -789,27 +793,46 @@ function closeOverlay() {
 }
 
 function resetAll() {
-  points = 0;
-  stars = 0;
-  solvedBlocks.clear();
-  solvedWrites.clear();
-  document.getElementById('points').textContent = '0';
-  document.getElementById('stars').textContent = '0 ⭐';
-  document.querySelectorAll('.badge').forEach(b => b.classList.remove('unlocked'));
-  
-  activeMode = 'block';
-  document.getElementById('btnModeBlock').className = 'mode-btn active';
-  document.getElementById('btnModeWrite').className = 'mode-btn locked';
-  document.getElementById('blockArea').style.display = 'block';
-  document.getElementById('writeArea').style.display = 'none';
-  
-  updateProgress();
-  loadLevel(1, document.querySelectorAll('.level-btn')[0]);
+  if (confirm("¿Estás seguro de reiniciar todo tu avance?")) {
+    points = 0;
+    stars = 0;
+    solvedBlocks.clear();
+    solvedWrites.clear();
+    updateStats();
+    document.querySelectorAll('.badge').forEach(b => b.classList.remove('unlocked'));
+    switchMode('block');
+    loadLevel(1, document.querySelectorAll('.level-btn')[0]);
+  }
 }
 
-window.onload = function() {
-  loadLevel(1);
-};
+/* ENVÍO DE DATOS A GOOGLE SHEETS VIA FETCH */
+function enviarDatosAGoogleSheets(accion, detalle) {
+  if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes("AQUI_TU_URL")) {
+    console.warn("Falta configurar la URL de Google Apps Script.");
+    return;
+  }
+
+  const payload = {
+    estudiante: studentName,
+    puntos: points,
+    estrellas: stars,
+    tiempo: document.getElementById('timer').textContent,
+    nivelActual: currentLevel,
+    modoActual: activeMode,
+    accion: accion,
+    detalle: detalle,
+    fecha: new Date().toLocaleString('es-ES')
+  };
+
+  fetch(GOOGLE_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(() => console.log('Datos exportados exitosamente a Google Sheets.'))
+  .catch(err => console.error('Error al exportar datos:', err));
+}
 </script>
 </body>
 </html>
