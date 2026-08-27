@@ -21,6 +21,11 @@
   .stat{display:flex;flex-direction:column;align-items:center}
   .stat span:first-child{font-size:12px;color:#687987;font-weight:600}
   .stat span:last-child{font-size:20px;font-weight:bold}
+  
+  .mode-selector{display:flex;gap:10px;margin-bottom:15px;background:#e2e9f0;padding:5px;border-radius:8px;width:fit-content}
+  .mode-btn{padding:8px 16px;border:none;border-radius:6px;background:transparent;cursor:pointer;font-weight:bold;color:#506273}
+  .mode-btn.active{background:var(--primary);color:white}
+
   .levels{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
   .level-btn{padding:9px 13px;border-radius:7px;border:1px solid #ccd7e0;background:#fff;cursor:pointer;font-weight:600}
   .level-btn.active{background:var(--dark);color:#fff}
@@ -33,23 +38,31 @@
   .data-table{width:100%;border-collapse:collapse;margin-top:12px}
   .data-table td,.data-table th{border:1px solid var(--border);padding:7px;text-align:left}
   .data-table th{background:#eef3f7}
+  
+  /* CASILLA DE SOLTAR CON REORGANIZACIÓN DINÁMICA */
   .drop {
-    min-height: 55px;
-    border: 2px dashed #b9c7d3;
+    min-height: 60px;
+    border: 2px dashed #2f5f85;
     border-radius: 8px;
-    padding: 6px;
+    padding: 8px;
     display: flex;
     gap: 6px;
     flex-wrap: wrap;
-    background: #fff;
+    background: #ffffff;
     align-items: center;
     margin-bottom: 12px;
+    transition: background 0.2s;
   }
+  .drop.drag-over { background: #f0f7ff; }
+
   .bank{display:flex;gap:6px;flex-wrap:wrap;background:#f8fafc;padding:12px;border-radius:8px;border:1px solid var(--border);min-height:60px}
   
-  /* ESTILOS DE BLOQUES POR CATEGORÍA CROMÁTICA */
-  .block{padding:8px 12px;border-radius:6px;border:1px solid #c9d8e4;cursor:grab;user-select:none;font-family:Consolas,monospace;font-weight:bold;font-size:14px}
-  .block:active{cursor:grabbing}
+  /* CROMÁTICA DE BLOQUES */
+  .block{
+    padding:8px 12px;border-radius:6px;border:1px solid #c9d8e4;cursor:grab;user-select:none;
+    font-family:Consolas,monospace;font-weight:bold;font-size:14px;transition:transform 0.15s, box-shadow 0.15s;
+  }
+  .block:active{cursor:grabbing; transform:scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.15);}
   .block.var{background:#e9f2fb; border-color:#9ec5fe; color:#0a58ca}
   .block.op{background:#f1eefb; border-color:#c5b3e6; color:#59359a}
   .block.val{background:#f6f2e9; border-color:#e2d3b7; color:#856404}
@@ -57,6 +70,19 @@
   .block.func{background:#fde2e2; border-color:#f5c6cb; color:#721c24}
   .block.paren{background:#e2f0fb; border-color:#b6d4fe; color:#084298}
   .block.sep{background:#fff3cd; border-color:#ffeeba; color:#856404}
+
+  /* INDICADOR DE INSERCIÓN DERECHA/IZQUIERDA */
+  .drop-indicator {
+    width: 4px; background: #2f5f85; height: 35px; border-radius: 2px;
+    animation: pulse 0.5s infinite alternate;
+  }
+  @keyframes pulse { from { opacity: 0.4; } to { opacity: 1; } }
+
+  .text-mode-area{display:none;}
+  .input-formula{
+    width: 100%; padding: 12px; font-family: Consolas, monospace; font-size: 15px;
+    border: 2px solid var(--primary); border-radius: 8px; margin-bottom: 10px;
+  }
 
   .feedback{display:none;margin-top:14px;padding:12px;border-radius:8px;line-height:1.45}
   .ok{display:block;background:var(--ok);border:1px solid var(--ok-border);color:#155724}
@@ -117,7 +143,13 @@
   </div>
 
   <div class="character-msg">
-    <span id="charText">¡Bienvenido! Soy el capataz. Construye la fórmula agrupando los bloques de colores.</span>
+    <span id="charText">¡Bienvenido! Selecciona el modo de trabajo y construye o escribe la fórmula de Excel.</span>
+  </div>
+
+  <!-- SELECTOR DE MODO BARRAS DE HERRAMIENTAS -->
+  <div class="mode-selector">
+    <button class="mode-btn active" id="btnBlockMode" onclick="setMode('blocks')">🧩 Modo Bloques</button>
+    <button class="mode-btn" id="btnTextMode" onclick="setMode('text')">✍️ Modo Escritura Manual</button>
   </div>
 
   <div class="levels">
@@ -148,15 +180,26 @@
     </section>
 
     <section class="card">
-      <h2>2. Construye la fórmula</h2>
-      <div id="dropZone" class="drop" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+      <h2>2. Construye o escribe la fórmula</h2>
       
-      <h3>Bloques disponibles</h3>
-      <div id="bank" class="bank" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+      <!-- CONTENEDOR MODO BLOQUES -->
+      <div id="blockModeArea">
+        <div class="stat-title" style="font-size:12px; font-weight:bold; color:#687987; margin-bottom:5px;">CASILLA DE CONSTRUCCIÓN (Puedes soltar e insertar entre casillas):</div>
+        <div id="dropZone" class="drop" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
+        
+        <h3>Bloques disponibles</h3>
+        <div id="bank" class="bank" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+      </div>
+
+      <!-- CONTENEDOR MODO ESCRITURA MANUAL -->
+      <div id="textModeArea" class="text-mode-area">
+        <div class="stat-title" style="font-size:12px; font-weight:bold; color:#687987; margin-bottom:5px;">ESCRIBE LA FÓRMULA DIRECTAMENTE:</div>
+        <input type="text" id="manualFormula" class="input-formula" placeholder='Ej: =SI(B2>10;"Completa";"Incompleta")' oninput="updateFormulaFromText()" />
+      </div>
 
       <p style="margin-top:15px;">
         <button class="primary" onclick="check()">Comprobar</button>
-        <button onclick="clearBuild()">Limpiar Casilla</button>
+        <button onclick="clearBuild()">Limpiar Casilla / Texto</button>
       </p>
       <div id="feedback" class="feedback"></div>
       
@@ -245,6 +288,22 @@ const BLOCK_LEVELS = {
 };
 
 let currentLevel = 1, points = 0, stars = 0, solvedLevels = new Set(), hintIndex = 0, timerInterval, seconds = 0;
+let currentMode = 'blocks';
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('btnBlockMode').classList.toggle('active', mode === 'blocks');
+  document.getElementById('btnTextMode').classList.toggle('active', mode === 'text');
+  
+  document.getElementById('blockModeArea').style.display = (mode === 'blocks') ? 'block' : 'none';
+  document.getElementById('textModeArea').style.display = (mode === 'text') ? 'block' : 'none';
+  
+  if(mode === 'text') {
+    updateFormulaFromText();
+  } else {
+    updateFormula();
+  }
+}
 
 function startTimer() {
   clearInterval(timerInterval);
@@ -295,39 +354,98 @@ function renderBank(blocks) {
   });
 }
 
-function allowDrop(e) { e.preventDefault(); }
-function drop(e) {
+/* LÓGICA DE REORGANIZACIÓN E INSERCIÓN ENTRE CASILLAS */
+function allowDrop(e) {
   e.preventDefault();
-  const id = e.dataTransfer.getData('text/plain');
-  const el = document.getElementById(id);
-  if (el) {
-    if (e.target.id === 'dropZone' || e.target.id === 'bank') {
-      e.target.appendChild(el);
-    } else if (e.target.classList.contains('block')) {
-      e.target.parentNode.appendChild(el);
+  const dropZone = document.getElementById('dropZone');
+  dropZone.classList.add('drag-over');
+  
+  // Si arrastra sobre un bloque existente en la casilla
+  if (e.target.classList.contains('block') && e.target.parentNode.id === 'dropZone') {
+    const rect = e.target.getBoundingClientRect();
+    const midX = rect.left + rect.width / 2;
+    if (e.clientX < midX) {
+      e.target.style.borderLeft = '4px solid #2f5f85';
+      e.target.style.borderRight = '';
+    } else {
+      e.target.style.borderRight = '4px solid #2f5f85';
+      e.target.style.borderLeft = '';
     }
-    updateFormula();
   }
 }
 
+function dragLeave(e) {
+  const dropZone = document.getElementById('dropZone');
+  dropZone.classList.remove('drag-over');
+  document.querySelectorAll('#dropZone .block').forEach(b => {
+    b.style.borderLeft = '';
+    b.style.borderRight = '';
+  });
+}
+
+function drop(e) {
+  e.preventDefault();
+  const dropZone = document.getElementById('dropZone');
+  dropZone.classList.remove('drag-over');
+  
+  // Limpiar estilos de borde indicativos
+  document.querySelectorAll('#dropZone .block').forEach(b => {
+    b.style.borderLeft = '';
+    b.style.borderRight = '';
+  });
+
+  const id = e.dataTransfer.getData('text/plain');
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  if (e.target.id === 'bank') {
+    e.target.appendChild(el);
+  } else if (e.target.id === 'dropZone') {
+    e.target.appendChild(el);
+  } else if (e.target.classList.contains('block') && e.target.parentNode.id === 'dropZone') {
+    // Insertar antes o después según la posición del cursor (Desplazamiento a la derecha)
+    const rect = e.target.getBoundingClientRect();
+    const midX = rect.left + rect.width / 2;
+    if (e.clientX < midX) {
+      dropZone.insertBefore(el, e.target);
+    } else {
+      dropZone.insertBefore(el, e.target.nextSibling);
+    }
+  }
+  updateFormula();
+}
+
 function updateFormula() {
+  if(currentMode !== 'blocks') return;
   const zone = document.getElementById('dropZone');
   const blocks = Array.from(zone.children).map(c => c.textContent);
   document.getElementById('formula').textContent = blocks.join('') || '=SI(...)';
 }
 
+function updateFormulaFromText() {
+  if(currentMode !== 'text') return;
+  const val = document.getElementById('manualFormula').value.trim();
+  document.getElementById('formula').textContent = val || '=SI(...)';
+}
+
 function check() {
-  const zone = document.getElementById('dropZone');
-  const built = Array.from(zone.children).map(c => c.textContent).join('');
+  let built = '';
+  if (currentMode === 'blocks') {
+    const zone = document.getElementById('dropZone');
+    built = Array.from(zone.children).map(c => c.textContent).join('');
+  } else {
+    built = document.getElementById('manualFormula').value.replace(/\s+/g, '');
+  }
+
   const ex = BLOCK_LEVELS[currentLevel];
-  const expected = ex.f;
+  const expected = ex.f.replace(/\s+/g, '');
 
   const fb = document.getElementById('feedback');
   fb.style.display = 'block';
 
   if (built === expected) {
     fb.className = 'feedback ok';
-    fb.textContent = '¡Correcto! Has construido la sintaxis perfecta.';
+    fb.textContent = '¡Correcto! Has construido/escrito la sintaxis perfecta.';
     
     if(!solvedLevels.has(currentLevel)) {
       solvedLevels.add(currentLevel);
@@ -341,7 +459,7 @@ function check() {
     showOverlay(`¡Felicidades! Superaste el Nivel ${currentLevel}`);
   } else {
     fb.className = 'feedback err';
-    fb.textContent = 'La estructura no coincide con la fórmula esperada. Revisa los bloques y sus posiciones.';
+    fb.textContent = 'La estructura no coincide con la fórmula esperada. Revisa el orden, comillas o paréntesis.';
   }
 }
 
@@ -372,7 +490,9 @@ function clearBuild() {
   const zone = document.getElementById('dropZone');
   const bank = document.getElementById('bank');
   while (zone.firstChild) bank.appendChild(zone.firstChild);
-  updateFormula();
+  document.getElementById('manualFormula').value = '';
+  if(currentMode === 'blocks') updateFormula();
+  else updateFormulaFromText();
 }
 
 function showOverlay(msg) {
