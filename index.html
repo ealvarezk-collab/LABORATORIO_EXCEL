@@ -35,37 +35,45 @@
   .data-table th{background:#eef3f7}
   .zone{margin:12px 0}
   .label{font-size:12px;font-weight:700;margin-bottom:5px;color:#687987}
- .drop {   .test-wrap {
-  flex-wrap: wrap;
-  max-height: 120px;          /* Limita la altura a unas 2 filas */
-  overflow-y: auto;           /* Scroll vertical si se excede */
-  align-content: flex-start;
-}
-  min-height: 45px;
-  border: 2px dashed #b9c7d3;
-  border-radius: 8px;
-  padding: 4px;
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-  background: #fff;
-  align-content: flex-start;
-  overflow: visible;
-}
-.sep-zone {
-  min-height: 45px;
-  border: 2px dashed #f1d39a;
-  border-radius: 8px;
-  padding: 4px;
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-  background: #fffbe6;
-  width: 60px;
-  align-items: center;
-  justify-content: center;
-  align-content: center;
-}
+  .drop {
+    min-height: 45px;
+    border: 2px dashed #b9c7d3;
+    border-radius: 8px;
+    padding: 4px;
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    background: #fff;
+    align-content: flex-start;
+    overflow: visible;
+  }
+  .test-wrap {
+    flex-wrap: wrap;
+    max-height: 120px;
+    overflow-y: auto;
+    align-content: flex-start;
+  }
+  .formula-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    min-height: 50px;
+    align-items: center;
+    margin-bottom: 5px;
+  }
+  .sep-zone {
+    min-height: 45px;
+    border: 2px dashed #f1d39a;
+    border-radius: 8px;
+    padding: 4px;
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    background: #fffbe6;
+    width: 60px;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+  }
   .bank{display:flex;gap:6px;flex-wrap:wrap;background:#f8fafc;padding:12px;border-radius:8px;border:1px solid var(--border)}
   .block{padding:8px 10px;border-radius:6px;border:1px solid #c9d8e4;background:#edf3f8;cursor:grab;user-select:none;font-family:Consolas,monospace}
   .var{background:#e9f2fb}
@@ -242,347 +250,47 @@ function registrarEvento(datos) {
 // ===================== DATOS DE NIVELES (ejercicios aleatorios) =====================
 const BLOCK_LEVELS = {
   1: [
-    {
-      text:"En una obra, una cuadrilla se considera completa cuando tiene más de 10 trabajadores. Si cumple la condición, mostrar “Cuadrilla completa”; de lo contrario, “Cuadrilla incompleta”.",
-      data:[["B2","Trabajadores",12]],
-      blocks:[
-        {text:"B2", type:"var"},{text:">", type:"op"},{text:"10", type:"val"},
-        {text:'"Cuadrilla completa"', type:"res"},{text:'"Cuadrilla incompleta"', type:"res"},
-        {text:";", type:"sep"},{text:";", type:"sep"}
-      ],
-      zones:{
-        test: { blocks:["B2",">","10"] },
-        true: { blocks:['"Cuadrilla completa"'] },
-        false: { blocks:['"Cuadrilla incompleta"'] },
-        sep1: { blocks:[";"] }, sep2: { blocks:[";"] }
-      },
-      f:'=SI(B2>10;"Cuadrilla completa";"Cuadrilla incompleta")',
-      h:["La prueba lógica es B2>10.","El valor verdadero va entre comillas.","No olvides los separadores ; entre argumentos."],
-      eval: (data) => { const B2 = data[0][2]; return B2>10 ? 'Cuadrilla completa' : 'Cuadrilla incompleta'; },
-      randomData: () => Math.floor(Math.random()*20)+1
-    },
-    {
-      text:"Un trabajador es considerado apto si su edad es mayor o igual a 18 años. Si cumple, mostrar “Apto”; de lo contrario, “No apto”.",
-      data:[["B2","Edad",20]],
-      blocks:[
-        {text:"B2", type:"var"},{text:">=", type:"op"},{text:"18", type:"val"},
-        {text:'"Apto"', type:"res"},{text:'"No apto"', type:"res"},
-        {text:";", type:"sep"},{text:";", type:"sep"}
-      ],
-      zones:{
-        test: { blocks:["B2",">=","18"] },
-        true: { blocks:['"Apto"'] },
-        false: { blocks:['"No apto"'] },
-        sep1: { blocks:[";"] }, sep2: { blocks:[";"] }
-      },
-      f:'=SI(B2>=18;"Apto";"No apto")',
-      h:["“Mayor o igual” es >=.","La condición es B2>=18.","El resultado verdadero es “Apto”."],
-      eval: (data) => { const B2 = data[0][2]; return B2>=18 ? 'Apto' : 'No apto'; },
-      randomData: () => Math.floor(Math.random()*40)+16
-    },
-    {
-      text:"Una obra es segura si el número de accidentes es menor o igual a 2. Si cumple, mostrar “Segura”; de lo contrario, “En riesgo”.",
-      data:[["B2","Accidentes",1]],
-      blocks:[
-        {text:"B2", type:"var"},{text:"<=", type:"op"},{text:"2", type:"val"},
-        {text:'"Segura"', type:"res"},{text:'"En riesgo"', type:"res"},
-        {text:";", type:"sep"},{text:";", type:"sep"}
-      ],
-      zones:{
-        test: { blocks:["B2","<=","2"] },
-        true: { blocks:['"Segura"'] },
-        false: { blocks:['"En riesgo"'] },
-        sep1: { blocks:[";"] }, sep2: { blocks:[";"] }
-      },
-      f:'=SI(B2<=2;"Segura";"En riesgo")',
-      h:["“Menor o igual” es <=.","La condición es B2<=2.","El resultado verdadero es “Segura”."],
-      eval: (data) => { const B2 = data[0][2]; return B2<=2 ? 'Segura' : 'En riesgo'; },
-      randomData: () => Math.floor(Math.random()*5)
-    }
+    { text:"En una obra, una cuadrilla se considera completa cuando tiene más de 10 trabajadores. Si cumple la condición, mostrar “Cuadrilla completa”; de lo contrario, “Cuadrilla incompleta”.", data:[["B2","Trabajadores",12]], blocks:[{text:"B2", type:"var"},{text:">", type:"op"},{text:"10", type:"val"},{text:'"Cuadrilla completa"', type:"res"},{text:'"Cuadrilla incompleta"', type:"res"},{text:";", type:"sep"},{text:";", type:"sep"}], zones:{test: { blocks:["B2",">","10"] }, true: { blocks:['"Cuadrilla completa"'] }, false: { blocks:['"Cuadrilla incompleta"'] }, sep1: { blocks:[";"] }, sep2: { blocks:[";"] }}, f:'=SI(B2>10;"Cuadrilla completa";"Cuadrilla incompleta")', h:["La prueba lógica es B2>10.","El valor verdadero va entre comillas.","No olvides los separadores ; entre argumentos."], eval:(data)=>{ const B2=data[0][2]; return B2>10 ? 'Cuadrilla completa' : 'Cuadrilla incompleta'; }, randomData:()=>Math.floor(Math.random()*20)+1 },
+    { text:"Un trabajador es considerado apto si su edad es mayor o igual a 18 años. Si cumple, mostrar “Apto”; de lo contrario, “No apto”.", data:[["B2","Edad",20]], blocks:[{text:"B2", type:"var"},{text:">=", type:"op"},{text:"18", type:"val"},{text:'"Apto"', type:"res"},{text:'"No apto"', type:"res"},{text:";", type:"sep"},{text:";", type:"sep"}], zones:{test: { blocks:["B2",">=","18"] }, true: { blocks:['"Apto"'] }, false: { blocks:['"No apto"'] }, sep1: { blocks:[";"] }, sep2: { blocks:[";"] }}, f:'=SI(B2>=18;"Apto";"No apto")', h:["“Mayor o igual” es >=.","La condición es B2>=18.","El resultado verdadero es “Apto”."], eval:(data)=>{ const B2=data[0][2]; return B2>=18 ? 'Apto' : 'No apto'; }, randomData:()=>Math.floor(Math.random()*40)+16 },
+    { text:"Una obra es segura si el número de accidentes es menor o igual a 2. Si cumple, mostrar “Segura”; de lo contrario, “En riesgo”.", data:[["B2","Accidentes",1]], blocks:[{text:"B2", type:"var"},{text:"<=", type:"op"},{text:"2", type:"val"},{text:'"Segura"', type:"res"},{text:'"En riesgo"', type:"res"},{text:";", type:"sep"},{text:";", type:"sep"}], zones:{test: { blocks:["B2","<=","2"] }, true: { blocks:['"Segura"'] }, false: { blocks:['"En riesgo"'] }, sep1: { blocks:[";"] }, sep2: { blocks:[";"] }}, f:'=SI(B2<=2;"Segura";"En riesgo")', h:["“Menor o igual” es <=.","La condición es B2<=2.","El resultado verdadero es “Segura”."], eval:(data)=>{ const B2=data[0][2]; return B2<=2 ? 'Segura' : 'En riesgo'; }, randomData:()=>Math.floor(Math.random()*5) }
   ],
   2: [
-    {
-      text:"Si un trabajador registra 20 días trabajados o más, obtiene un bono de $50.000. Si registra menos de 20 días, obtiene $0.",
-      data:[["B2","Días trabajados",22]],
-      blocks:[
-        {text:"B2", type:"var"},{text:">=", type:"op"},{text:"20", type:"val"},
-        {text:"50000", type:"val"},{text:"0", type:"val"},
-        {text:";", type:"sep"},{text:";", type:"sep"}
-      ],
-      zones:{
-        test: { blocks:["B2",">=","20"] },
-        true: { blocks:["50000"] },
-        false: { blocks:["0"] },
-        sep1: { blocks:[";"] }, sep2: { blocks:[";"] }
-      },
-      f:"=SI(B2>=20;50000;0)",
-      h:["“20 días o más” es >=20.","Los resultados son números, no llevan comillas.","Recuerda los ; separadores."],
-      eval: (data) => { const B2 = data[0][2]; return B2>=20 ? 50000 : 0; },
-      randomData: () => Math.floor(Math.random()*30)+1
-    },
-    {
-      text:"Un trabajador recibe una bonificación de $30.000 si su asistencia es mayor al 85%. En caso contrario, no recibe bonificación.",
-      data:[["B2","Asistencia","88%"]],
-      blocks:[
-        {text:"B2", type:"var"},{text:">", type:"op"},{text:"85%", type:"val"},
-        {text:"30000", type:"val"},{text:"0", type:"val"},
-        {text:";", type:"sep"},{text:";", type:"sep"}
-      ],
-      zones:{
-        test: { blocks:["B2",">","85%"] },
-        true: { blocks:["30000"] },
-        false: { blocks:["0"] },
-        sep1: { blocks:[";"] }, sep2: { blocks:[";"] }
-      },
-      f:'=SI(B2>85%;30000;0)',
-      h:["“Mayor al 85%” es >85%.","Los resultados son números.","No olvides el % en el valor."],
-      eval: (data) => { const B2 = data[0][2]; return B2>0.85 ? 30000 : 0; },
-      randomData: () => (Math.floor(Math.random()*20)+70)+"%" 
-    },
-    {
-      text:"Un trabajador recibe una multa de $10.000 si llega tarde 3 o más veces. Si llega tarde menos de 3 veces, no recibe multa.",
-      data:[["B2","Llegadas tarde",4]],
-      blocks:[
-        {text:"B2", type:"var"},{text:">=", type:"op"},{text:"3", type:"val"},
-        {text:"10000", type:"val"},{text:"0", type:"val"},
-        {text:";", type:"sep"},{text:";", type:"sep"}
-      ],
-      zones:{
-        test: { blocks:["B2",">=","3"] },
-        true: { blocks:["10000"] },
-        false: { blocks:["0"] },
-        sep1: { blocks:[";"] }, sep2: { blocks:[";"] }
-      },
-      f:"=SI(B2>=3;10000;0)",
-      h:["“3 o más” es >=3.","Los resultados son números.","Recuerda los separadores."],
-      eval: (data) => { const B2 = data[0][2]; return B2>=3 ? 10000 : 0; },
-      randomData: () => Math.floor(Math.random()*8)
-    }
+    { text:"Si un trabajador registra 20 días trabajados o más, obtiene un bono de $50.000. Si registra menos de 20 días, obtiene $0.", data:[["B2","Días trabajados",22]], blocks:[{text:"B2", type:"var"},{text:">=", type:"op"},{text:"20", type:"val"},{text:"50000", type:"val"},{text:"0", type:"val"},{text:";", type:"sep"},{text:";", type:"sep"}], zones:{test: { blocks:["B2",">=","20"] }, true: { blocks:["50000"] }, false: { blocks:["0"] }, sep1: { blocks:[";"] }, sep2: { blocks:[";"] }}, f:"=SI(B2>=20;50000;0)", h:["“20 días o más” es >=20.","Los resultados son números, no llevan comillas.","Recuerda los ; separadores."], eval:(data)=>{ const B2=data[0][2]; return B2>=20 ? 50000 : 0; }, randomData:()=>Math.floor(Math.random()*30)+1 },
+    { text:"Un trabajador recibe una bonificación de $30.000 si su asistencia es mayor al 85%. En caso contrario, no recibe bonificación.", data:[["B2","Asistencia","88%"]], blocks:[{text:"B2", type:"var"},{text:">", type:"op"},{text:"85%", type:"val"},{text:"30000", type:"val"},{text:"0", type:"val"},{text:";", type:"sep"},{text:";", type:"sep"}], zones:{test: { blocks:["B2",">","85%"] }, true: { blocks:["30000"] }, false: { blocks:["0"] }, sep1: { blocks:[";"] }, sep2: { blocks:[";"] }}, f:'=SI(B2>85%;30000;0)', h:["“Mayor al 85%” es >85%.","Los resultados son números.","No olvides el % en el valor."], eval:(data)=>{ const B2=data[0][2]; return B2>0.85 ? 30000 : 0; }, randomData:()=> (Math.floor(Math.random()*20)+70)+"%" },
+    { text:"Un trabajador recibe una multa de $10.000 si llega tarde 3 o más veces. Si llega tarde menos de 3 veces, no recibe multa.", data:[["B2","Llegadas tarde",4]], blocks:[{text:"B2", type:"var"},{text:">=", type:"op"},{text:"3", type:"val"},{text:"10000", type:"val"},{text:"0", type:"val"},{text:";", type:"sep"},{text:";", type:"sep"}], zones:{test: { blocks:["B2",">=","3"] }, true: { blocks:["10000"] }, false: { blocks:["0"] }, sep1: { blocks:[";"] }, sep2: { blocks:[";"] }}, f:"=SI(B2>=3;10000;0)", h:["“3 o más” es >=3.","Los resultados son números.","Recuerda los separadores."], eval:(data)=>{ const B2=data[0][2]; return B2>=3 ? 10000 : 0; }, randomData:()=>Math.floor(Math.random()*8) }
   ],
   3: [
-    {
-      text:"Clasifica el nivel de riesgo: 1 a 4 = Bajo; 5 a 9 = Medio; 10 a 16 = Alto; sobre 16 = Crítico.",
-      data:[["B2","Puntaje",13]],
-      blocks:[
-        {text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:"<=", type:"op"},{text:"4", type:"val"},{text:";", type:"sep"},{text:'"Bajo"', type:"res"},{text:";", type:"sep"},
-        {text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:"<=", type:"op"},{text:"9", type:"val"},{text:";", type:"sep"},{text:'"Medio"', type:"res"},{text:";", type:"sep"},
-        {text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:"<=", type:"op"},{text:"16", type:"val"},{text:";", type:"sep"},{text:'"Alto"', type:"res"},{text:";", type:"sep"},{text:'"Crítico"', type:"res"},
-        {text:")", type:"paren"},{text:")", type:"paren"},{text:")", type:"paren"}
-      ],
-      formulaArray:["SI","(","B2","<=","4",";",'"Bajo"',";","SI","(","B2","<=","9",";",'"Medio"',";","SI","(","B2","<=","16",";",'"Alto"',";",'"Crítico"',")",")",")"],
-      f:'=SI(B2<=4;"Bajo";SI(B2<=9;"Medio";SI(B2<=16;"Alto";"Crítico")))',
-      h:["Comienza con SI( y anida otro SI como tercer argumento.","Cada SI necesita su propio paréntesis de cierre.","Hay tres niveles de anidación."],
-      eval: (data) => { const B2 = data[0][2]; if (B2<=4) return 'Bajo'; if (B2<=9) return 'Medio'; if (B2<=16) return 'Alto'; return 'Crítico'; },
-      randomData: () => Math.floor(Math.random()*20)+1
-    },
-    {
-      text:"Clasifica la productividad: más de 40 = Alta; de 21 a 40 = Media; de 5 a 20 = Baja; menos de 5 = Muy baja.",
-      data:[["B2","Horas",25]],
-      blocks:[
-        {text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:">", type:"op"},{text:"40", type:"val"},{text:";", type:"sep"},{text:'"Alta"', type:"res"},{text:";", type:"sep"},
-        {text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:">", type:"op"},{text:"20", type:"val"},{text:";", type:"sep"},{text:'"Media"', type:"res"},{text:";", type:"sep"},
-        {text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:">", type:"op"},{text:"4", type:"val"},{text:";", type:"sep"},{text:'"Baja"', type:"res"},{text:";", type:"sep"},{text:'"Muy baja"', type:"res"},
-        {text:")", type:"paren"},{text:")", type:"paren"},{text:")", type:"paren"}
-      ],
-      formulaArray:["SI","(","B2",">","40",";",'"Alta"',";","SI","(","B2",">","20",";",'"Media"',";","SI","(","B2",">","4",";",'"Baja"',";",'"Muy baja"',")",")",")"],
-      f:'=SI(B2>40;"Alta";SI(B2>20;"Media";SI(B2>4;"Baja";"Muy baja")))',
-      h:["Ordena de mayor a menor usando >.","Cada SI anidado va como tercer argumento.","No olvides los paréntesis de cierre."],
-      eval: (data) => { const B2 = data[0][2]; if (B2>40) return 'Alta'; if (B2>20) return 'Media'; if (B2>4) return 'Baja'; return 'Muy baja'; },
-      randomData: () => Math.floor(Math.random()*50)
-    },
-    {
-      text:"Clasifica la temperatura en obra: menos de 5 = Frío; de 5 a 15 = Templado; de 16 a 30 = Cálido; más de 30 = Caluroso.",
-      data:[["B2","Temperatura",22]],
-      blocks:[
-        {text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:"<", type:"op"},{text:"5", type:"val"},{text:";", type:"sep"},{text:'"Frío"', type:"res"},{text:";", type:"sep"},
-        {text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:"<", type:"op"},{text:"16", type:"val"},{text:";", type:"sep"},{text:'"Templado"', type:"res"},{text:";", type:"sep"},
-        {text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:"<", type:"op"},{text:"31", type:"val"},{text:";", type:"sep"},{text:'"Cálido"', type:"res"},{text:";", type:"sep"},{text:'"Caluroso"', type:"res"},
-        {text:")", type:"paren"},{text:")", type:"paren"},{text:")", type:"paren"}
-      ],
-      formulaArray:["SI","(","B2","<","5",";",'"Frío"',";","SI","(","B2","<","16",";",'"Templado"',";","SI","(","B2","<","31",";",'"Cálido"',";",'"Caluroso"',")",")",")"],
-      f:'=SI(B2<5;"Frío";SI(B2<16;"Templado";SI(B2<31;"Cálido";"Caluroso")))',
-      h:["Usa < para los límites superiores.","Los intervalos son abiertos por la derecha.","Anida tres SI."],
-      eval: (data) => { const B2 = data[0][2]; if (B2<5) return 'Frío'; if (B2<16) return 'Templado'; if (B2<31) return 'Cálido'; return 'Caluroso'; },
-      randomData: () => Math.floor(Math.random()*40)
-    }
+    { text:"Clasifica el nivel de riesgo: 1 a 4 = Bajo; 5 a 9 = Medio; 10 a 16 = Alto; sobre 16 = Crítico.", data:[["B2","Puntaje",13]], blocks:[{text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:"<=", type:"op"},{text:"4", type:"val"},{text:";", type:"sep"},{text:'"Bajo"', type:"res"},{text:";", type:"sep"},{text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:"<=", type:"op"},{text:"9", type:"val"},{text:";", type:"sep"},{text:'"Medio"', type:"res"},{text:";", type:"sep"},{text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:"<=", type:"op"},{text:"16", type:"val"},{text:";", type:"sep"},{text:'"Alto"', type:"res"},{text:";", type:"sep"},{text:'"Crítico"', type:"res"},{text:")", type:"paren"},{text:")", type:"paren"},{text:")", type:"paren"}], formulaArray:["SI","(","B2","<=","4",";",'"Bajo"',";","SI","(","B2","<=","9",";",'"Medio"',";","SI","(","B2","<=","16",";",'"Alto"',";",'"Crítico"',")",")",")"], f:'=SI(B2<=4;"Bajo";SI(B2<=9;"Medio";SI(B2<=16;"Alto";"Crítico")))', h:["Comienza con SI( y anida otro SI como tercer argumento.","Cada SI necesita su propio paréntesis de cierre.","Hay tres niveles de anidación."], eval:(data)=>{ const B2=data[0][2]; if (B2<=4) return 'Bajo'; if (B2<=9) return 'Medio'; if (B2<=16) return 'Alto'; return 'Crítico'; }, randomData:()=>Math.floor(Math.random()*20)+1 },
+    { text:"Clasifica la productividad: más de 40 = Alta; de 21 a 40 = Media; de 5 a 20 = Baja; menos de 5 = Muy baja.", data:[["B2","Horas",25]], blocks:[{text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:">", type:"op"},{text:"40", type:"val"},{text:";", type:"sep"},{text:'"Alta"', type:"res"},{text:";", type:"sep"},{text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:">", type:"op"},{text:"20", type:"val"},{text:";", type:"sep"},{text:'"Media"', type:"res"},{text:";", type:"sep"},{text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:">", type:"op"},{text:"4", type:"val"},{text:";", type:"sep"},{text:'"Baja"', type:"res"},{text:";", type:"sep"},{text:'"Muy baja"', type:"res"},{text:")", type:"paren"},{text:")", type:"paren"},{text:")", type:"paren"}], formulaArray:["SI","(","B2",">","40",";",'"Alta"',";","SI","(","B2",">","20",";",'"Media"',";","SI","(","B2",">","4",";",'"Baja"',";",'"Muy baja"',")",")",")"], f:'=SI(B2>40;"Alta";SI(B2>20;"Media";SI(B2>4;"Baja";"Muy baja")))', h:["Ordena de mayor a menor usando >.","Cada SI anidado va como tercer argumento.","No olvides los paréntesis de cierre."], eval:(data)=>{ const B2=data[0][2]; if (B2>40) return 'Alta'; if (B2>20) return 'Media'; if (B2>4) return 'Baja'; return 'Muy baja'; }, randomData:()=>Math.floor(Math.random()*50) },
+    { text:"Clasifica la temperatura en obra: menos de 5 = Frío; de 5 a 15 = Templado; de 16 a 30 = Cálido; más de 30 = Caluroso.", data:[["B2","Temperatura",22]], blocks:[{text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:"<", type:"op"},{text:"5", type:"val"},{text:";", type:"sep"},{text:'"Frío"', type:"res"},{text:";", type:"sep"},{text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:"<", type:"op"},{text:"16", type:"val"},{text:";", type:"sep"},{text:'"Templado"', type:"res"},{text:";", type:"sep"},{text:"SI", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:"<", type:"op"},{text:"31", type:"val"},{text:";", type:"sep"},{text:'"Cálido"', type:"res"},{text:";", type:"sep"},{text:'"Caluroso"', type:"res"},{text:")", type:"paren"},{text:")", type:"paren"},{text:")", type:"paren"}], formulaArray:["SI","(","B2","<","5",";",'"Frío"',";","SI","(","B2","<","16",";",'"Templado"',";","SI","(","B2","<","31",";",'"Cálido"',";",'"Caluroso"',")",")",")"], f:'=SI(B2<5;"Frío";SI(B2<16;"Templado";SI(B2<31;"Cálido";"Caluroso")))', h:["Usa < para los límites superiores.","Los intervalos son abiertos por la derecha.","Anida tres SI."], eval:(data)=>{ const B2=data[0][2]; if (B2<5) return 'Frío'; if (B2<16) return 'Templado'; if (B2<31) return 'Cálido'; return 'Caluroso'; }, randomData:()=>Math.floor(Math.random()*40) }
   ],
   4: [
-    {
-      text:"Un trabajador obtiene un bono si cumple simultáneamente dos condiciones: registra 20 días trabajados o más Y su asistencia es igual o superior al 90%. Si no cumple ambas, no obtiene bono.",
-      data:[["B2","Días trabajados",21],["C2","Asistencia","95%"]],
-      blocks:[
-        {text:"Y", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:">=", type:"op"},{text:"20", type:"val"},{text:";", type:"sep"},{text:"C2", type:"var"},{text:">=", type:"op"},{text:"90%", type:"val"},{text:")", type:"paren"},
-        {text:'"Bono"', type:"res"},{text:'"Sin bono"', type:"res"},{text:";", type:"sep"},{text:";", type:"sep"}
-      ],
-      zones:{
-        test: { blocks:["Y","(","B2",">=","20",";","C2",">=","90%",")"] },
-        true: { blocks:['"Bono"'] },
-        false: { blocks:['"Sin bono"'] },
-        sep1: { blocks:[";"] }, sep2: { blocks:[";"] }
-      },
-      f:'=SI(Y(B2>=20;C2>=90%);"Bono";"Sin bono")',
-      h:["La función Y agrupa las dos condiciones.","Dentro de Y los argumentos van separados por ;.","La estructura es =SI(prueba;verdadero;falso)."],
-      eval: (data) => { const B2 = data[0][2]; const C2 = data[1][2]; return (B2>=20 && C2>=0.9) ? 'Bono' : 'Sin bono'; },
-      randomData: () => [Math.floor(Math.random()*30)+1, (Math.floor(Math.random()*50)+50)+"%"]
-    },
-    {
-      text:"Un proyecto se considera en riesgo si los días de retraso son mayores o iguales a 10 Y la satisfacción del cliente es menor o igual a 50%. Si se cumple, mostrar “Crítico”; si no, “Aceptable”.",
-      data:[["B2","Días retraso",12],["C2","Satisfacción","45%"]],
-      blocks:[
-        {text:"Y", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:">=", type:"op"},{text:"10", type:"val"},{text:";", type:"sep"},{text:"C2", type:"var"},{text:"<=", type:"op"},{text:"50%", type:"val"},{text:")", type:"paren"},
-        {text:'"Crítico"', type:"res"},{text:'"Aceptable"', type:"res"},{text:";", type:"sep"},{text:";", type:"sep"}
-      ],
-      zones:{
-        test: { blocks:["Y","(","B2",">=","10",";","C2","<=","50%",")"] },
-        true: { blocks:['"Crítico"'] },
-        false: { blocks:['"Aceptable"'] },
-        sep1: { blocks:[";"] }, sep2: { blocks:[";"] }
-      },
-      f:'=SI(Y(B2>=10;C2<=50%);"Crítico";"Aceptable")',
-      h:["Una condición usa >= y la otra <=.","La función Y exige que ambas se cumplan.","Recuerda los separadores dentro de Y."],
-      eval: (data) => { const B2 = data[0][2]; const C2 = data[1][2]; return (B2>=10 && C2<=0.5) ? 'Crítico' : 'Aceptable'; },
-      randomData: () => [Math.floor(Math.random()*20), (Math.floor(Math.random()*60))+20+"%"]
-    },
-    {
-      text:"Un trabajador recibe un incentivo si su productividad es mayor o igual a 80% Y su número de errores es menor o igual a 2. Si cumple, “Incentivo”; si no, “Sin incentivo”.",
-      data:[["B2","Productividad","85%"],["C2","Errores",1]],
-      blocks:[
-        {text:"Y", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:">=", type:"op"},{text:"80%", type:"val"},{text:";", type:"sep"},{text:"C2", type:"var"},{text:"<=", type:"op"},{text:"2", type:"val"},{text:")", type:"paren"},
-        {text:'"Incentivo"', type:"res"},{text:'"Sin incentivo"', type:"res"},{text:";", type:"sep"},{text:";", type:"sep"}
-      ],
-      zones:{
-        test: { blocks:["Y","(","B2",">=","80%",";","C2","<=","2",")"] },
-        true: { blocks:['"Incentivo"'] },
-        false: { blocks:['"Sin incentivo"'] },
-        sep1: { blocks:[";"] }, sep2: { blocks:[";"] }
-      },
-      f:'=SI(Y(B2>=80%;C2<=2);"Incentivo";"Sin incentivo")',
-      h:["Una condición usa >= y la otra <=.","La función Y agrupa las dos condiciones.","No olvides los separadores."],
-      eval: (data) => { const B2 = data[0][2]; const C2 = data[1][2]; return (B2>=0.8 && C2<=2) ? 'Incentivo' : 'Sin incentivo'; },
-      randomData: () => [Math.floor(Math.random()*30)+70+"%", Math.floor(Math.random()*5)]
-    }
+    { text:"Un trabajador obtiene un bono si cumple simultáneamente dos condiciones: registra 20 días trabajados o más Y su asistencia es igual o superior al 90%. Si no cumple ambas, no obtiene bono.", data:[["B2","Días trabajados",21],["C2","Asistencia","95%"]], blocks:[{text:"Y", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:">=", type:"op"},{text:"20", type:"val"},{text:";", type:"sep"},{text:"C2", type:"var"},{text:">=", type:"op"},{text:"90%", type:"val"},{text:")", type:"paren"},{text:'"Bono"', type:"res"},{text:'"Sin bono"', type:"res"},{text:";", type:"sep"},{text:";", type:"sep"}], zones:{test: { blocks:["Y","(","B2",">=","20",";","C2",">=","90%",")"] }, true: { blocks:['"Bono"'] }, false: { blocks:['"Sin bono"'] }, sep1: { blocks:[";"] }, sep2: { blocks:[";"] }}, f:'=SI(Y(B2>=20;C2>=90%);"Bono";"Sin bono")', h:["La función Y agrupa las dos condiciones.","Dentro de Y los argumentos van separados por ;.","La estructura es =SI(prueba;verdadero;falso)."], eval:(data)=>{ const B2=data[0][2]; const C2=data[1][2]; return (B2>=20 && C2>=0.9) ? 'Bono' : 'Sin bono'; }, randomData:()=>[Math.floor(Math.random()*30)+1, (Math.floor(Math.random()*50)+50)+"%"] },
+    { text:"Un proyecto se considera en riesgo si los días de retraso son mayores o iguales a 10 Y la satisfacción del cliente es menor o igual a 50%. Si se cumple, mostrar “Crítico”; si no, “Aceptable”.", data:[["B2","Días retraso",12],["C2","Satisfacción","45%"]], blocks:[{text:"Y", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:">=", type:"op"},{text:"10", type:"val"},{text:";", type:"sep"},{text:"C2", type:"var"},{text:"<=", type:"op"},{text:"50%", type:"val"},{text:")", type:"paren"},{text:'"Crítico"', type:"res"},{text:'"Aceptable"', type:"res"},{text:";", type:"sep"},{text:";", type:"sep"}], zones:{test: { blocks:["Y","(","B2",">=","10",";","C2","<=","50%",")"] }, true: { blocks:['"Crítico"'] }, false: { blocks:['"Aceptable"'] }, sep1: { blocks:[";"] }, sep2: { blocks:[";"] }}, f:'=SI(Y(B2>=10;C2<=50%);"Crítico";"Aceptable")', h:["Una condición usa >= y la otra <=.","La función Y exige que ambas se cumplan.","Recuerda los separadores dentro de Y."], eval:(data)=>{ const B2=data[0][2]; const C2=data[1][2]; return (B2>=10 && C2<=0.5) ? 'Crítico' : 'Aceptable'; }, randomData:()=>[Math.floor(Math.random()*20), (Math.floor(Math.random()*60))+20+"%"] },
+    { text:"Un trabajador recibe un incentivo si su productividad es mayor o igual a 80% Y su número de errores es menor o igual a 2. Si cumple, “Incentivo”; si no, “Sin incentivo”.", data:[["B2","Productividad","85%"],["C2","Errores",1]], blocks:[{text:"Y", type:"func"},{text:"(", type:"paren"},{text:"B2", type:"var"},{text:">=", type:"op"},{text:"80%", type:"val"},{text:";", type:"sep"},{text:"C2", type:"var"},{text:"<=", type:"op"},{text:"2", type:"val"},{text:")", type:"paren"},{text:'"Incentivo"', type:"res"},{text:'"Sin incentivo"', type:"res"},{text:";", type:"sep"},{text:";", type:"sep"}], zones:{test: { blocks:["Y","(","B2",">=","80%",";","C2","<=","2",")"] }, true: { blocks:['"Incentivo"'] }, false: { blocks:['"Sin incentivo"'] }, sep1: { blocks:[";"] }, sep2: { blocks:[";"] }}, f:'=SI(Y(B2>=80%;C2<=2);"Incentivo";"Sin incentivo")', h:["Una condición usa >= y la otra <=.","La función Y agrupa las dos condiciones.","No olvides los separadores."], eval:(data)=>{ const B2=data[0][2]; const C2=data[1][2]; return (B2>=0.8 && C2<=2) ? 'Incentivo' : 'Sin incentivo'; }, randomData:()=>[Math.floor(Math.random()*30)+70+"%", Math.floor(Math.random()*5)] }
   ]
 };
 
 const WRITE_LEVELS = {
   1: [
-    {
-      text:"En una obra, un trabajador es considerado apto si tiene una edad mayor o igual a 18 años. Si cumple, mostrar “Apto”; de lo contrario, “No apto”.",
-      data:[["B2","Edad",20]],
-      f:'=SI(B2>=18;"Apto";"No apto")',
-      accepted:['=SI(B2<18;"No apto";"Apto")'],
-      h:["“Mayor o igual” es >=.","La condición es B2>=18.","El resultado verdadero es “Apto”.","También puedes invertir la condición.","No olvides los separadores ; y las comillas dobles."],
-      eval: (data) => { const B2 = data[0][2]; return B2>=18 ? 'Apto' : 'No apto'; },
-      randomData: () => Math.floor(Math.random()*40)+16
-    },
-    {
-      text:"Una obra es segura si el número de accidentes es menor o igual a 2. Si cumple, mostrar “Segura”; de lo contrario, “En riesgo”.",
-      data:[["B2","Accidentes",1]],
-      f:'=SI(B2<=2;"Segura";"En riesgo")',
-      accepted:['=SI(B2>2;"En riesgo";"Segura")'],
-      h:["“Menor o igual” es <=.","La condición es B2<=2.","El resultado verdadero es “Segura”.","Puedes invertir la condición.","Usa comillas dobles para los textos."],
-      eval: (data) => { const B2 = data[0][2]; return B2<=2 ? 'Segura' : 'En riesgo'; },
-      randomData: () => Math.floor(Math.random()*5)
-    },
-    {
-      text:"Un trabajador recibe un bono si su evaluación es mayor o igual a 80 puntos. Si cumple, mostrar “Bono”; si no, “Sin bono”.",
-      data:[["B2","Evaluación",85]],
-      f:'=SI(B2>=80;"Bono";"Sin bono")',
-      accepted:['=SI(B2<80;"Sin bono";"Bono")'],
-      h:["“Mayor o igual” es >=.","La condición es B2>=80.","El resultado verdadero es “Bono”.","Puedes invertir la condición.","Recuerda los separadores ;."],
-      eval: (data) => { const B2 = data[0][2]; return B2>=80 ? 'Bono' : 'Sin bono'; },
-      randomData: () => Math.floor(Math.random()*30)+60
-    }
+    { text:"En una obra, un trabajador es considerado apto si tiene una edad mayor o igual a 18 años. Si cumple, mostrar “Apto”; de lo contrario, “No apto”.", data:[["B2","Edad",20]], f:'=SI(B2>=18;"Apto";"No apto")', accepted:['=SI(B2<18;"No apto";"Apto")'], h:["“Mayor o igual” es >=.","La condición es B2>=18.","El resultado verdadero es “Apto”.","También puedes invertir la condición.","No olvides los separadores ; y las comillas dobles."], eval:(data)=>{ const B2=data[0][2]; return B2>=18 ? 'Apto' : 'No apto'; }, randomData:()=>Math.floor(Math.random()*40)+16 },
+    { text:"Una obra es segura si el número de accidentes es menor o igual a 2. Si cumple, mostrar “Segura”; de lo contrario, “En riesgo”.", data:[["B2","Accidentes",1]], f:'=SI(B2<=2;"Segura";"En riesgo")', accepted:['=SI(B2>2;"En riesgo";"Segura")'], h:["“Menor o igual” es <=.","La condición es B2<=2.","El resultado verdadero es “Segura”.","Puedes invertir la condición.","Usa comillas dobles para los textos."], eval:(data)=>{ const B2=data[0][2]; return B2<=2 ? 'Segura' : 'En riesgo'; }, randomData:()=>Math.floor(Math.random()*5) },
+    { text:"Un trabajador recibe un bono si su evaluación es mayor o igual a 80 puntos. Si cumple, mostrar “Bono”; si no, “Sin bono”.", data:[["B2","Evaluación",85]], f:'=SI(B2>=80;"Bono";"Sin bono")', accepted:['=SI(B2<80;"Sin bono";"Bono")'], h:["“Mayor o igual” es >=.","La condición es B2>=80.","El resultado verdadero es “Bono”.","Puedes invertir la condición.","Recuerda los separadores ;."], eval:(data)=>{ const B2=data[0][2]; return B2>=80 ? 'Bono' : 'Sin bono'; }, randomData:()=>Math.floor(Math.random()*30)+60 }
   ],
   2: [
-    {
-      text:"Un trabajador recibe una bonificación de $30.000 si su asistencia es mayor al 85%. En caso contrario, no recibe bonificación.",
-      data:[["B2","Asistencia","88%"]],
-      f:'=SI(B2>85%;30000;0)',
-      accepted:['=SI(B2<=85%;0;30000)'],
-      h:["“Mayor al 85%” es >85%.","El resultado verdadero es 30000, el falso es 0.","Puedes invertir la condición y los resultados.","Recuerda que los porcentajes van con % en la fórmula.","Comprueba que el separador sea ;."],
-      eval: (data) => { const B2 = data[0][2]; return B2>0.85 ? 30000 : 0; },
-      randomData: () => (Math.floor(Math.random()*20)+70)+"%" 
-    },
-    {
-      text:"Un trabajador recibe una multa de $10.000 si llega tarde 3 o más veces. Si llega tarde menos de 3 veces, no recibe multa.",
-      data:[["B2","Llegadas tarde",4]],
-      f:'=SI(B2>=3;10000;0)',
-      accepted:['=SI(B2<3;0;10000)'],
-      h:["“3 o más” es >=3.","Los resultados son números.","Puedes invertir la condición.","No olvides los separadores ;.","La fórmula comienza con =SI(."],
-      eval: (data) => { const B2 = data[0][2]; return B2>=3 ? 10000 : 0; },
-      randomData: () => Math.floor(Math.random()*8)
-    },
-    {
-      text:"Un trabajador recibe un bono de $20.000 si su productividad es mayor o igual al 90%. Si no, recibe $5.000.",
-      data:[["B2","Productividad","92%"]],
-      f:'=SI(B2>=90%;20000;5000)',
-      accepted:['=SI(B2<90%;5000;20000)'],
-      h:["“Mayor o igual” es >=.","Resultado verdadero 20000, falso 5000.","Puedes invertir la condición.","Usa % en el valor.","Separador ;."],
-      eval: (data) => { const B2 = data[0][2]; return B2>=0.9 ? 20000 : 5000; },
-      randomData: () => (Math.floor(Math.random()*20)+80)+"%" 
-    }
+    { text:"Un trabajador recibe una bonificación de $30.000 si su asistencia es mayor al 85%. En caso contrario, no recibe bonificación.", data:[["B2","Asistencia","88%"]], f:'=SI(B2>85%;30000;0)', accepted:['=SI(B2<=85%;0;30000)'], h:["“Mayor al 85%” es >85%.","El resultado verdadero es 30000, el falso es 0.","Puedes invertir la condición y los resultados.","Recuerda que los porcentajes van con % en la fórmula.","Comprueba que el separador sea ;."], eval:(data)=>{ const B2=data[0][2]; return B2>0.85 ? 30000 : 0; }, randomData:()=> (Math.floor(Math.random()*20)+70)+"%" },
+    { text:"Un trabajador recibe una multa de $10.000 si llega tarde 3 o más veces. Si llega tarde menos de 3 veces, no recibe multa.", data:[["B2","Llegadas tarde",4]], f:'=SI(B2>=3;10000;0)', accepted:['=SI(B2<3;0;10000)'], h:["“3 o más” es >=3.","Los resultados son números.","Puedes invertir la condición.","No olvides los separadores ;.","La fórmula comienza con =SI(."], eval:(data)=>{ const B2=data[0][2]; return B2>=3 ? 10000 : 0; }, randomData:()=>Math.floor(Math.random()*8) },
+    { text:"Un trabajador recibe un bono de $20.000 si su productividad es mayor o igual al 90%. Si no, recibe $5.000.", data:[["B2","Productividad","92%"]], f:'=SI(B2>=90%;20000;5000)', accepted:['=SI(B2<90%;5000;20000)'], h:["“Mayor o igual” es >=.","Resultado verdadero 20000, falso 5000.","Puedes invertir la condición.","Usa % en el valor.","Separador ;."], eval:(data)=>{ const B2=data[0][2]; return B2>=0.9 ? 20000 : 5000; }, randomData:()=> (Math.floor(Math.random()*20)+80)+"%" }
   ],
   3: [
-    {
-      text:"Clasifica la productividad según horas trabajadas: menos de 20 = Baja; de 20 a 40 = Media; más de 40 = Alta.",
-      data:[["B2","Horas trabajadas",35]],
-      f:'=SI(B2<20;"Baja";SI(B2<=40;"Media";"Alta"))',
-      accepted:[
-        '=SI(B2>40;"Alta";SI(B2>=20;"Media";"Baja"))',
-        '=SI(B2<=40;SI(B2<20;"Baja";"Media");"Alta")'
-      ],
-      h:["Menos de 20 es <20.","Entre 20 y 40 incluye 40, usa <=40.","Más de 40 es el último caso.","También puedes ordenar los rangos de mayor a menor.","Prueba con SI(B2>40;\"Alta\";SI(B2>=20;\"Media\";\"Baja\"))"],
-      eval: (data) => { const B2 = data[0][2]; if (B2<20) return 'Baja'; if (B2<=40) return 'Media'; return 'Alta'; },
-      randomData: () => Math.floor(Math.random()*50)+5
-    },
-    {
-      text:"Clasifica la temperatura: menos de 5 = Frío; de 5 a 15 = Templado; de 16 a 30 = Cálido; más de 30 = Caluroso.",
-      data:[["B2","Temperatura",22]],
-      f:'=SI(B2<5;"Frío";SI(B2<16;"Templado";SI(B2<31;"Cálido";"Caluroso")))',
-      accepted:['=SI(B2>30;"Caluroso";SI(B2>15;"Cálido";SI(B2>4;"Templado";"Frío")))'],
-      h:["Usa < para los límites superiores.","Los intervalos son abiertos por la derecha.","Anida tres SI.","Puedes invertir el orden.","No olvides los paréntesis de cierre."],
-      eval: (data) => { const B2 = data[0][2]; if (B2<5) return 'Frío'; if (B2<16) return 'Templado'; if (B2<31) return 'Cálido'; return 'Caluroso'; },
-      randomData: () => Math.floor(Math.random()*40)
-    },
-    {
-      text:"Clasifica el riesgo: menos de 3 = Bajo; de 3 a 7 = Medio; de 8 a 12 = Alto; más de 12 = Crítico.",
-      data:[["B2","Nivel de riesgo",9]],
-      f:'=SI(B2<3;"Bajo";SI(B2<8;"Medio";SI(B2<13;"Alto";"Crítico")))',
-      accepted:['=SI(B2>12;"Crítico";SI(B2>7;"Alto";SI(B2>2;"Medio";"Bajo")))'],
-      h:["Usa < para los límites.","Tres SI anidados.","Puedes invertir el orden.","Recuerda los paréntesis.","Separador ;."],
-      eval: (data) => { const B2 = data[0][2]; if (B2<3) return 'Bajo'; if (B2<8) return 'Medio'; if (B2<13) return 'Alto'; return 'Crítico'; },
-      randomData: () => Math.floor(Math.random()*16)
-    }
+    { text:"Clasifica la productividad según horas trabajadas: menos de 20 = Baja; de 20 a 40 = Media; más de 40 = Alta.", data:[["B2","Horas trabajadas",35]], f:'=SI(B2<20;"Baja";SI(B2<=40;"Media";"Alta"))', accepted:['=SI(B2>40;"Alta";SI(B2>=20;"Media";"Baja"))','=SI(B2<=40;SI(B2<20;"Baja";"Media");"Alta")'], h:["Menos de 20 es <20.","Entre 20 y 40 incluye 40, usa <=40.","Más de 40 es el último caso.","También puedes ordenar los rangos de mayor a menor.","Prueba con SI(B2>40;\"Alta\";SI(B2>=20;\"Media\";\"Baja\"))"], eval:(data)=>{ const B2=data[0][2]; if (B2<20) return 'Baja'; if (B2<=40) return 'Media'; return 'Alta'; }, randomData:()=>Math.floor(Math.random()*50)+5 },
+    { text:"Clasifica la temperatura: menos de 5 = Frío; de 5 a 15 = Templado; de 16 a 30 = Cálido; más de 30 = Caluroso.", data:[["B2","Temperatura",22]], f:'=SI(B2<5;"Frío";SI(B2<16;"Templado";SI(B2<31;"Cálido";"Caluroso")))', accepted:['=SI(B2>30;"Caluroso";SI(B2>15;"Cálido";SI(B2>4;"Templado";"Frío")))'], h:["Usa < para los límites superiores.","Los intervalos son abiertos por la derecha.","Anida tres SI.","Puedes invertir el orden.","No olvides los paréntesis de cierre."], eval:(data)=>{ const B2=data[0][2]; if (B2<5) return 'Frío'; if (B2<16) return 'Templado'; if (B2<31) return 'Cálido'; return 'Caluroso'; }, randomData:()=>Math.floor(Math.random()*40) },
+    { text:"Clasifica el riesgo: menos de 3 = Bajo; de 3 a 7 = Medio; de 8 a 12 = Alto; más de 12 = Crítico.", data:[["B2","Nivel de riesgo",9]], f:'=SI(B2<3;"Bajo";SI(B2<8;"Medio";SI(B2<13;"Alto";"Crítico")))', accepted:['=SI(B2>12;"Crítico";SI(B2>7;"Alto";SI(B2>2;"Medio";"Bajo")))'], h:["Usa < para los límites.","Tres SI anidados.","Puedes invertir el orden.","Recuerda los paréntesis.","Separador ;."], eval:(data)=>{ const B2=data[0][2]; if (B2<3) return 'Bajo'; if (B2<8) return 'Medio'; if (B2<13) return 'Alto'; return 'Crítico'; }, randomData:()=>Math.floor(Math.random()*16) }
   ],
   4: [
-    {
-      text:"Un trabajador recibe un incentivo si tiene una antigüedad mayor a 2 años Y un puntaje de evaluación igual o superior a 80. Si no cumple ambas, no recibe incentivo.",
-      data:[["B2","Antigüedad (años)",3],["C2","Puntaje evaluación",85]],
-      f:'=SI(Y(B2>2;C2>=80);"Incentivo";"Sin incentivo")',
-      accepted:['=SI(Y(B2>2;C2>=80);"Incentivo";"Sin incentivo")'],
-      h:["“Mayor a 2” es >2.","“Igual o superior a 80” es >=80.","Ambas condiciones deben cumplirse.","Usa la función Y dentro de SI.","La estructura es =SI(Y(cond1;cond2);verdadero;falso)."],
-      eval: (data) => { const B2 = data[0][2]; const C2 = data[1][2]; return (B2>2 && C2>=80) ? 'Incentivo' : 'Sin incentivo'; },
-      randomData: () => [Math.floor(Math.random()*5), Math.floor(Math.random()*30)+70]
-    },
-    {
-      text:"Un proyecto se considera crítico si los días de retraso son mayores o iguales a 10 Y la satisfacción del cliente es menor o igual a 50%.",
-      data:[["B2","Días retraso",12],["C2","Satisfacción","45%"]],
-      f:'=SI(Y(B2>=10;C2<=50%);"Crítico";"Aceptable")',
-      accepted:['=SI(Y(B2>=10;C2<=50%);"Crítico";"Aceptable")'],
-      h:["Una condición usa >= y la otra <=.","La función Y exige que ambas se cumplan.","Recuerda los separadores dentro de Y.","Usa % en el valor.","La estructura es =SI(Y(...);...;...)."],
-      eval: (data) => { const B2 = data[0][2]; const C2 = data[1][2]; return (B2>=10 && C2<=0.5) ? 'Crítico' : 'Aceptable'; },
-      randomData: () => [Math.floor(Math.random()*20), (Math.floor(Math.random()*60))+20+"%"]
-    },
-    {
-      text:"Un trabajador recibe un incentivo si su productividad es mayor o igual a 80% Y su número de errores es menor o igual a 2.",
-      data:[["B2","Productividad","85%"],["C2","Errores",1]],
-      f:'=SI(Y(B2>=80%;C2<=2);"Incentivo";"Sin incentivo")',
-      accepted:['=SI(Y(B2>=80%;C2<=2);"Incentivo";"Sin incentivo")'],
-      h:["Una condición usa >= y la otra <=.","La función Y agrupa las dos condiciones.","No olvides los separadores.","Usa % en el valor.","La estructura es =SI(Y(...);...;...)."],
-      eval: (data) => { const B2 = data[0][2]; const C2 = data[1][2]; return (B2>=0.8 && C2<=2) ? 'Incentivo' : 'Sin incentivo'; },
-      randomData: () => [Math.floor(Math.random()*30)+70+"%", Math.floor(Math.random()*5)]
-    }
+    { text:"Un trabajador recibe un incentivo si tiene una antigüedad mayor a 2 años Y un puntaje de evaluación igual o superior a 80. Si no cumple ambas, no recibe incentivo.", data:[["B2","Antigüedad (años)",3],["C2","Puntaje evaluación",85]], f:'=SI(Y(B2>2;C2>=80);"Incentivo";"Sin incentivo")', accepted:['=SI(Y(B2>2;C2>=80);"Incentivo";"Sin incentivo")'], h:["“Mayor a 2” es >2.","“Igual o superior a 80” es >=80.","Ambas condiciones deben cumplirse.","Usa la función Y dentro de SI.","La estructura es =SI(Y(cond1;cond2);verdadero;falso)."], eval:(data)=>{ const B2=data[0][2]; const C2=data[1][2]; return (B2>2 && C2>=80) ? 'Incentivo' : 'Sin incentivo'; }, randomData:()=>[Math.floor(Math.random()*5), Math.floor(Math.random()*30)+70] },
+    { text:"Un proyecto se considera crítico si los días de retraso son mayores o iguales a 10 Y la satisfacción del cliente es menor o igual a 50%.", data:[["B2","Días retraso",12],["C2","Satisfacción","45%"]], f:'=SI(Y(B2>=10;C2<=50%);"Crítico";"Aceptable")', accepted:['=SI(Y(B2>=10;C2<=50%);"Crítico";"Aceptable")'], h:["Una condición usa >= y la otra <=.","La función Y exige que ambas se cumplan.","Recuerda los separadores dentro de Y.","Usa % en el valor.","La estructura es =SI(Y(...);...;...)."], eval:(data)=>{ const B2=data[0][2]; const C2=data[1][2]; return (B2>=10 && C2<=0.5) ? 'Crítico' : 'Aceptable'; }, randomData:()=>[Math.floor(Math.random()*20), (Math.floor(Math.random()*60))+20+"%"] },
+    { text:"Un trabajador recibe un incentivo si su productividad es mayor o igual a 80% Y su número de errores es menor o igual a 2.", data:[["B2","Productividad","85%"],["C2","Errores",1]], f:'=SI(Y(B2>=80%;C2<=2);"Incentivo";"Sin incentivo")', accepted:['=SI(Y(B2>=80%;C2<=2);"Incentivo";"Sin incentivo")'], h:["Una condición usa >= y la otra <=.","La función Y agrupa las dos condiciones.","No olvides los separadores.","Usa % en el valor.","La estructura es =SI(Y(...);...;...)."], eval:(data)=>{ const B2=data[0][2]; const C2=data[1][2]; return (B2>=0.8 && C2<=2) ? 'Incentivo' : 'Sin incentivo'; }, randomData:()=>[Math.floor(Math.random()*30)+70+"%", Math.floor(Math.random()*5)] }
   ]
 };
 
@@ -647,14 +355,9 @@ function startTimer() {
   if (timerInterval) clearInterval(timerInterval);
   seconds = 0;
   updateTimerDisplay();
-  timerInterval = setInterval(() => {
-    seconds++;
-    updateTimerDisplay();
-  }, 1000);
+  timerInterval = setInterval(() => { seconds++; updateTimerDisplay(); }, 1000);
 }
-function stopTimer() {
-  clearInterval(timerInterval);
-}
+function stopTimer() { clearInterval(timerInterval); }
 function updateTimerDisplay() {
   const mins = Math.floor(seconds/60).toString().padStart(2,'0');
   const secs = (seconds%60).toString().padStart(2,'0');
@@ -664,9 +367,7 @@ function updateTimerDisplay() {
 function unlockAchievement(id) {
   if (!achievements.has(id)) {
     achievements.add(id);
-    try {
-      localStorage.setItem('excelAchievements', JSON.stringify([...achievements]));
-    } catch(e) {}
+    try { localStorage.setItem('excelAchievements', JSON.stringify([...achievements])); } catch(e) {}
     showAchievementToast(id);
   }
   renderAchievements();
@@ -706,12 +407,10 @@ function showAchievementToast(id) {
 // ===================== FUNCIONES DE OVERLAY (COLA) =====================
 let overlayQueue = [];
 let overlayShowing = false;
-
 function enqueueOverlay(html, duration = 2500) {
   overlayQueue.push({ html, duration });
   processOverlayQueue();
 }
-
 function processOverlayQueue() {
   if (overlayShowing || overlayQueue.length === 0) return;
   overlayShowing = true;
@@ -731,42 +430,30 @@ function processOverlayQueue() {
     setTimeout(processOverlayQueue, 300);
   }, duration);
 }
-
-function showOverlay(html) {
-  enqueueOverlay(html);
-}
-
+function showOverlay(html) { enqueueOverlay(html); }
 function showLevelComplete(level, mode) {
   const modeText = mode === 'blocks' ? '🧩 Bloques' : '⌨️ Escritura';
   showOverlay(`<div class="crown">👑</div><b>¡Nivel ${level} completado!</b><br>Modo: ${modeText}`);
 }
-
 function showAllBlockUnlocked() {
   showOverlay(`<div class="crown">🏆</div><b>¡Modo escritura desbloqueado!</b><br>Has completado todos los niveles de bloques.`);
 }
-
 function showAllWritingComplete() {
   showOverlay(`<div class="crown">🎖️</div><b>¡Felicidades!</b><br>Has completado todos los niveles de escritura.`);
 }
 
 // ===================== MANEJO DE DATOS =====================
-function getLevelData() {
-  return currentExercise;
-}
-
+function getLevelData() { return currentExercise; }
 function initData() {
   const l = getLevelData();
   currentData = l.data.map(row => [row[0], row[1], row[2]]);
   renderDataTable();
 }
-
 function renderDataTable() {
   const dataDiv = document.getElementById('data');
   dataDiv.innerHTML = `<table class="data-table"><tr><th>Celda</th><th>Variable</th><th>Valor</th></tr>` +
-    currentData.map(row => `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td></tr>`).join('') +
-    `</table>`;
+    currentData.map(row => `<tr><td>${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td></tr>`).join('') + `</table>`;
 }
-
 function changeData() {
   const l = getLevelData();
   if (level === 4) {
@@ -778,14 +465,7 @@ function changeData() {
   }
   renderDataTable();
   updateResult();
-
-  registrarEvento({
-    nombre: playerName,
-    nivel: level,
-    modo: mode,
-    evento: "cambio_datos",
-    tiempo: seconds
-  });
+  registrarEvento({ nombre: playerName, nivel: level, modo: mode, evento: "cambio_datos", tiempo: seconds });
 }
 
 // ===================== CARGA DE NIVEL =====================
@@ -800,14 +480,13 @@ function load(n, btn) {
   const exercises = mode === 'blocks' ? BLOCK_LEVELS[n] : WRITE_LEVELS[n];
   const randomIndex = Math.floor(Math.random() * exercises.length);
   currentExercise = exercises[randomIndex];
-
   const l = currentExercise;
 
   const charTexts = {
     blocks: {
       1:"Arrastra los bloques a las zonas correspondientes. Recuerda los ; entre argumentos.",
       2:"Arma la fórmula completa usando las zonas y los separadores.",
-      3:"Anida varios SI en una sola fila horizontal. Usa scroll si es necesario.",
+      3:"Anida varios SI en dos filas. Usa la segunda fila para continuar la fórmula.",
       4:"Usa la función Y y no olvides los ; dentro y fuera de Y."
     },
     write: {
@@ -818,7 +497,6 @@ function load(n, btn) {
     }
   };
   document.getElementById('charText').textContent = charTexts[mode][n];
-
   document.getElementById('text').textContent = l.text;
   initData();
 
@@ -830,35 +508,37 @@ function load(n, btn) {
 
     if (level === 3) {
       zonesContainer.innerHTML = `
-  <div class="zone">
-    <div class="label">FÓRMULA COMPLETA (arrastra los bloques; se acomodan en filas)</div>
-    <div id="formula-zone" class="drop" style="flex-wrap:wrap; overflow-y:auto; max-height:150px; align-items:flex-start;"></div>
-  </div>`;
-      setupSingleZone();
+        <div class="zone">
+          <div class="label">FÓRMULA COMPLETA (usa dos filas para continuar la fórmula)</div>
+          <div id="formula-zone-1" class="drop formula-row"></div>
+          <div style="text-align:center; margin:5px 0; font-weight:bold; color:#687987;">▼ continúa ▼</div>
+          <div id="formula-zone-2" class="drop formula-row"></div>
+        </div>`;
+      setupTwoRowZone();
     } else {
-     zonesContainer.innerHTML = `
-  <div style="display:flex;flex-direction:column;gap:12px;">
-    <div class="zone">
-      <div class="label">PRUEBA LÓGICA</div>
-      <div id="test" class="drop ${level === 4 ? 'test-wrap' : ''}"></div>
-    </div>
-    <div class="zone" style="display:flex;align-items:center;gap:15px;">
-      <div class="label" style="margin:0;">SEPARADOR 1</div>
-      <div id="sep1" class="sep-zone"></div>
-    </div>
-    <div class="zone">
-      <div class="label">VALOR SI ES VERDADERO</div>
-      <div id="true" class="drop"></div>
-    </div>
-    <div class="zone" style="display:flex;align-items:center;gap:15px;">
-      <div class="label" style="margin:0;">SEPARADOR 2</div>
-      <div id="sep2" class="sep-zone"></div>
-    </div>
-    <div class="zone">
-      <div class="label">VALOR SI ES FALSO</div>
-      <div id="false" class="drop"></div>
-    </div>
-  </div>`;
+      zonesContainer.innerHTML = `
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="zone">
+            <div class="label">PRUEBA LÓGICA</div>
+            <div id="test" class="drop ${level === 4 ? 'test-wrap' : ''}"></div>
+          </div>
+          <div class="zone" style="display:flex;align-items:center;gap:15px;">
+            <div class="label" style="margin:0;">SEPARADOR 1</div>
+            <div id="sep1" class="sep-zone"></div>
+          </div>
+          <div class="zone">
+            <div class="label">VALOR SI ES VERDADERO</div>
+            <div id="true" class="drop"></div>
+          </div>
+          <div class="zone" style="display:flex;align-items:center;gap:15px;">
+            <div class="label" style="margin:0;">SEPARADOR 2</div>
+            <div id="sep2" class="sep-zone"></div>
+          </div>
+          <div class="zone">
+            <div class="label">VALOR SI ES FALSO</div>
+            <div id="false" class="drop"></div>
+          </div>
+        </div>`;
       setupSeparatedZones();
     }
 
@@ -891,50 +571,27 @@ function load(n, btn) {
   updateStats();
   updateWriteButton();
 
-  registrarEvento({
-    nombre: playerName,
-    nivel: n,
-    modo: mode,
-    evento: "inicio",
-    tiempo: seconds,
-    pistas: hi,
-    puntos: points,
-    estrellas: starsEarned
-  });
+  registrarEvento({ nombre: playerName, nivel: n, modo: mode, evento: "inicio", tiempo: seconds, pistas: hi, puntos: points, estrellas: starsEarned });
 }
 
 // ===================== INSERCIÓN HORIZONTAL =====================
 function insertBlockAtPosition(zone, el, clientX, clientY) {
   const rect = zone.getBoundingClientRect();
-  if (clientY < rect.top || clientY > rect.bottom || clientX < rect.left || clientX > rect.right) {
-    return;
-  }
+  if (clientY < rect.top || clientY > rect.bottom || clientX < rect.left || clientX > rect.right) return;
 
-  if (el.parentNode) {
-    el.parentNode.removeChild(el);
-  }
+  if (el.parentNode) el.parentNode.removeChild(el);
 
   const children = [...zone.children];
-  if (children.length === 0) {
-    zone.appendChild(el);
-    return;
-  }
+  if (children.length === 0) { zone.appendChild(el); return; }
 
   let insertIndex = children.length;
   for (let i = 0; i < children.length; i++) {
     const childRect = children[i].getBoundingClientRect();
     const centerX = childRect.left + childRect.width / 2;
-    if (clientX < centerX) {
-      insertIndex = i;
-      break;
-    }
+    if (clientX < centerX) { insertIndex = i; break; }
   }
-
-  if (insertIndex >= children.length) {
-    zone.appendChild(el);
-  } else {
-    zone.insertBefore(el, children[insertIndex]);
-  }
+  if (insertIndex >= children.length) zone.appendChild(el);
+  else zone.insertBefore(el, children[insertIndex]);
 }
 
 // ===================== SETUP DE ZONAS =====================
@@ -942,18 +599,51 @@ function setupSingleZone() {
   const zone = document.getElementById('formula-zone');
   zone.ondragover = ev => { ev.preventDefault(); ev.dataTransfer.dropEffect = 'move'; };
   zone.ondrop = ev => {
-  ev.preventDefault();
-  const i = parseInt(ev.dataTransfer.getData('text/plain'), 10);
-  const el = document.querySelector(`[data-i="${i}"]`);
-  if (el) {
-    zone.appendChild(el); // simplemente agrega al final
+    ev.preventDefault();
+    const i = parseInt(ev.dataTransfer.getData('text/plain'), 10);
+    const el = document.querySelector(`[data-i="${i}"]`);
+    if (el) {
+      zone.appendChild(el);
+      updateFormula();
+      updateResult();
+      document.getElementById('feedback').className = 'feedback';
+    }
+  };
+  const bank = document.getElementById('bank');
+  bank.ondragover = ev => { ev.preventDefault(); ev.dataTransfer.dropEffect = 'move'; };
+  bank.ondrop = ev => {
+    ev.preventDefault();
+    const i = parseInt(ev.dataTransfer.getData('text/plain'), 10);
+    const el = document.querySelector(`[data-i="${i}"]`);
+    if (el) bank.appendChild(el);
     updateFormula();
     updateResult();
-    document.getElementById('feedback').className = 'feedback';
-  }
-};
+  };
+}
 
+function setupTwoRowZone() {
+  const zone1 = document.getElementById('formula-zone-1');
+  const zone2 = document.getElementById('formula-zone-2');
   const bank = document.getElementById('bank');
+
+  function allowDrop(zone) {
+    zone.ondragover = ev => { ev.preventDefault(); ev.dataTransfer.dropEffect = 'move'; };
+    zone.ondrop = ev => {
+      ev.preventDefault();
+      const i = parseInt(ev.dataTransfer.getData('text/plain'), 10);
+      const el = document.querySelector(`[data-i="${i}"]`);
+      if (el) {
+        zone.appendChild(el);
+        updateFormula();
+        updateResult();
+        document.getElementById('feedback').className = 'feedback';
+      }
+    };
+  }
+
+  allowDrop(zone1);
+  allowDrop(zone2);
+
   bank.ondragover = ev => { ev.preventDefault(); ev.dataTransfer.dropEffect = 'move'; };
   bank.ondrop = ev => {
     ev.preventDefault();
@@ -981,16 +671,15 @@ function setupSeparatedZones() {
         return;
       }
       if (level === 4 && zoneId === 'test') {
-  zone.appendChild(el);   // Agrega al final; flexbox lo coloca en la fila correcta
-} else {
-  insertBlockAtPosition(zone, el, ev.clientX, ev.clientY);
-}
+        zone.appendChild(el);
+      } else {
+        insertBlockAtPosition(zone, el, ev.clientX, ev.clientY);
+      }
       updateFormula();
       updateResult();
       document.getElementById('feedback').className = 'feedback';
     };
   });
-
   const bank = document.getElementById('bank');
   bank.ondragover = ev => { ev.preventDefault(); ev.dataTransfer.dropEffect = 'move'; };
   bank.ondrop = ev => {
@@ -1016,25 +705,22 @@ function setMode(newMode) {
   const activeBtn = document.querySelector('.level-btn.active');
   load(level, activeBtn);
 }
-
 function updateWriteButton() {
   const btnWrite = document.getElementById('btnWrite');
   btnWrite.disabled = !(blockSolved.size === 4);
-  if (btnWrite.disabled) {
-    btnWrite.title = 'Completa todos los niveles de bloques para desbloquear la escritura';
-  } else {
-    btnWrite.title = '';
-  }
+  if (btnWrite.disabled) btnWrite.title = 'Completa todos los niveles de bloques para desbloquear la escritura';
+  else btnWrite.title = '';
 }
 
 // ===================== OBTENER SECUENCIA DE BLOQUES =====================
 function getZoneBlocks(zoneId) {
   return [...document.getElementById(zoneId).children].map(x => x.textContent);
 }
-
 function getFormulaSequenceForZones() {
   if (level === 3) {
-    return getZoneBlocks('formula-zone');
+    const fila1 = getZoneBlocks('formula-zone-1');
+    const fila2 = getZoneBlocks('formula-zone-2');
+    return [...fila1, ...fila2];
   } else {
     const test = getZoneBlocks('test');
     const trueVal = getZoneBlocks('true');
@@ -1051,18 +737,14 @@ function updateFormula() {
   let formulaText = '';
   if (mode === 'blocks') {
     const seq = getFormulaSequenceForZones();
-    if (level === 3) {
-      formulaText = seq.length ? '=' + seq.join('') : 'Construye la fórmula.';
-    } else {
-      formulaText = seq.length ? '=SI(' + seq.join('') + ')' : 'Construye la fórmula.';
-    }
+    if (level === 3) formulaText = seq.length ? '=' + seq.join('') : 'Construye la fórmula.';
+    else formulaText = seq.length ? '=SI(' + seq.join('') + ')' : 'Construye la fórmula.';
   } else {
     formulaText = document.getElementById('formulaInput').value.trim() || 'Construye la fórmula.';
   }
   document.getElementById('formula').textContent = formulaText;
   updateResult();
 }
-
 function updateResult() {
   const resultDisplay = document.getElementById('resultDisplay');
   resultDisplay.textContent = '—';
@@ -1082,9 +764,7 @@ function updateResult() {
         JSON.stringify(getZoneBlocks('false')) === JSON.stringify(expected.false.blocks) &&
         JSON.stringify(getZoneBlocks('sep1')) === JSON.stringify(expected.sep1.blocks) &&
         JSON.stringify(getZoneBlocks('sep2')) === JSON.stringify(expected.sep2.blocks);
-      if (ok) {
-        resultDisplay.textContent = l.eval(currentData);
-      }
+      if (ok) resultDisplay.textContent = l.eval(currentData);
     }
   } else {
     const formula = document.getElementById('formulaInput').value.trim();
@@ -1092,11 +772,8 @@ function updateResult() {
       const accepted = [l.f, ...(l.accepted || [])];
       const user = formula.toLowerCase().replace(/\s/g,'');
       const isCorrect = accepted.some(f => f.toLowerCase().replace(/\s/g,'') === user);
-      if (isCorrect) {
-        resultDisplay.textContent = l.eval(currentData);
-      } else {
-        resultDisplay.innerHTML = `<span class="error-msg">#¿NOMBRE? o fórmula incorrecta</span>`;
-      }
+      if (isCorrect) resultDisplay.textContent = l.eval(currentData);
+      else resultDisplay.innerHTML = `<span class="error-msg">#¿NOMBRE? o fórmula incorrecta</span>`;
     }
   }
 }
@@ -1133,11 +810,8 @@ function check() {
     } else {
       const expected = l.zones;
       const zoneNames = {
-        test: "PRUEBA LÓGICA",
-        true: "VALOR SI ES VERDADERO",
-        false: "VALOR SI ES FALSO",
-        sep1: "SEPARADOR 1",
-        sep2: "SEPARADOR 2"
+        test: "PRUEBA LÓGICA", true: "VALOR SI ES VERDADERO", false: "VALOR SI ES FALSO",
+        sep1: "SEPARADOR 1", sep2: "SEPARADOR 2"
       };
       const zonesToCheck = ['test', 'true', 'false', 'sep1', 'sep2'];
       for (const zoneId of zonesToCheck) {
@@ -1162,32 +836,17 @@ function check() {
     if (!ok) errors.push('La fórmula escrita no es correcta. Revisa la sintaxis.');
   }
 
-  registrarEvento({
-    nombre: playerName,
-    nivel: level,
-    modo: mode,
-    evento: "comprobar",
-    resultado: ok ? "exito" : "fallo",
-    errores: errors.join("|") || "ninguno",
-    tiempo: seconds,
-    pistas: hi,
-    puntos: points,
-    estrellas: starsEarned
-  });
+  registrarEvento({ nombre: playerName, nivel: level, modo: mode, evento: "comprobar", resultado: ok ? "exito" : "fallo", errores: errors.join("|") || "ninguno", tiempo: seconds, pistas: hi, puntos: points, estrellas: starsEarned });
 
   if (ok) {
     solved.add(level);
     if (mode === 'blocks') {
       blockSolved.add(level);
       updateWriteButton();
-      if (blockSolved.size === 4) {
-        showAllBlockUnlocked();
-      }
+      if (blockSolved.size === 4) showAllBlockUnlocked();
     } else if (mode === 'write') {
       writeSolved.add(level);
-      if (writeSolved.size === 4) {
-        showAllWritingComplete();
-      }
+      if (writeSolved.size === 4) showAllWritingComplete();
     }
 
     showLevelComplete(level, mode);
@@ -1239,15 +898,7 @@ function hint() {
   if (hi < h.length) {
     document.getElementById('hint').textContent = '💡 ' + h[hi++];
     document.getElementById('hint').style.display = 'block';
-
-    registrarEvento({
-      nombre: playerName,
-      nivel: level,
-      modo: mode,
-      evento: "pista",
-      pistas: hi,
-      tiempo: seconds
-    });
+    registrarEvento({ nombre: playerName, nivel: level, modo: mode, evento: "pista", pistas: hi, tiempo: seconds });
   } else {
     document.getElementById('hint').textContent = '💡 No quedan más pistas.';
     document.getElementById('hint').style.display = 'block';
@@ -1259,8 +910,10 @@ function clearBuild() {
   if (mode === 'blocks') {
     const bank = document.getElementById('bank');
     if (level === 3) {
-      const zone = document.getElementById('formula-zone');
-      [...zone.children].forEach(e => bank.appendChild(e));
+      const zone1 = document.getElementById('formula-zone-1');
+      const zone2 = document.getElementById('formula-zone-2');
+      [...zone1.children].forEach(e => bank.appendChild(e));
+      [...zone2.children].forEach(e => bank.appendChild(e));
     } else {
       const zones = ['test', 'true', 'false', 'sep1', 'sep2'];
       zones.forEach(zoneId => {
@@ -1280,12 +933,7 @@ function clearBuild() {
 function resetAll() {
   stopTimer();
   if (confirm('¿Seguro que deseas reiniciar todos los puntos y progreso?')) {
-    points = 0;
-    starsEarned = 0;
-    solved.clear();
-    blockSolved.clear();
-    writeSolved.clear();
-    achievements.clear();
+    points = 0; starsEarned = 0; solved.clear(); blockSolved.clear(); writeSolved.clear(); achievements.clear();
     try { localStorage.removeItem('excelAchievements'); } catch(e) {}
     updateStats();
     renderAchievements();
