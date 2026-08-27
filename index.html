@@ -833,28 +833,28 @@ function load(n, btn) {
       setupSingleZone();
     } else {
       zonesContainer.innerHTML = `
-        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;gap:10px;">
-          <div class="zone" style="flex:1;min-width:200px;">
-            <div class="label">PRUEBA LÓGICA</div>
-            <div id="test" class="drop"></div>
-          </div>
-          <div class="zone" style="flex:0 0 auto;">
-            <div class="label">SEPARADOR</div>
-            <div id="sep1" class="sep-zone"></div>
-          </div>
-          <div class="zone" style="flex:1;min-width:200px;">
-            <div class="label">VALOR SI ES VERDADERO</div>
-            <div id="true" class="drop"></div>
-          </div>
-          <div class="zone" style="flex:0 0 auto;">
-            <div class="label">SEPARADOR</div>
-            <div id="sep2" class="sep-zone"></div>
-          </div>
-          <div class="zone" style="flex:1;min-width:200px;">
-            <div class="label">VALOR SI ES FALSO</div>
-            <div id="false" class="drop"></div>
-          </div>
-        </div>`;
+  <div style="display:flex;flex-direction:column;gap:20px;">
+    <div class="zone">
+      <div class="label">PRUEBA LÓGICA</div>
+      <div id="test" class="drop"></div>
+    </div>
+    <div class="zone" style="display:flex;align-items:center;gap:15px;">
+      <div class="label" style="margin:0;">SEPARADOR 1</div>
+      <div id="sep1" class="sep-zone"></div>
+    </div>
+    <div class="zone">
+      <div class="label">VALOR SI ES VERDADERO</div>
+      <div id="true" class="drop"></div>
+    </div>
+    <div class="zone" style="display:flex;align-items:center;gap:15px;">
+      <div class="label" style="margin:0;">SEPARADOR 2</div>
+      <div id="sep2" class="sep-zone"></div>
+    </div>
+    <div class="zone">
+      <div class="label">VALOR SI ES FALSO</div>
+      <div id="false" class="drop"></div>
+    </div>
+  </div>`;
       setupSeparatedZones();
     }
 
@@ -901,24 +901,33 @@ function load(n, btn) {
 }
 
 // ===================== INSERCIÓN HORIZONTAL =====================
-function insertBlockAtPosition(zone, el, clientX) {
+function insertBlockAtPosition(zone, el, clientX, clientY) {
+  // Verificar que el punto de caída esté dentro de la zona
+  const rect = zone.getBoundingClientRect();
+  if (clientY < rect.top || clientY > rect.bottom || clientX < rect.left || clientX > rect.right) {
+    return; // No hacer nada si está fuera de la zona
+  }
+
   if (el.parentNode) {
     el.parentNode.removeChild(el);
   }
+
   const children = [...zone.children];
   if (children.length === 0) {
     zone.appendChild(el);
     return;
   }
+
   let insertIndex = children.length;
   for (let i = 0; i < children.length; i++) {
-    const rect = children[i].getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
+    const childRect = children[i].getBoundingClientRect();
+    const centerX = childRect.left + childRect.width / 2;
     if (clientX < centerX) {
       insertIndex = i;
       break;
     }
   }
+
   if (insertIndex >= children.length) {
     zone.appendChild(el);
   } else {
@@ -969,7 +978,7 @@ function setupSeparatedZones() {
   showFeedback('err', `⚠️ La zona ${sepName} ya tiene un separador.`);
   return;
       }
-      insertBlockAtPosition(zone, el, ev.clientX);
+      insertBlockAtPosition(zone, el, ev.clientX, ev.clientY);
       updateFormula();
       updateResult();
       document.getElementById('feedback').className = 'feedback';
