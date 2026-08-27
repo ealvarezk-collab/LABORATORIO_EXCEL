@@ -3,807 +3,471 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Laboratorio Interactivo de Fórmulas SI - Excel</title>
+  <title>Plataforma Interactiva de Ejercicios</title>
+  
   <style>
+    /* ==========================================================================
+       1. VARIABLES GLOBALES Y RESET
+       ========================================================================== */
     :root {
-      --bg: #f8fafc;
-      --card-bg: #ffffff;
-      --card-border: #e2e8f0;
+      --primary-color: #2563eb;
+      --primary-hover: #1d4ed8;
+      --secondary-color: #f1f5f9;
+      --secondary-hover: #e2e8f0;
+      --accent-hint: #d97706;
+      --accent-hint-bg: #fef3c7;
+      --accent-hint-hover: #fde68a;
+      
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --border-color: #e2e8f0;
+      
       --text-main: #0f172a;
-      --text-sub: #64748b;
-      --accent: #2563eb;
-      --accent-hover: #1d4ed8;
-      --success: #16a34a;
-      --success-bg: #f0fdf4;
-      --danger: #dc2626;
-      --danger-bg: #fef2f2;
-      --warning: #d97706;
-      --warning-bg: #fffbeb;
-      --info-bg: #eff6ff;
+      --text-muted: #64748b;
+      
+      --sidebar-width: 330px;
+      --radius: 12px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.05);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-    body { background-color: var(--bg); color: var(--text-main); padding: 24px 16px; display: flex; justify-content: center; min-height: 100vh; }
-    .container { max-width: 920px; width: 100%; display: flex; flex-direction: column; gap: 20px; }
-
-    /* Modales */
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
-      display: flex; justify-content: center; align-items: center; z-index: 1000;
-    }
-    .modal-card {
-      background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px;
-      padding: 32px; max-width: 460px; width: 90%; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
-    }
-    .modal-card input {
-      width: 100%; padding: 12px 16px; margin: 18px 0; border-radius: 8px; border: 1.5px solid var(--card-border);
-      background: #f1f5f9; color: var(--text-main); font-size: 16px; outline: none; transition: border 0.2s;
-    }
-    .modal-card input:focus { border-color: var(--accent); background: #ffffff; }
-
-    /* Encabezado y Estadísticas (Tema Claro) */
-    header {
-      background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 24px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
-    }
-    .header-title-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-    h1 { font-size: 22px; color: var(--text-main); font-weight: 700; }
-    
-    .stats-bar {
-      display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 16px;
-      background: #f1f5f9; padding: 14px 18px; border-radius: 12px; border: 1px solid #e2e8f0;
-    }
-    .stat-item { font-size: 13px; font-weight: 600; color: var(--text-sub); }
-    .stat-value { color: var(--accent); font-size: 15px; font-weight: 700; }
-
-    /* Navegación */
-    .nav-section { display: flex; gap: 12px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
-    .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
-    
-    button {
-      background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 8px;
-      cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(37,99,235,0.15);
-    }
-    button:hover { background: var(--accent-hover); transform: translateY(-1px); }
-    button.secondary { background: #e2e8f0; color: var(--text-main); box-shadow: none; }
-    button.secondary:hover { background: #cbd5e1; }
-    
-    .level-btn { background: #ffffff; color: var(--text-main); border: 1.5px solid var(--card-border); box-shadow: none; }
-    .level-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
-    .level-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
-    
-    .mode-btn { background: #ffffff; color: var(--text-main); border: 1.5px solid var(--card-border); box-shadow: none; }
-    .mode-btn.active { background: var(--success); color: white; border-color: var(--success); }
-    .mode-btn.locked { opacity: 0.5; cursor: not-allowed; }
-
-    /* Tarjetas principales */
-    .card {
-      background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 24px;
-      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
-    }
-    
-    .data-table { width: 100%; border-collapse: collapse; margin-top: 12px; border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); }
-    .data-table th, .data-table td { padding: 10px 14px; text-align: left; font-size: 14px; }
-    .data-table th { background: #f1f5f9; color: var(--text-sub); font-weight: 600; border-bottom: 1px solid var(--card-border); }
-    .data-table td { background: #ffffff; border-bottom: 1px solid #f1f5f9; }
-
-    /* Área de Construcción de Bloques por Filas */
-    .builder-row { margin-bottom: 14px; }
-    .row-label { font-size: 13px; font-weight: 600; color: var(--text-sub); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
-    .drop-zone-row {
-      min-height: 52px; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 10px;
-      padding: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; transition: all 0.2s;
-    }
-    .drop-zone-row.drag-over { background: #eff6ff; border-color: var(--accent); }
-    
-    .sep-row-container { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
-    .sep-box { min-width: 70px; height: 46px; min-height: 46px; }
-
-    /* Banco de Bloques Arrastrables */
-    .bank-area {
-      min-height: 80px; background: #f8fafc; border: 1.5px solid var(--card-border); border-radius: 12px;
-      padding: 12px; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;
-    }
-    .block {
-      padding: 8px 16px; border-radius: 8px; font-family: 'Segoe UI Mono', monospace; font-weight: 700; cursor: grab;
-      user-select: none; box-shadow: 0 2px 4px rgba(0,0,0,0.06); font-size: 14px; transition: transform 0.15s, box-shadow 0.15s;
-    }
-    .block:active { cursor: grabbing; transform: scale(1.03); }
-    
-    /* Colores por Categoría de Bloque */
-    .block.func { background: #8b5cf6; color: white; }
-    .block.var { background: #0284c7; color: white; }
-    .block.op { background: #ea580c; color: white; }
-    .block.val { background: #16a34a; color: white; }
-    .block.sep { background: #d97706; color: white; }
-    .block.res { background: #db2777; color: white; }
-    .block.paren { background: #64748b; color: white; }
-
-    /* Entrada Manual */
-    .manual-input {
-      width: 100%; padding: 14px 16px; background: #f8fafc; border: 1.5px solid var(--card-border);
-      border-radius: 10px; color: var(--text-main); font-family: monospace; font-size: 16px; margin-top: 10px; outline: none;
-    }
-    .manual-input:focus { border-color: var(--accent); background: #ffffff; }
-
-    /* Vista previa de fórmula y evaluación */
-    .formula-preview {
-      background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 14px 18px;
-      font-family: monospace; color: #38bdf8; font-size: 16px; word-break: break-all;
-    }
-    .result-box {
-      display: flex; align-items: center; justify-content: space-between; background: #f1f5f9;
-      padding: 14px 18px; border-radius: 10px; border: 1px solid var(--card-border); margin-top: 16px;
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    /* Barra de Progreso e Insignias */
-    .progress-bar-container { background: #e2e8f0; border-radius: 20px; height: 10px; width: 100%; overflow: hidden; margin-top: 8px; }
-    .progress-fill { background: var(--success); height: 100%; width: 0%; transition: width 0.4s ease; }
-    .badges-container { display: flex; gap: 12px; margin-top: 12px; }
-    .badge { opacity: 0.25; filter: grayscale(1); transition: all 0.3s; font-size: 26px; }
-    .badge.unlocked { opacity: 1; filter: grayscale(0); transform: scale(1.1); }
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      line-height: 1.5;
+    }
 
-    /* Retroalimentación Granular y Pistas */
-    .feedback { padding: 16px; border-radius: 12px; font-weight: 500; display: none; margin-top: 14px; line-height: 1.5; font-size: 14px; }
-    .feedback.ok { background: var(--success-bg); color: #14532d; border: 1.5px solid #bbf7d0; }
-    .feedback.err { background: var(--danger-bg); color: #7f1d1d; border: 1.5px solid #fecaca; }
-    
-    .diagnostic-list { margin-top: 8px; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
-    .hint-box { background: var(--warning-bg); color: #78350f; border: 1.5px solid #fde68a; padding: 14px; border-radius: 10px; display: none; margin-top: 14px; font-size: 14px; }
+    /* ==========================================================================
+       2. ESTRUCTURA Y LAYOUT (SIDEBAR FIJO + WORKSPACE)
+       ========================================================================== */
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+    }
+
+    /* --- Columna Fija Izquierda (Sidebar del Ejercicio) --- */
+    .exercise-sidebar {
+      width: var(--sidebar-width);
+      min-width: 290px;
+      max-width: 360px;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      background-color: var(--bg-card);
+      border-right: 1px solid var(--border-color);
+      padding: 1.5rem;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.03);
+      z-index: 10;
+    }
+
+    /* Encabezado del ejercicio */
+    .sidebar-header {
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .badge-ejercicio {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      background-color: #eff6ff;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.5rem;
+    }
+
+    .sidebar-header h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* Área del enunciado con scroll propio si es muy largo */
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      margin: 1.25rem 0;
+      padding-right: 0.5rem;
+    }
+
+    .sidebar-content::-webkit-scrollbar {
+      width: 5px;
+    }
+    .sidebar-content::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    .enunciado {
+      font-size: 0.95rem;
+      color: #334155;
+      line-height: 1.6;
+    }
+
+    /* Sección de pistas interactiva dentro del sidebar */
+    .pista-box {
+      margin-top: 1rem;
+      padding: 0.85rem;
+      background-color: var(--accent-hint-bg);
+      border: 1px dashed var(--accent-hint);
+      border-radius: var(--radius);
+      font-size: 0.85rem;
+      color: #78350f;
+      display: none; /* Oculta por defecto */
+    }
+
+    .pista-box.visible {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    /* Acciones inferiores del sidebar */
+    .sidebar-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    .btn-pista {
+      width: 100%;
+      padding: 0.65rem 1rem;
+      background-color: var(--accent-hint-bg);
+      color: var(--accent-hint);
+      border: 1px solid #fde68a;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: background-color 0.2s;
+    }
+    .btn-pista:hover {
+      background-color: var(--accent-hint-hover);
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-nav {
+      flex: 1;
+      padding: 0.6rem;
+      background-color: var(--secondary-color);
+      color: var(--text-main);
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .btn-nav:hover {
+      background-color: var(--secondary-hover);
+    }
+
+    /* --- Área Principal de Trabajo (Workspace Derecha) --- */
+    .workspace-container {
+      flex: 1;
+      padding: 2.5rem;
+      overflow-y: auto;
+      max-width: 1200px;
+    }
+
+    .workspace-header {
+      margin-bottom: 2rem;
+    }
+
+    .workspace-header h1 {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .workspace-header p {
+      color: var(--text-muted);
+    }
+
+    /* Grid interactivo de selección de variables */
+    .variables-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .variable-card {
+      background-color: var(--bg-card);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .variable-card:hover {
+      border-color: #93c5fd;
+      transform: translateY(-2px);
+    }
+
+    .variable-card.selected {
+      border-color: var(--primary-color);
+      background-color: #eff6ff;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    }
+
+    .variable-card .var-symbol {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 0.25rem;
+    }
+
+    .variable-card .var-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .variable-card .var-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    /* Barra de acciones de respuesta */
+    .submit-section {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .btn-primary {
+      padding: 0.8rem 1.75rem;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: background-color 0.2s;
+    }
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .feedback-message {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .feedback-message.success { color: #16a34a; }
+    .feedback-message.error { color: #dc2626; }
+
+    /* Animación simple */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Adaptación responsive para pantallas pequeñas */
+    @media (max-width: 768px) {
+      .app-layout {
+        flex-direction: column;
+      }
+      .exercise-sidebar {
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+      }
+      .workspace-container {
+        padding: 1.5rem;
+      }
+    }
   </style>
 </head>
 <body>
 
-<!-- Modal Registro -->
-<div class="modal-overlay" id="registroModal">
-  <div class="modal-card">
-    <h2>Bienvenido al Laboratorio</h2>
-    <p style="color: var(--text-sub); margin-top: 8px; font-size: 14px;">Ingresa tu nombre completo para guardar tus logros de práctica de Excel.</p>
-    <input type="text" id="studentNameInput" placeholder="Tu nombre..." />
-    <button onclick="registrarEstudiante()" style="width: 100%;">Comenzar Práctica</button>
-  </div>
-</div>
-
-<!-- Modal Mensajes / Overlay -->
-<div class="modal-overlay" id="overlay" style="display: none;">
-  <div class="modal-card">
-    <div id="overlayIcon" style="font-size: 48px; margin-bottom: 10px;">🎉</div>
-    <h2 id="overlayTitle">¡Excelente trabajo!</h2>
-    <p id="overlayMsg" style="color: var(--text-sub); margin: 15px 0; font-size: 14px;"></p>
-    <button onclick="closeOverlay()" style="width: 100%;">Continuar</button>
-  </div>
-</div>
-
-<div class="container">
-  <!-- Encabezado con estadísticas y progreso -->
-  <header>
-    <div class="header-title-bar">
-      <h1>Laboratorio de Fórmulas Excel (=SI)</h1>
-      <span id="userDisplayName" style="font-weight: 600; color: var(--accent); font-size: 14px;">Estudiante</span>
-    </div>
+<div class="app-layout">
+  
+  <!-- ======================================================================
+       COLUMNA IZQUIERDA FIJA: ENUNCIADO, PISTAS Y NAVEGACIÓN
+       ====================================================================== -->
+  <aside class="exercise-sidebar">
     
-    <div class="stats-bar">
-      <div class="stat-item">PUNTOS: <span class="stat-value" id="points">0</span></div>
-      <div class="stat-item">ESTRELLAS: <span class="stat-value" id="stars">0 ⭐</span></div>
-      <div class="stat-item">BLOQUES: <span class="stat-value" id="blockProg">0/4</span></div>
-      <div class="stat-item">ESCRITURA: <span class="stat-value" id="writeProg">0/4</span></div>
-      <div class="stat-item">TIEMPO: <span class="stat-value" id="timer">00:00</span></div>
+    <!-- Encabezado -->
+    <div class="sidebar-header">
+      <span class="badge-ejercicio" id="badge-ejercicio">Ejercicio 1 de 3</span>
+      <h2 id="titulo-ejercicio">Cálculo de Velocidad y Distancia</h2>
     </div>
-    
-    <div style="margin-top: 16px;">
-      <div id="progressText" style="font-size: 12px; font-weight: 600; color: var(--text-sub);">Progreso Global del Curso: 0%</div>
-      <div class="progress-bar-container">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
-      <div class="badges-container">
-        <span class="badge" id="badge1" title="Primer Acierto">🌱</span>
-        <span class="badge" id="badge2" title="Maestro de Bloques">🧩</span>
-        <span class="badge" id="badge3" title="Sintaxis Perfecta">✍️</span>
-        <span class="badge" id="badge4" title="Experto Excel">🏆</span>
+
+    <!-- Contenido Scrollable (Enunciado) -->
+    <div class="sidebar-content">
+      <p class="enunciado" id="texto-enunciado">
+        Un automóvil se desplaza a lo largo de una carretera recta parte desde el reposo y acelera a una tasa constante durante un período de tiempo determinado. 
+        <br><br>
+        <strong>Objetivo:</strong> Selecciona únicamente las variables necesarias en la derecha para calcular la <strong>distancia total recorrida</strong> por el vehículo.
+      </p>
+
+      <!-- Panel desplegable de pistas -->
+      <div class="pista-box" id="pista-box">
+        💡 <strong>Pista:</strong> Recuerda la fórmula del movimiento rectilíneo uniformemente variado (MRUV): $d = v_0 \cdot t + \frac{1}{2} a \cdot t^2$. ¿Cuáles de estas variables tienes disponibles?
       </div>
     </div>
-  </header>
 
-  <!-- Navegación de Niveles y Modos -->
-  <div class="nav-section">
-    <div class="btn-group">
-      <button class="level-btn active" onclick="loadLevel(1, this)">Nivel 1</button>
-      <button class="level-btn" onclick="loadLevel(2, this)">Nivel 2</button>
-      <button class="level-btn" onclick="loadLevel(3, this)">Nivel 3</button>
-      <button class="level-btn" onclick="loadLevel(4, this)">Nivel 4</button>
+    <!-- Botones fijos inferiores -->
+    <div class="sidebar-actions">
+      <button class="btn-pista" id="btn-pista" onclick="togglePista()">
+        💡 Ver Pista
+      </button>
+      
+      <div class="nav-buttons">
+        <button class="btn-nav" id="btn-anterior" onclick="cambiarEjercicio(-1)">← Anterior</button>
+        <button class="btn-nav" id="btn-siguiente" onclick="cambiarEjercicio(1)">Siguiente →</button>
+      </div>
     </div>
-    <div class="btn-group">
-      <button id="btnModeBlock" class="mode-btn active" onclick="switchMode('block')">Modo Bloques</button>
-      <button id="btnModeWrite" class="mode-btn locked" onclick="switchMode('write')">Modo Escritura</button>
-      <button class="secondary" onclick="resetAll()">Reiniciar</button>
-    </div>
-  </div>
+  </aside>
 
-  <!-- Enunciado y Tabla de Datos -->
-  <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <h3 style="color: var(--text-sub); font-size: 12px; letter-spacing: 0.5px; font-weight: 700;">ENUNCIADO DEL CASO</h3>
-      <button class="secondary" onclick="loadRandomExercise()" style="padding: 4px 10px; font-size: 12px;">🔀 Otro ejercicio</button>
-    </div>
-    <p id="text" style="font-size: 16px; margin-top: 10px; font-weight: 500; color: var(--text-main); line-height: 1.5;"></p>
-    <div id="data" style="margin-top: 14px;"></div>
-  </div>
 
-  <!-- Área interactiva (Bloques por filas o Escritura) -->
-  <div class="card">
-    <h3 id="phaseTitle" style="font-size: 15px; color: var(--text-main);">Construcción por Filas (Bloques)</h3>
-
-    <!-- Modo Bloques -->
-    <div id="blockArea" style="margin-top: 16px;">
-      <div id="builderRows"></div>
-      <p style="font-size: 12px; font-weight: 600; color: var(--text-sub); margin: 16px 0 8px 0;">BANCO DE BLOQUES (Arrastra los elementos a las casillas superiores):</p>
-      <div class="bank-area" id="bank" ondrop="dropToBank(event)" ondragover="allowDrop(event)"></div>
+  <!-- ======================================================================
+       ÁREA PRINCIPAL DE TRABAJO (DERECHA)
+       ====================================================================== -->
+  <main class="workspace-container">
+    
+    <div class="workspace-header">
+      <h1>Selección de Variables Requeridas</h1>
+      <p>Haz clic sobre las tarjetas de variables que consideres indispensables para resolver el planteamiento.</p>
     </div>
 
-    <!-- Modo Escritura Manual -->
-    <div id="writeArea" style="display: none; margin-top: 16px;">
-      <p style="font-size: 14px; color: var(--text-sub);">Escribe la fórmula completa manualmente respetando la sintaxis exacta de Excel:</p>
-      <input type="text" id="manualFormula" class="manual-input" placeholder='=SI(B2>10;"Cuadrilla completa";"Cuadrilla incompleta")' oninput="updateFormulaFromText()" />
+    <!-- Grilla de variables seleccionables -->
+    <div class="variables-grid" id="variables-grid">
+      
+      <div class="variable-card" onclick="toggleSelection(this)" data-var="v0">
+        <div class="var-symbol">v₀</div>
+        <div class="var-name">Velocidad Inicial</div>
+        <div class="var-desc">Velocidad con la que inicia el movimiento (m/s).</div>
+      </div>
+
+      <div class="variable-card" onclick="toggleSelection(this)" data-var="a">
+        <div class="var-symbol">a</div>
+        <div class="var-name">Aceleración</div>
+        <div class="var-desc">Tasa de cambio de velocidad por unidad de tiempo (m/s²).</div>
+      </div>
+
+      <div class="variable-card" onclick="toggleSelection(this)" data-var="t">
+        <div class="var-symbol">t</div>
+        <div class="var-name">Tiempo Transcurrido</div>
+        <div class="var-desc">Duración del movimiento (s).</div>
+      </div>
+
+      <div class="variable-card" onclick="toggleSelection(this)" data-var="m">
+        <div class="var-symbol">m</div>
+        <div class="var-name">Masa del Vehículo</div>
+        <div class="var-desc">Masa total del móvil (kg).</div>
+      </div>
+
+      <div class="variable-card" onclick="toggleSelection(this)" data-var="p">
+        <div class="var-symbol">P</div>
+        <div class="var-name">Presión de Neumáticos</div>
+        <div class="var-desc">Presión de aire interna (PSI).</div>
+      </div>
+
     </div>
-  </div>
 
-  <!-- Vista previa, evaluación y retroalimentación granular -->
-  <div class="card">
-    <div style="font-size: 12px; font-weight: 600; color: var(--text-sub); margin-bottom: 8px;">VISTA PREVIA DE LA FÓRMULA GENERADA:</div>
-    <div class="formula-preview" id="formula">=SI(...)</div>
-
-    <div class="result-box">
-      <span style="font-size: 14px; font-weight: 600; color: var(--text-sub);">Resultado Evaluado en Celda:</span>
-      <b id="resultDisplay" style="color: var(--success); font-size: 18px;">—</b>
+    <!-- Botón de verificación y feedback -->
+    <div class="submit-section">
+      <button class="btn-primary" onclick="validarRespuesta()">Comprobar Selección</button>
+      <span class="feedback-message" id="feedback-msg"></span>
     </div>
 
-    <div style="display: flex; gap: 10px; margin-top: 16px;">
-      <button onclick="checkCurrentPhase()" style="flex: 2;">Verificar Respuesta</button>
-      <button class="secondary" onclick="showHint()" style="flex: 1;">Pista 💡</button>
-      <button class="secondary" onclick="clearCurrentPhase()" style="flex: 1;">Limpiar</button>
-    </div>
+  </main>
 
-    <div id="hint" class="hint-box"></div>
-    <div id="feedback" class="feedback"></div>
-  </div>
 </div>
 
+<!-- ==========================================================================
+     LÓGICA JAVASCRIPT
+     ========================================================================== -->
 <script>
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTNt780x1-Hg_hD7RzVL1OY5GlSm7bLY3nssmxKFNBR6o8ZoR1QsupDj9qIlRVlyt9vQ/exec";
+  // Estado local
+  let pistaVisible = false;
 
-let studentName = "";
-let activeMode = 'block'; 
-let currentLevel = 1;
-let currentExercise = null;
-let points = 0;
-let stars = 0;
-let solvedBlocks = new Set();
-let solvedWrites = new Set();
-let hintIndex = 0;
-let timerInterval, seconds = 0;
-
-// BANCO COMPLETO CON 3 EJERCICIOS POR NIVEL
-const EXERCISE_BANK = {
-  1: [
-    {
-      text: "Una cuadrilla se considera completa si la cantidad de personal registrada en B2 supera los 10 trabajadores. Si esto se cumple, mostrar “Cuadrilla completa”; de lo contrario, mostrar “Cuadrilla incompleta”.",
-      data: [["B2", "Trabajadores", 12]],
-      blocks: [
-        {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:">", type:"op"}, {text:"10", type:"val"},
-        {text:";", type:"sep"}, {text:'"Cuadrilla completa"', type:"res"}, {text:";", type:"sep"},
-        {text:'"Cuadrilla incompleta"', type:"res"}, {text:")", type:"paren"}
-      ],
-      expected: '=SI(B2>10;"Cuadrilla completa";"Cuadrilla incompleta")',
-      expectedParts: { prueba: "B2>10", vVerdadero: '"Cuadrilla completa"', vFalso: '"Cuadrilla incompleta"' },
-      hints: ["Identifica que 'supera los' se traduce como el operador mayor que (>).", "Usa el separador ; entre cada argumento.", "Respuesta verdadera: \"Cuadrilla completa\". Respuesta falsa: \"Cuadrilla incompleta\"."],
-      eval: (d) => d[0][2] > 10 ? 'Cuadrilla completa' : 'Cuadrilla incompleta'
-    },
-    {
-      text: "En control de calidad, si la lectura del sensor en B2 es exactamente igual a la palabra “Normal”, reportar “Aprobado”; si se presenta algo distinto, colocar “Revisión”.",
-      data: [["B2", "Sensor Presión", "Normal"]],
-      blocks: [
-        {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:"=", type:"op"}, {text:'"Normal"', type:"val"},
-        {text:";", type:"sep"}, {text:'"Aprobado"', type:"res"}, {text:";", type:"sep"},
-        {text:'"Revisión"', type:"res"}, {text:")", type:"paren"}
-      ],
-      expected: '=SI(B2="Normal";"Aprobado";"Revisión")',
-      expectedParts: { prueba: 'B2="Normal"', vVerdadero: '"Aprobado"', vFalso: '"Revisión"' },
-      hints: ["'Es exactamente igual a' requiere el operador = en la prueba lógica.", "Recuerda que los textos se comparan entre comillas.", "Separadores ; en los casilleros correspondientes."],
-      eval: (d) => d[0][2] === 'Normal' ? 'Aprobado' : 'Revisión'
-    },
-    {
-      text: "Si el estado del equipo en B2 resulta ser idéntico a “Operativo”, marcar “Ingreso permitido”; de manera contraria, registrar “Ingreso denegado”.",
-      data: [["B2", "Estado Equipo", "Operativo"]],
-      blocks: [
-        {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:"=", type:"op"}, {text:'"Operativo"', type:"val"},
-        {text:";", type:"sep"}, {text:'"Ingreso permitido"', type:"res"}, {text:";", type:"sep"},
-        {text:'"Ingreso denegado"', type:"res"}, {text:")", type:"paren"}
-      ],
-      expected: '=SI(B2="Operativo";"Ingreso permitido";"Ingreso denegado")',
-      expectedParts: { prueba: 'B2="Operativo"', vVerdadero: '"Ingreso permitido"', vFalso: '"Ingreso denegado"' },
-      hints: ["Compara B2 con \"Operativo\" usando el signo =.", "Comprueba que la respuesta verdadera y falsa coincidan con el texto exacto del enunciado."],
-      eval: (d) => d[0][2] === 'Operativo' ? 'Ingreso permitido' : 'Ingreso denegado'
-    }
-  ],
-  2: [
-    {
-      text: "Si un colaborador acumula un total de días trabajados en B2 mayor o igual a 20, asignarle un bono de 50000; pero si registra menos de esa cantidad, asignarle 0.",
-      data: [["B2", "Días trabajados", 22]],
-      blocks: [
-        {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:">=", type:"op"}, {text:"20", type:"val"},
-        {text:";", type:"sep"}, {text:"50000", type:"val"}, {text:";", type:"sep"},
-        {text:"0", type:"val"}, {text:")", type:"paren"}
-      ],
-      expected: '=SI(B2>=20;50000;0)',
-      expectedParts: { prueba: "B2>=20", vVerdadero: "50000", vFalso: "0" },
-      hints: ["La frase 'mayor o igual a' requiere el operador >=.", "Los valores numéricos (50000 y 0) no llevan comillas.", "Separa los argumentos con ;."],
-      eval: (d) => d[0][2] >= 20 ? 50000 : 0
-    },
-    {
-      text: "Si las horas extraordinarias registradas en la celda B2 sobrepasan las 15 horas, liquidar un pago de 120000; de lo contrario, indicar 0.",
-      data: [["B2", "Horas Extra", 18]],
-      blocks: [
-        {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:">", type:"op"}, {text:"15", type:"val"},
-        {text:";", type:"sep"}, {text:"120000", type:"val"}, {text:";", type:"sep"},
-        {text:"0", type:"val"}, {text:")", type:"paren"}
-      ],
-      expected: '=SI(B2>15;120000;0)',
-      expectedParts: { prueba: "B2>15", vVerdadero: "120000", vFalso: "0" },
-      hints: ["'Sobrepasan' significa estrictamente mayor que (>).", "Verdadero: 120000, Falso: 0.", "Recuerda no colocar comillas a los números."],
-      eval: (d) => d[0][2] > 15 ? 120000 : 0
-    },
-    {
-      text: "Si la temperatura reportada en B2 es superior a 40 grados, calcular un recargo de 25000; en caso contrario, registrar 0.",
-      data: [["B2", "Temperatura", 42]],
-      blocks: [
-        {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:">", type:"op"}, {text:"40", type:"val"},
-        {text:";", type:"sep"}, {text:"25000", type:"val"}, {text:";", type:"sep"},
-        {text:"0", type:"val"}, {text:")", type:"paren"}
-      ],
-      expected: '=SI(B2>40;25000;0)',
-      expectedParts: { prueba: "B2>40", vVerdadero: "25000", vFalso: "0" },
-      hints: ["'Es superior a' equivale al operador mayor que (>).", "Números sin comillas.", "Verifica ubicar el punto y coma en las cajas separadoras."],
-      eval: (d) => d[0][2] > 40 ? 25000 : 0
-    }
-  ],
-  3: [
-    {
-      text: "Clasifica el riesgo: si el puntaje en B2 es menor o igual a 4, categorizar como “Bajo”; si es menor o igual a 9, categorizar como “Medio”; para cualquier otro valor, marcar como “Alto”.",
-      data: [["B2", "Puntaje Riesgo", 5]],
-      blocks: [
-        {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:"<=", type:"op"}, {text:"4", type:"val"}, {text:";", type:"sep"},
-        {text:'"Bajo"', type:"res"}, {text:";", type:"sep"}, {text:"SI(", type:"func"}, {text:"B2", type:"var"},
-        {text:"<=", type:"op"}, {text:"9", type:"val"}, {text:";", type:"sep"}, {text:'"Medio"', type:"res"},
-        {text:";", type:"sep"}, {text:'"Alto"', type:"res"}, {text:")", type:"paren"}, {text:")", type:"paren"}
-      ],
-      expected: '=SI(B2<=4;"Bajo";SI(B2<=9;"Medio";"Alto"))',
-      expectedParts: { prueba: "B2<=4", vVerdadero: '"Bajo"', vFalso: 'SI(B2<=9;"Medio";"Alto")' },
-      hints: ["'Menor o igual a' corresponde al símbolo <=.", "En la Fila 1 evalúa la primera condición y en la Fila 2 inicia el segundo SI.", "Recuerda cerrar ambos paréntesis al final."],
-      eval: (d) => d[0][2] <= 4 ? 'Bajo' : (d[0][2] <= 9 ? 'Medio' : 'Alto')
-    },
-    {
-      text: "Evalúa desempeño: si la nota en B2 es mayor o igual a 6, calificar como “Excelente”; si alcanza o supera los 4 puntos, calificar como “Aprobado”; si no, marcar “Reprobado”.",
-      data: [["B2", "Nota Final", 5]],
-      blocks: [
-        {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:">=", type:"op"}, {text:"6", type:"val"}, {text:";", type:"sep"},
-        {text:'"Excelente"', type:"res"}, {text:";", type:"sep"}, {text:"SI(", type:"func"}, {text:"B2", type:"var"},
-        {text:">=", type:"op"}, {text:"4", type:"val"}, {text:";", type:"sep"}, {text:'"Aprobado"', type:"res"},
-        {text:";", type:"sep"}, {text:'"Reprobado"', type:"res"}, {text:")", type:"paren"}, {text:")", type:"paren"}
-      ],
-      expected: '=SI(B2>=6;"Excelente";SI(B2>=4;"Aprobado";"Reprobado"))',
-      expectedParts: { prueba: "B2>=6", vVerdadero: '"Excelente"', vFalso: 'SI(B2>=4;"Aprobado";"Reprobado")' },
-      hints: ["Inicia evaluando la nota máxima (>=6).", "El segundo SI anidado evalúa >=4.", "Comprueba cerrar con dos paréntesis final ))."],
-      eval: (d) => d[0][2] >= 6 ? 'Excelente' : (d[0][2] >= 4 ? 'Aprobado' : 'Reprobado')
-    },
-    {
-      text: "Clasifica antigüedad: si los años en B2 son inferiores a 2, asigna “Inicial”; si son menores a 5, asigna “Intermedio”; para cualquier otro caso, asigna “Avanzado”.",
-      data: [["B2", "Años Antigüedad", 3]],
-      blocks: [
-        {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:"<", type:"op"}, {text:"2", type:"val"}, {text:";", type:"sep"},
-        {text:'"Inicial"', type:"res"}, {text:";", type:"sep"}, {text:"SI(", type:"func"}, {text:"B2", type:"var"},
-        {text:"<", type:"op"}, {text:"5", type:"val"}, {text:";", type:"sep"}, {text:'"Intermedio"', type:"res"},
-        {text:";", type:"sep"}, {text:'"Avanzado"', type:"res"}, {text:")", type:"paren"}, {text:")", type:"paren"}
-      ],
-      expected: '=SI(B2<2;"Inicial";SI(B2<5;"Intermedio";"Avanzado"))',
-      expectedParts: { prueba: "B2<2", vVerdadero: '"Inicial"', vFalso: 'SI(B2<5;"Intermedio";"Avanzado")' },
-      hints: ["'Inferiores a' o 'menores a' es el operador menor que (<).", "Ubica el segundo SI dentro de la respuesta falsa del primer SI."],
-      eval: (d) => d[0][2] < 2 ? 'Inicial' : (d[0][2] < 5 ? 'Intermedio' : 'Avanzado')
-    }
-  ],
-  4: [
-    {
-      text: "[SI + Y] Otorga un beneficio si se cumplen AMBAS condiciones: los días en B2 son mayores o iguales a 20 Y ADEMÁS la asistencia en C2 es mayor o igual a 90%. Mostrar “Bono”; de lo contrario “Sin bono”.",
-      data: [["B2", "Días", 21], ["C2", "Asistencia", "95%"]],
-      blocks: [
-        {text:"=SI(", type:"func"}, {text:"Y(", type:"func"}, {text:"B2", type:"var"}, {text:">=", type:"op"}, {text:"20", type:"val"},
-        {text:";", type:"sep"}, {text:"C2", type:"var"}, {text:">=", type:"op"}, {text:"90%", type:"val"}, {text:")", type:"paren"},
-        {text:";", type:"sep"}, {text:'"Bono"', type:"res"}, {text:";", type:"sep"}, {text:'"Sin bono"', type:"res"}, {text:")", type:"paren"}
-      ],
-      expected: '=SI(Y(B2>=20;C2>=90%);"Bono";"Sin bono")',
-      expectedParts: { prueba: "Y(B2>=20;C2>=90%)", vVerdadero: '"Bono"', vFalso: '"Sin bono"' },
-      hints: ["Al requerir dos condiciones obligatorias simultáneas, usa la función Y().", "Cierra la función Y() con su paréntesis antes del primer punto y coma."],
-      eval: (d) => (d[0][2] >= 20 && parseInt(d[1][2]) >= 90) ? 'Bono' : 'Sin bono'
-    },
-    {
-      text: "[SI + O] Activa una alerta si la temperatura en B2 sobrepasa los 50 grados O BIEN si la presión en C2 es mayor a 100. De cumplirse cualquiera, mostrar “Alerta”; si ninguna se presenta, registrar “Normal”.",
-      data: [["B2", "Temperatura", 55], ["C2", "Presión", 90]],
-      blocks: [
-        {text:"=SI(", type:"func"}, {text:"O(", type:"func"}, {text:"B2", type:"var"}, {text:">", type:"op"}, {text:"50", type:"val"},
-        {text:";", type:"sep"}, {text:"C2", type:"var"}, {text:">", type:"op"}, {text:"100", type:"val"}, {text:")", type:"paren"},
-        {text:";", type:"sep"}, {text:'"Alerta"', type:"res"}, {text:";", type:"sep"}, {text:'"Normal"', type:"res"}, {text:")", type:"paren"}
-      ],
-      expected: '=SI(O(B2>50;C2>100);"Alerta";"Normal")',
-      expectedParts: { prueba: "O(B2>50;C2>100)", vVerdadero: '"Alerta"', vFalso: '"Normal"' },
-      hints: ["La presencia de 'O BIEN' exige utilizar la función lógica O() en la prueba.", "Verifica que ambas comparaciones usen el operador mayor que (>)."],
-      eval: (d) => (d[0][2] > 50 || d[1][2] > 100) ? 'Alerta' : 'Normal'
-    },
-    {
-      text: "[SI + Y] Declara una inspección como aprobada únicamente si el casco en B2 es igual a “Sí” Y ADEMÁS el chaleco en C2 es igual a “Sí”. Si se cumplen ambas, indicar “Apto”; caso contrario “No Apto”.",
-      data: [["B2", "Casco", "Sí"], ["C2", "Chaleco", "Sí"]],
-      blocks: [
-        {text:"=SI(", type:"func"}, {text:"Y(", type:"func"}, {text:"B2", type:"var"}, {text:"=", type:"op"}, {text:'"Sí"', type:"val"},
-        {text:";", type:"sep"}, {text:"C2", type:"var"}, {text:"=", type:"op"}, {text:'"Sí"', type:"val"}, {text:")", type:"paren"},
-        {text:";", type:"sep"}, {text:'"Apto"', type:"res"}, {text:";", type:"sep"}, {text:'"No Apto"', type:"res"}, {text:")", type:"paren"}
-      ],
-      expected: '=SI(Y(B2="Sí";C2="Sí");"Apto";"No Apto")',
-      expectedParts: { prueba: 'Y(B2="Sí";C2="Sí")', vVerdadero: '"Apto"', vFalso: '"No Apto"' },
-      hints: ["Utiliza Y() conteniendo las dos igualdades de texto.", "Asegúrate de incluir comillas en \"Sí\"."],
-      eval: (d) => (d[0][2] === 'Sí' && d[1][2] === 'Sí') ? 'Apto' : 'No Apto'
-    }
-  ]
-};
-
-// Inicialización al cargar el DOM
-window.addEventListener('DOMContentLoaded', () => {
-  loadLevel(1);
-});
-
-function registrarEstudiante() {
-  const input = document.getElementById('studentNameInput');
-  const name = input.value.trim();
-  if (!name) { alert("Por favor ingresa tu nombre para comenzar."); return; }
-  studentName = name;
-  document.getElementById('userDisplayName').textContent = studentName;
-  document.getElementById('registroModal').style.display = 'none';
-  enviarDatosAGoogleSheets("Inicio", "Sesión iniciada");
-}
-
-function startTimer() {
-  clearInterval(timerInterval);
-  seconds = 0;
-  timerInterval = setInterval(() => {
-    seconds++;
-    const m = String(Math.floor(seconds / 60)).padStart(2, '0');
-    const s = String(seconds % 60).padStart(2, '0');
-    document.getElementById('timer').textContent = `${m}:${s}`;
-  }, 1000);
-}
-
-function switchMode(mode) {
-  if (mode === 'write' && solvedBlocks.size < 4) {
-    showOverlay('🔒 Modo Bloqueado', 'Debes completar los 4 niveles en el Modo Bloques antes de acceder al Modo Escritura.', '⚠️');
-    return;
-  }
-  activeMode = mode;
-  document.getElementById('btnModeBlock').className = `mode-btn ${mode === 'block' ? 'active' : ''}`;
-  document.getElementById('btnModeWrite').className = `mode-btn ${solvedBlocks.size < 4 ? 'locked' : (mode === 'write' ? 'active' : '')}`;
-  
-  document.getElementById('blockArea').style.display = mode === 'block' ? 'block' : 'none';
-  document.getElementById('writeArea').style.display = mode === 'write' ? 'block' : 'none';
-  document.getElementById('phaseTitle').textContent = mode === 'block' ? 'Construcción por Filas (Bloques)' : 'Escritura Manual Libre';
-  
-  clearCurrentPhase();
-  document.getElementById('feedback').style.display = 'none';
-}
-
-function loadLevel(lvl, btn) {
-  currentLevel = lvl;
-  if(btn) {
-    document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-  }
-  loadRandomExercise();
-}
-
-function loadRandomExercise() {
-  hintIndex = 0;
-  const list = EXERCISE_BANK[currentLevel] || EXERCISE_BANK[1];
-  currentExercise = list[Math.floor(Math.random() * list.length)];
-  
-  document.getElementById('text').textContent = currentExercise.text;
-  let html = '<table class="data-table"><tr><th>Celda</th><th>Concepto</th><th>Valor</th></tr>';
-  currentExercise.data.forEach(r => html += `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td></tr>`);
-  html += '</table>';
-  document.getElementById('data').innerHTML = html;
-
-  buildRowsUI(currentLevel);
-  renderBank(currentExercise.blocks);
-  clearCurrentPhase();
-  document.getElementById('hint').style.display = 'none';
-  document.getElementById('feedback').style.display = 'none';
-  document.getElementById('resultDisplay').textContent = '—';
-  startTimer();
-}
-
-function buildRowsUI(lvl) {
-  const container = document.getElementById('builderRows');
-  if (lvl === 3) {
-    container.innerHTML = `
-      <div class="builder-row">
-        <div class="row-label"><span>1. Primera Condición y Respuesta Verdadero</span></div>
-        <div class="drop-zone-row" id="row1" ondrop="dropBlock(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
-      </div>
-      <div class="builder-row">
-        <div class="row-label"><span>2. SI Anidado (Segunda Condición, Verdadero y Falso)</span></div>
-        <div class="drop-zone-row" id="row2" ondrop="dropBlock(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
-      </div>
-    `;
-  } else {
-    container.innerHTML = `
-      <div class="builder-row">
-        <div class="row-label"><span>1. Prueba Lógica (Condición)</span></div>
-        <div class="drop-zone-row" id="row1" ondrop="dropBlock(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
-      </div>
-      <div class="sep-row-container">
-        <span style="font-size:12px; font-weight:700; color:var(--warning);">Separador:</span>
-        <div class="drop-zone-row sep-box" id="sep1" ondrop="dropBlock(event)" ondragover="allowDrop(event)"></div>
-      </div>
-      <div class="builder-row">
-        <div class="row-label"><span>2. Valor si es Verdadero</span></div>
-        <div class="drop-zone-row" id="row2" ondrop="dropBlock(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
-      </div>
-      <div class="sep-row-container">
-        <span style="font-size:12px; font-weight:700; color:var(--warning);">Separador:</span>
-        <div class="drop-zone-row sep-box" id="sep2" ondrop="dropBlock(event)" ondragover="allowDrop(event)"></div>
-      </div>
-      <div class="builder-row">
-        <div class="row-label"><span>3. Valor si es Falso</span></div>
-        <div class="drop-zone-row" id="row3" ondrop="dropBlock(event)" ondragover="allowDrop(event)" ondragleave="dragLeave(event)"></div>
-      </div>
-    `;
-  }
-}
-
-function renderBank(blocks) {
-  const bank = document.getElementById('bank');
-  bank.innerHTML = '';
-  const shuffled = [...blocks].sort(() => Math.random() - 0.5);
-  shuffled.forEach((b, i) => {
-    const el = document.createElement('div');
-    el.className = `block ${b.type}`;
-    el.draggable = true;
-    el.id = 'blk_' + i;
-    el.textContent = b.text;
-    el.ondragstart = e => e.dataTransfer.setData('text/plain', e.target.id);
-    bank.appendChild(el);
-  });
-}
-
-function allowDrop(e) {
-  e.preventDefault();
-  const zone = e.target.closest('.drop-zone-row') || e.target.closest('.bank-area');
-  if(zone) zone.classList.add('drag-over');
-}
-
-function dragLeave(e) {
-  const zone = e.target.closest('.drop-zone-row') || e.target.closest('.bank-area');
-  if(zone) zone.classList.remove('drag-over');
-}
-
-function dropBlock(e) {
-  e.preventDefault();
-  const zone = e.target.closest('.drop-zone-row');
-  if(zone) zone.classList.remove('drag-over');
-
-  const id = e.dataTransfer.getData('text/plain');
-  const el = document.getElementById(id);
-  if (el && zone) {
-    zone.appendChild(el);
-    updateFormulaFromRows();
-  }
-}
-
-function dropToBank(e) {
-  e.preventDefault();
-  const bank = document.getElementById('bank');
-  bank.classList.remove('drag-over');
-  const id = e.dataTransfer.getData('text/plain');
-  const el = document.getElementById(id);
-  if (el) {
-    bank.appendChild(el);
-    updateFormulaFromRows();
-  }
-}
-
-function updateFormulaFromRows() {
-  if (activeMode !== 'block') return;
-  let fullFormula = '';
-  if (currentLevel === 3) {
-    const r1 = Array.from(document.getElementById('row1')?.children || []).map(c => c.textContent).join('');
-    const r2 = Array.from(document.getElementById('row2')?.children || []).map(c => c.textContent).join('');
-    fullFormula = r1 + r2;
-  } else {
-    const r1 = Array.from(document.getElementById('row1')?.children || []).map(c => c.textContent).join('');
-    const s1 = document.getElementById('sep1')?.textContent || '';
-    const r2 = Array.from(document.getElementById('row2')?.children || []).map(c => c.textContent).join('');
-    const s2 = document.getElementById('sep2')?.textContent || '';
-    const r3 = Array.from(document.getElementById('row3')?.children || []).map(c => c.textContent).join('');
-    fullFormula = r1 + s1 + r2 + s2 + r3;
-  }
-  document.getElementById('formula').textContent = fullFormula || '=SI(...)';
-}
-
-function updateFormulaFromText() {
-  const inputVal = document.getElementById('manualFormula').value;
-  document.getElementById('formula').textContent = inputVal || '=SI(...)';
-}
-
-function clearCurrentPhase() {
-  if (activeMode === 'block') {
-    const bank = document.getElementById('bank');
-    document.querySelectorAll('.drop-zone-row').forEach(zone => {
-      Array.from(zone.children).forEach(child => bank.appendChild(child));
-    });
-    updateFormulaFromRows();
-  } else {
-    document.getElementById('manualFormula').value = '';
-    updateFormulaFromText();
-  }
-}
-
-function showHint() {
-  if (!currentExercise || !currentExercise.hints) return;
-  const hintBox = document.getElementById('hint');
-  hintBox.style.display = 'block';
-  hintBox.textContent = `💡 Pista ${hintIndex + 1}: ${currentExercise.hints[hintIndex % currentExercise.hints.length]}`;
-  hintIndex++;
-}
-
-// SISTEMA DE RETROALIMENTACIÓN GRANULAR Y POSITIVA
-function checkCurrentPhase() {
-  const currentFormula = document.getElementById('formula').textContent.replace(/\s+/g, '');
-  const expectedFormula = currentExercise.expected.replace(/\s+/g, '');
-  const fb = document.getElementById('feedback');
-  fb.style.display = 'block';
-
-  if (currentFormula === expectedFormula) {
-    fb.className = 'feedback ok';
-    fb.innerHTML = `<b>🎉 ¡Excelente trabajo!</b><br>Has construido la fórmula perfectamente con la sintaxis exacta de Excel.`;
+  // 1. Mostrar/Ocultar Pista
+  function togglePista() {
+    const pistaBox = document.getElementById('pista-box');
+    const btnPista = document.getElementById('btn-pista');
     
-    const res = currentExercise.eval(currentExercise.data);
-    document.getElementById('resultDisplay').textContent = res;
+    pistaVisible = !pistaVisible;
     
-    points += 100;
-    document.getElementById('points').textContent = points;
-    
-    if (activeMode === 'block') {
-      solvedBlocks.add(currentLevel);
-      document.getElementById('blockProg').textContent = `${solvedBlocks.size}/4`;
+    if (pistaVisible) {
+      pistaBox.classList.add('visible');
+      btnPista.style.backgroundColor = '#fde68a';
     } else {
-      solvedWrites.add(currentLevel);
-      document.getElementById('writeProg').textContent = `${solvedWrites.size}/4`;
+      pistaBox.classList.remove('visible');
+      btnPista.style.backgroundColor = 'var(--accent-hint-bg)';
     }
+  }
+
+  // 2. Selección de Variables
+  function toggleSelection(cardElement) {
+    cardElement.classList.toggle('selected');
+    // Limpiar mensaje previo al cambiar selección
+    document.getElementById('feedback-msg').textContent = '';
+  }
+
+  // 3. Validar Respuestas
+  function validarRespuesta() {
+    const selectedCards = document.querySelectorAll('.variable-card.selected');
+    const selectedVars = Array.from(selectedCards).map(card => card.getAttribute('data-var'));
+    const feedbackMsg = document.getElementById('feedback-msg');
+
+    // Variables correctas para este ejercicio: v0, a, t
+    const correctas = ['v0', 'a', 't'];
     
-    updateProgressAndBadges();
-    enviarDatosAGoogleSheets("Acierto", `Nivel ${currentLevel} (${activeMode}) completado`);
+    const esCorrecto = correctas.every(v => selectedVars.includes(v)) && selectedVars.length === correctas.length;
 
-    if (solvedBlocks.size === 4 && activeMode === 'block') {
-      showOverlay('🏆 ¡Fase de Bloques Completada!', 'Has desbloqueado el Modo Escritura Manual.', '👑');
-      document.getElementById('btnModeWrite').classList.remove('locked');
-    }
-  } else {
-    fb.className = 'feedback err';
-    
-    // Diagnóstico detallado por partes
-    let diagHTML = '<b>🔍 Diagnóstico y retroalimentación:</b><ul class="diagnostic-list">';
-    
-    if (activeMode === 'block' && currentLevel !== 3) {
-      const pLógica = Array.from(document.getElementById('row1')?.children || []).map(c => c.textContent).join('');
-      const s1 = document.getElementById('sep1')?.textContent || '';
-      const vVerd = Array.from(document.getElementById('row2')?.children || []).map(c => c.textContent).join('');
-      const s2 = document.getElementById('sep2')?.textContent || '';
-      const vFals = Array.from(document.getElementById('row3')?.children || []).map(c => c.textContent).join('');
-
-      // 1. Verificar Prueba Lógica
-      if (pLógica === "=SI(" + currentExercise.expectedParts.prueba) {
-        diagHTML += '<li>✅ <b>Prueba Lógica:</b> ¡Muy bien! Está correctamente formulada.</li>';
-      } else {
-        diagHTML += '<li>💡 <b>Prueba Lógica:</b> Revisa los elementos en la primera fila (función, celda variable, operador o valor).</li>';
-      }
-
-      // 2. Verificar Separadores
-      if (s1 === ';' && s2 === ';') {
-        diagHTML += '<li>✅ <b>Separadores (;):</b> Colocados correctamente.</li>';
-      } else {
-        diagHTML += '<li>💡 <b>Separadores (;):</b> Asegúrate de ubicar el bloque punto y coma <code>;</code> en los casilleros amarillos.</li>';
-      }
-
-      // 3. Verificar Valor Verdadero
-      if (vVerd === currentExercise.expectedParts.vVerdadero) {
-        diagHTML += '<li>✅ <b>Valor Verdadero:</b> Correcto.</li>';
-      } else {
-        diagHTML += '<li>💡 <b>Valor Verdadero:</b> Revisa qué debe devolver Excel si la condición se cumple.</li>';
-      }
-
-      // 4. Verificar Valor Falso
-      if (vFals === currentExercise.expectedParts.vFalso + ")") {
-        diagHTML += '<li>✅ <b>Valor Falso y Cierre:</b> Correcto.</li>';
-      } else {
-        diagHTML += '<li>💡 <b>Valor Falso / Cierre:</b> Verifica el resultado alternativo y no olvides cerrar con el paréntesis <code>)</code>.</li>';
-      }
+    if (esCorrecto) {
+      feedbackMsg.className = 'feedback-message success';
+      feedbackMsg.textContent = '¡Correcto! Has seleccionado adecuadamente todas las variables necesarias.';
     } else {
-      diagHTML += '<li>💡 Revisa la sintaxis general, el orden de los argumentos y que los textos estén entre comillas dobles.</li>';
+      feedbackMsg.className = 'feedback-message error';
+      feedbackMsg.textContent = 'Respuesta incompleta o incorrecta. Revisa tu selección o consulta la pista.';
     }
-
-    diagHTML += '</ul>';
-    fb.innerHTML = diagHTML;
-    enviarDatosAGoogleSheets("Error", `Fallo en Nivel ${currentLevel}. Intento: ${currentFormula}`);
   }
-}
 
-function updateProgressAndBadges() {
-  const totalSolved = solvedBlocks.size + solvedWrites.size;
-  const pct = Math.round((totalSolved / 8) * 100);
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressText').textContent = `Progreso Global del Curso: ${pct}%`;
-
-  if (totalSolved >= 1) document.getElementById('badge1').classList.add('unlocked');
-  if (solvedBlocks.size >= 4) document.getElementById('badge2').classList.add('unlocked');
-  if (solvedWrites.size >= 4) document.getElementById('badge3').classList.add('unlocked');
-  if (totalSolved === 8) {
-    document.getElementById('badge4').classList.add('unlocked');
-    stars = 5;
-    document.getElementById('stars').textContent = '5 ⭐';
+  // 4. Navegación (Ejemplo base para cambiar ejercicio)
+  function cambiarEjercicio(direccion) {
+    // Aquí puedes enlazar tu lógica para cargar el siguiente/anterior ejercicio en el DOM
+    alert(`Navegar al ejercicio ${direccion > 0 ? 'siguiente' : 'anterior'}`);
   }
-}
-
-function showOverlay(title, msg, icon) {
-  document.getElementById('overlayTitle').textContent = title;
-  document.getElementById('overlayMsg').textContent = msg;
-  document.getElementById('overlayIcon').textContent = icon || '🎉';
-  document.getElementById('overlay').style.display = 'flex';
-}
-
-function closeOverlay() {
-  document.getElementById('overlay').style.display = 'none';
-}
-
-function resetAll() {
-  points = 0;
-  stars = 0;
-  solvedBlocks.clear();
-  solvedWrites.clear();
-  document.getElementById('points').textContent = '0';
-  document.getElementById('stars').textContent = '0 ⭐';
-  document.getElementById('blockProg').textContent = '0/4';
-  document.getElementById('writeProg').textContent = '0/4';
-  document.getElementById('progressFill').style.width = '0%';
-  document.getElementById('progressText').textContent = 'Progreso Global del Curso: 0%';
-  document.querySelectorAll('.badge').forEach(b => b.classList.remove('unlocked'));
-  switchMode('block');
-  loadLevel(1, document.querySelectorAll('.level-btn')[0]);
-}
-
-function enviarDatosAGoogleSheets(accion, detalle) {
-  if (!GOOGLE_SCRIPT_URL) return;
-  const params = new URLSearchParams({
-    estudiante: studentName || "Anónimo",
-    puntos: points,
-    estrellas: stars,
-    tiempo: document.getElementById('timer') ? document.getElementById('timer').textContent : "00:00",
-    nivel: currentLevel,
-    modo: activeMode,
-    accion: accion || "Registro",
-    detalle: detalle || "",
-    fecha: new Date().toLocaleString('es-ES')
-  });
-
-  fetch(`${GOOGLE_SCRIPT_URL}?${params.toString()}`, {
-    method: 'GET',
-    mode: 'no-cors'
-  }).catch(err => console.error("Error al enviar datos:", err));
-}
 </script>
+
 </body>
 </html>
