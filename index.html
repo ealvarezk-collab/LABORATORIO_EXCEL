@@ -818,61 +818,64 @@ function load(n, btn) {
   document.getElementById('text').textContent = l.text;
   initData();
 
-  if (mode === 'blocks') {
-    document.getElementById('blocksMode').style.display = '';
-    document.getElementById('writeMode').style.display = 'none';
-    const zonesContainer = document.getElementById('zonesContainer');
-    zonesContainer.innerHTML = '';
+ if (mode === 'blocks') {
+  document.getElementById('blocksMode').style.display = '';
+  document.getElementById('writeMode').style.display = 'none';
+  const zonesContainer = document.getElementById('zonesContainer');
+  zonesContainer.innerHTML = '';
 
-    if (level === 3) {
-      zonesContainer.innerHTML = `
+  if (level === 3) {
+    zonesContainer.innerHTML = `
+      <div class="zone">
+        <div class="label">FÓRMULA COMPLETA (arrastra los bloques en orden horizontal)</div>
+        <div id="formula-zone" class="drop" style="flex-wrap:nowrap; overflow-x:auto; min-height:80px; align-items:center;"></div>
+      </div>`;
+    setupSingleZone();
+  } else {
+    // Zonas separadas apiladas verticalmente para evitar confusiones
+    zonesContainer.innerHTML = `
+      <div style="display:flex;flex-direction:column;gap:20px;">
         <div class="zone">
-          <div class="label">FÓRMULA COMPLETA (arrastra los bloques en orden horizontal)</div>
-          <div id="formula-zone" class="drop" style="flex-wrap:nowrap; overflow-x:auto; min-height:60px; align-items:center;"></div>
-        </div>`;
-      setupSingleZone();
-    } else {
-      zonesContainer.innerHTML = `
-  <div style="display:flex;flex-direction:column;gap:20px;">
-    <div class="zone">
-      <div class="label">PRUEBA LÓGICA</div>
-      <div id="test" class="drop"></div>
-    </div>
-    <div class="zone" style="display:flex;align-items:center;gap:15px;">
-      <div class="label" style="margin:0;">SEPARADOR 1</div>
-      <div id="sep1" class="sep-zone"></div>
-    </div>
-    <div class="zone">
-      <div class="label">VALOR SI ES VERDADERO</div>
-      <div id="true" class="drop"></div>
-    </div>
-    <div class="zone" style="display:flex;align-items:center;gap:15px;">
-      <div class="label" style="margin:0;">SEPARADOR 2</div>
-      <div id="sep2" class="sep-zone"></div>
-    </div>
-    <div class="zone">
-      <div class="label">VALOR SI ES FALSO</div>
-      <div id="false" class="drop"></div>
-    </div>
-  </div>`;
-      setupSeparatedZones();
-    }
+          <div class="label">PRUEBA LÓGICA</div>
+          <div id="test" class="drop"></div>
+        </div>
+        <div class="zone" style="display:flex;align-items:center;gap:15px;">
+          <div class="label" style="margin:0;">SEPARADOR 1</div>
+          <div id="sep1" class="sep-zone"></div>
+        </div>
+        <div class="zone">
+          <div class="label">VALOR SI ES VERDADERO</div>
+          <div id="true" class="drop"></div>
+        </div>
+        <div class="zone" style="display:flex;align-items:center;gap:15px;">
+          <div class="label" style="margin:0;">SEPARADOR 2</div>
+          <div id="sep2" class="sep-zone"></div>
+        </div>
+        <div class="zone">
+          <div class="label">VALOR SI ES FALSO</div>
+          <div id="false" class="drop"></div>
+        </div>
+      </div>`;
+    setupSeparatedZones();
+  }
 
-    const shuffled = [...l.blocks].sort(() => Math.random() - 0.5);
-    const bank = document.getElementById('bank');
-    bank.innerHTML = '';
-    shuffled.forEach((block, i) => {
-      const e = document.createElement('div');
-      e.className = 'block ' + block.type;
-      e.textContent = block.text;
-      e.draggable = true;
-      e.dataset.i = i;
-      e.ondragstart = ev => {
-        ev.dataTransfer.setData('text/plain', i);
-        ev.dataTransfer.effectAllowed = 'move';
-      };
-      bank.appendChild(e);
-    });
+  // El resto del código de llenado del banco se mantiene igual...
+  const shuffled = [...l.blocks].sort(() => Math.random() - 0.5);
+  const bank = document.getElementById('bank');
+  bank.innerHTML = '';
+  shuffled.forEach((block, i) => {
+    const e = document.createElement('div');
+    e.className = 'block ' + block.type;
+    e.textContent = block.text;
+    e.draggable = true;
+    e.dataset.i = i;
+    e.ondragstart = ev => {
+      ev.dataTransfer.setData('text/plain', i);
+      ev.dataTransfer.effectAllowed = 'move';
+    };
+    bank.appendChild(e);
+  });
+}
   } else {
     document.getElementById('blocksMode').style.display = 'none';
     document.getElementById('writeMode').style.display = '';
