@@ -1,246 +1,403 @@
-<!-- CONTENEDOR AUTÓNOMO PARA BLACKBOARD -->
-<div id="app-excel-lab-container">
-  <style>
-    #app-excel-lab-container {
-      --bg: #f4f7fa; --card: #fff; --border: #d9e2ea; --dark: #17324d; --primary: #2f5f85;
-      --ok: #eaf6ef; --ok-border: #b8ddc7; --err-bg: #fff0f0; --err-border: #efb5b5;
-      --hint-bg: #fff7e6; --hint-border: #f1d39a;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: var(--bg);
-      color: #263746;
-      padding: 15px;
-      border-radius: 10px;
-    }
-    #app-excel-lab-container * { box-sizing: border-box; }
-    #app-excel-lab-container header { background: var(--dark); color: #fff; padding: 20px; text-align: center; border-radius: 8px; }
-    #app-excel-lab-container header h1 { margin: 0 0 8px; font-size: 1.6rem; }
-    #app-excel-lab-container header p { margin: 0; opacity: .9; }
-    #app-excel-lab-container main { max-width: 1200px; margin: 20px auto; }
-    #app-excel-lab-container .top-bar { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: space-between; margin-bottom: 15px; }
-    #app-excel-lab-container .stats { display: flex; gap: 20px; flex-wrap: wrap; background: var(--card); border: 1px solid var(--border); padding: 10px 15px; border-radius: 8px; }
-    #app-excel-lab-container .stat { display: flex; flex-direction: column; align-items: center; }
-    #app-excel-lab-container .stat span:first-child { font-size: 12px; color: #687987; font-weight: 600; }
-    #app-excel-lab-container .stat span:last-child { font-size: 20px; font-weight: bold; }
-    #app-excel-lab-container .levels { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
-    #app-excel-lab-container .level-btn { padding: 9px 13px; border-radius: 7px; border: 1px solid #ccd7e0; background: #fff; cursor: pointer; font-weight: 600; }
-    #app-excel-lab-container .level-btn.active { background: var(--dark); color: #fff; }
-    #app-excel-lab-container .grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 18px; }
-    #app-excel-lab-container .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
-    #app-excel-lab-container .card h2 { margin-top: 0; font-size: 1.2rem; }
-    #app-excel-lab-container button.primary { background: var(--primary); color: white; border: none; }
-    #app-excel-lab-container button { padding: 9px 13px; border-radius: 7px; border: 1px solid #ccd7e0; background: #fff; cursor: pointer; font-weight: 600; }
-    #app-excel-lab-container .enunciado { background: #f8fafc; border-left: 4px solid var(--primary); padding: 14px; line-height: 1.5; }
-    #app-excel-lab-container .data-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-    #app-excel-lab-container .data-table td, #app-excel-lab-container .data-table th { border: 1px solid var(--border); padding: 7px; text-align: left; }
-    #app-excel-lab-container .data-table th { background: #eef3f7; }
-    #app-excel-lab-container .zone { margin: 12px 0; }
-    #app-excel-lab-container .label { font-size: 12px; font-weight: 700; margin-bottom: 5px; color: #687987; }
-    #app-excel-lab-container .drop { min-height: 45px; border: 2px dashed #b9c7d3; border-radius: 8px; padding: 4px; display: flex; gap: 4px; flex-wrap: wrap; background: #fff; align-content: flex-start; }
-    #app-excel-lab-container .bank { display: flex; gap: 6px; flex-wrap: wrap; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--border); min-height: 50px; }
-    #app-excel-lab-container .block { padding: 8px 10px; border-radius: 6px; border: 1px solid #c9d8e4; background: #edf3f8; cursor: grab; user-select: none; font-family: Consolas, monospace; }
-    #app-excel-lab-container .feedback { display: none; margin-top: 14px; padding: 12px; border-radius: 8px; line-height: 1.45; }
-    #app-excel-lab-container .ok { display: block; background: var(--ok); border: 1px solid var(--ok-border); }
-    #app-excel-lab-container .err { display: block; background: var(--err-bg); border: 1px solid var(--err-border); }
-    #app-excel-lab-container .hint { display: block; background: var(--hint-bg); border: 1px solid var(--hint-border); }
-    #app-excel-lab-container .formula { font-family: Consolas, monospace; background: #17212b; color: #d9edf7; padding: 13px; border-radius: 7px; min-height: 24px; white-space: pre-wrap; }
-    #app-excel-lab-container .result-area { margin-top: 10px; padding: 10px; background: #eef3f7; border-radius: 6px; font-weight: bold; }
-    #app-excel-lab-container .character-msg { background: #fffbe6; border: 1px solid #f1d39a; padding: 10px; border-radius: 6px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
-    #app-excel-lab-container .progress-container { flex: 1; min-width: 200px; max-width: 400px; background: #e0e0e0; border-radius: 20px; height: 20px; position: relative; overflow: hidden; }
-    #app-excel-lab-container .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #4CAF50, #2f5f85); transition: width 0.5s ease; }
-    #app-excel-lab-container .progress-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 12px; font-weight: bold; }
-    @media(max-width: 800px) { #app-excel-lab-container .grid { grid-template-columns: 1fr; } }
-  </style>
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratorio Interactivo: Función SI con Gamificación</title>
+<style>
+  :root{
+    --bg:#f4f7fa; --card:#fff; --border:#d9e2ea; --dark:#17324d; --primary:#2f5f85;
+    --ok:#eaf6ef; --ok-border:#b8ddc7; --err-bg:#fff0f0; --err-border:#efb5b5;
+    --hint-bg:#fff7e6; --hint-border:#f1d39a;
+  }
+  *{box-sizing:border-box}
+  body{font-family:'Segoe UI',Arial,sans-serif;margin:0;background:var(--bg);color:#263746}
+  header{background:var(--dark);color:#fff;padding:22px;text-align:center}
+  header h1{margin:0 0 8px;font-size:1.6rem}
+  header p{margin:0;opacity:.9}
+  main{max-width:1200px;margin:20px auto;padding:0 16px}
+  .top-bar{display:flex;flex-wrap:wrap;gap:15px;align-items:center;justify-content:space-between;margin-bottom:15px}
+  .stats{display:flex;gap:20px;flex-wrap:wrap;background:var(--card);border:1px solid var(--border);padding:10px 15px;border-radius:8px}
+  .stat{display:flex;flex-direction:column;align-items:center}
+  .stat span:first-child{font-size:12px;color:#687987;font-weight:600}
+  .stat span:last-child{font-size:20px;font-weight:bold}
+  .levels{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
+  .level-btn{padding:9px 13px;border-radius:7px;border:1px solid #ccd7e0;background:#fff;cursor:pointer;font-weight:600}
+  .level-btn.active{background:var(--dark);color:#fff}
+  .grid{display:grid;grid-template-columns:1fr 1.4fr;gap:18px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px}
+  .card h2{margin-top:0;font-size:1.2rem}
+  button.primary{background:var(--primary);color:white;border:none}
+  button{padding:9px 13px;border-radius:7px;border:1px solid #ccd7e0;background:#fff;cursor:pointer;font-weight:600}
+  .enunciado{background:#f8fafc;border-left:4px solid var(--primary);padding:14px;line-height:1.5}
+  .data-table{width:100%;border-collapse:collapse;margin-top:12px}
+  .data-table td,.data-table th{border:1px solid var(--border);padding:7px;text-align:left}
+  .data-table th{background:#eef3f7}
+  .drop {
+    min-height: 55px;
+    border: 2px dashed #b9c7d3;
+    border-radius: 8px;
+    padding: 6px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    background: #fff;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .bank{display:flex;gap:6px;flex-wrap:wrap;background:#f8fafc;padding:12px;border-radius:8px;border:1px solid var(--border);min-height:60px}
+  
+  /* ESTILOS DE BLOQUES POR CATEGORÍA CROMÁTICA */
+  .block{padding:8px 12px;border-radius:6px;border:1px solid #c9d8e4;cursor:grab;user-select:none;font-family:Consolas,monospace;font-weight:bold;font-size:14px}
+  .block:active{cursor:grabbing}
+  .block.var{background:#e9f2fb; border-color:#9ec5fe; color:#0a58ca}
+  .block.op{background:#f1eefb; border-color:#c5b3e6; color:#59359a}
+  .block.val{background:#f6f2e9; border-color:#e2d3b7; color:#856404}
+  .block.res{background:#edf6ef; border-color:#b1dfbb; color:#155724}
+  .block.func{background:#fde2e2; border-color:#f5c6cb; color:#721c24}
+  .block.paren{background:#e2f0fb; border-color:#b6d4fe; color:#084298}
+  .block.sep{background:#fff3cd; border-color:#ffeeba; color:#856404}
 
-  <header>
-    <h1>🏗️ Laboratorio Interactivo: Lógica de funciones SI</h1>
-    <p>Excel aplicado a seguridad y construcción · ¡Supera los desafíos!</p>
-  </header>
+  .feedback{display:none;margin-top:14px;padding:12px;border-radius:8px;line-height:1.45}
+  .ok{display:block;background:var(--ok);border:1px solid var(--ok-border);color:#155724}
+  .err{display:block;background:var(--err-bg);border:1px solid var(--err-border);color:#721c24}
+  .hint{display:block;background:var(--hint-bg);border:1px solid var(--hint-border);color:#856404}
+  .formula{font-family:Consolas,monospace;background:#17212b;color:#7cd5ff;padding:13px;border-radius:7px;min-height:24px;white-space:pre-wrap;word-break:break-all}
+  .result-area{margin-top:10px;padding:10px;background:#eef3f7;border-radius:6px;font-weight:bold}
+  .character-msg{background:#fffbe6;border:1px solid #f1d39a;padding:10px;border-radius:6px;margin-bottom:15px;display:flex;align-items:center;gap:10px}
+  .achievements{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .badge{background:#f0f0f0;border:1px solid #ccc;padding:5px 10px;border-radius:20px;font-size:12px;display:flex;align-items:center;gap:5px;opacity:0.5}
+  .badge.unlocked{background:#d4edda;border-color:#28a745;color:#155724;opacity:1;font-weight:bold}
+  
+  .overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.75); display: flex; align-items: center; justify-content: center;
+    z-index: 10000; animation: fadeIn 0.3s;
+  }
+  .overlay-content {
+    background: white; padding: 30px; border-radius: 20px; text-align: center;
+    font-size: 1.3rem; box-shadow: 0 0 30px rgba(255,215,0,0.8); animation: bounceIn 0.5s;
+  }
+  .crown { font-size: 3.5rem; margin-bottom: 10px; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes bounceIn { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+  
+  .progress-container { flex: 1; min-width: 150px; max-width: 300px; background: #e0e0e0; border-radius: 20px; height: 20px; position: relative; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #4CAF50, #2f5f85); transition: width 0.5s ease; }
+  .progress-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 11px; font-weight: bold; }
+  @media(max-width:800px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
 
-  <main>
-    <div class="top-bar">
-      <div class="stats">
-        <div class="stat"><span>Puntos</span><span id="points">0</span></div>
-        <div class="stat"><span>Estrellas</span><span id="stars">0</span></div>
-        <div class="stat"><span>Tiempo</span><span id="timer">00:00</span></div>
-        <div class="stat"><span>Progreso</span><span id="score">0/4</span></div>
-      </div>
-      <div class="progress-container">
-        <div class="progress-fill" id="progressFill"></div>
-        <span class="progress-text" id="progressText">0%</span>
-      </div>
-    </div>
-
-    <div class="character-msg">
-      <span id="charText">¡Bienvenido! Completa los desafíos para asegurar la obra.</span>
-    </div>
-
-    <div class="levels">
-      <button class="level-btn active" onclick="LabApp.load(1, this)">Nivel 1 · SI</button>
-      <button class="level-btn" onclick="LabApp.load(2, this)">Nivel 2 · SI con números</button>
-      <button class="level-btn" onclick="LabApp.load(3, this)">Nivel 3 · SI anidado</button>
-      <button class="level-btn" onclick="LabApp.load(4, this)">Nivel 4 · SI + Y</button>
-      <button onclick="LabApp.resetAll()">Reiniciar todo</button>
-    </div>
-
-    <div class="grid">
-      <section class="card">
-        <h2>1. Enunciado</h2>
-        <div id="text" class="enunciado"></div>
-        <div id="data"></div>
-        <button onclick="LabApp.changeData()" style="margin-top:10px">🔄 Cambiar datos</button>
-        <h3>Pista</h3>
-        <button onclick="LabApp.hint()">💡 Necesito una pista</button>
-        <div id="hint" class="feedback hint"></div>
-      </section>
-
-      <section class="card">
-        <h2>2. Construye la fórmula</h2>
-        <div id="blocksMode">
-          <div class="label">ARRASTRA LOS BLOQUES AL ÁREA DE CONSTRUCCIÓN</div>
-          <div id="dropZone" class="drop" ondrop="LabApp.drop(event)" ondragover="LabApp.allowDrop(event)"></div>
-          <h3 style="margin-top:15px">Bloques disponibles</h3>
-          <div id="bank" class="bank" ondrop="LabApp.drop(event)" ondragover="LabApp.allowDrop(event)"></div>
-        </div>
-        <p>
-          <button class="primary" onclick="LabApp.check()">Comprobar</button>
-          <button onclick="LabApp.clearBuild()">Limpiar</button>
-        </p>
-        <div id="feedback" class="feedback"></div>
-        <h3>Fórmula resultante</h3>
-        <div id="formula" class="formula">=SI(...)</div>
-        <h3>Resultado calculado</h3>
-        <div class="result-area"><span id="resultDisplay">—</span></div>
-      </section>
-    </div>
-  </main>
-
-  <script>
-    const LabApp = (() => {
-      const BLOCK_LEVELS = {
-        1: [{ text: "En una obra, una cuadrilla se considera completa si tiene más de 10 trabajadores (B2>10).", data: [["B2", "Trabajadores", 12]], blocks: ["=SI(", "B2", ">", "10", ";", '"Cuadrilla completa"', ";", '"Cuadrilla incompleta"', ")"], eval: d => d[0][2] > 10 ? 'Cuadrilla completa' : 'Cuadrilla incompleta', hint: "Usa B2 > 10 como prueba lógica." }],
-        2: [{ text: "Si un trabajador registra 20 días o más (B2>=20), recibe $50.000 de bono, de lo contrario $0.", data: [["B2", "Días", 22]], blocks: ["=SI(", "B2", ">=", "20", ";", "50000", ";", "0", ")"], eval: d => d[0][2] >= 20 ? 50000 : 0, hint: "Los valores numéricos no llevan comillas." }],
-        3: [{ text: "Clasifica el riesgo (B2): <=4 es 'Bajo', <=9 es 'Medio', de lo contrario 'Alto'.", data: [["B2", "Puntaje", 5]], blocks: ["=SI(", "B2", "<=", "4", ";", '"Bajo"', ";", "SI(", "B2", "<=", "9", ";", '"Medio"', ";", '"Alto"', "))"], eval: d => d[0][2] <= 4 ? 'Bajo' : (d[0][2] <= 9 ? 'Medio' : 'Alto'), hint: "Anida una segunda función SI en la opción falsa." }],
-        4: [{ text: "Bono si Días (B2) >= 20 Y Asistencia (C2) >= 90%.", data: [["B2", "Días", 21], ["C2", "Asistencia", "95%"]], blocks: ["=SI(", "Y(", "B2", ">=", "20", ";", "C2", ">=", "90%", ");", '"Bono"', ";", '"Sin bono"', ")"], eval: d => (d[0][2] >= 20 && parseInt(d[1][2]) >= 90) ? 'Bono' : 'Sin bono', hint: "Agrupa las dos condiciones dentro de Y()." }]
-      };
-
-      let currentLevel = 1, points = 0, stars = 0, timerInterval, seconds = 0;
-
-      function startTimer() {
-        clearInterval(timerInterval);
-        seconds = 0;
-        timerInterval = setInterval(() => {
-          seconds++;
-          const m = String(Math.floor(seconds / 60)).padStart(2, '0');
-          const s = String(seconds % 60).padStart(2, '0');
-          document.getElementById('timer').textContent = `${m}:${s}`;
-        }, 1000);
-      }
-
-      function load(lvl, btn) {
-        currentLevel = lvl;
-        if(btn) {
-          document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-        }
-        const ex = BLOCK_LEVELS[lvl][0];
-        document.getElementById('text').textContent = ex.text;
-        
-        let html = '<table class="data-table"><tr><th>Celda</th><th>Concepto</th><th>Valor</th></tr>';
-        ex.data.forEach(r => html += `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td></tr>`);
-        html += '</table>';
-        document.getElementById('data').innerHTML = html;
-
-        clearBuild();
-        renderBank(ex.blocks);
-        document.getElementById('hint').style.display = 'none';
-        document.getElementById('feedback').style.display = 'none';
-        startTimer();
-      }
-
-      function renderBank(blocks) {
-        const bank = document.getElementById('bank');
-        bank.innerHTML = '';
-        const shuffled = [...blocks].sort(() => Math.random() - 0.5);
-        shuffled.forEach((b, i) => {
-          const el = document.createElement('div');
-          el.className = 'block';
-          el.draggable = true;
-          el.id = 'blk_' + i;
-          el.textContent = b;
-          el.ondragstart = e => e.dataTransfer.setData('text/plain', e.target.id);
-          bank.appendChild(el);
-        });
-      }
-
-      function allowDrop(e) { e.preventDefault(); }
-      function drop(e) {
-        e.preventDefault();
-        const id = e.dataTransfer.getData('text/plain');
-        const el = document.getElementById(id);
-        if (el && (e.target.id === 'dropZone' || e.target.id === 'bank' || e.target.classList.contains('drop'))) {
-          e.target.appendChild(el);
-          updateFormula();
-        }
-      }
-
-      function updateFormula() {
-        const zone = document.getElementById('dropZone');
-        const blocks = Array.from(zone.children).map(c => c.textContent);
-        document.getElementById('formula').textContent = blocks.join(' ') || '=SI(...)';
-      }
-
-      function check() {
-        const zone = document.getElementById('dropZone');
-        const built = Array.from(zone.children).map(c => c.textContent).join('');
-        const ex = BLOCK_LEVELS[currentLevel][0];
-        const expected = ex.blocks.join('');
-
-        const fb = document.getElementById('feedback');
-        fb.style.display = 'block';
-
-        if (built === expected) {
-          fb.className = 'feedback ok';
-          fb.textContent = '¡Correcto! Has construido la sintaxis perfecta.';
-          points += 100;
-          stars = Math.min(12, stars + 1);
-          document.getElementById('points').textContent = points;
-          document.getElementById('stars').textContent = stars;
-          document.getElementById('resultDisplay').textContent = ex.eval(ex.data);
-        } else {
-          fb.className = 'feedback err';
-          fb.textContent = 'Estructura incorrecta. Revisa el orden de las condiciones y separadores.';
-        }
-      }
-
-      function clearBuild() {
-        const zone = document.getElementById('dropZone');
-        const bank = document.getElementById('bank');
-        while (zone.firstChild) bank.appendChild(zone.firstChild);
-        updateFormula();
-      }
-
-      function hint() {
-        const h = document.getElementById('hint');
-        h.textContent = BLOCK_LEVELS[currentLevel][0].hint;
-        h.style.display = 'block';
-      }
-
-      function resetAll() {
-        points = 0; stars = 0;
-        document.getElementById('points').textContent = '0';
-        document.getElementById('stars').textContent = '0';
-        load(1, document.querySelector('.level-btn'));
-      }
-
-      function changeData() {
-        const ex = BLOCK_LEVELS[currentLevel][0];
-        ex.data[0][2] = Math.floor(Math.random() * 20) + 1;
-        load(currentLevel);
-      }
-
-      setTimeout(() => load(1), 100);
-
-      return { load, allowDrop, drop, check, clearBuild, hint, resetAll, changeData };
-    })();
-  </script>
+<div id="overlay" class="overlay" style="display:none;">
+  <div class="overlay-content">
+    <div class="crown">👑</div>
+    <div id="overlayMsg">¡Nivel Completado!</div>
+    <button class="primary" onclick="closeOverlay()" style="margin-top:15px;">Continuar</button>
+  </div>
 </div>
+
+<header>
+  <h1>🏗️ Laboratorio Interactivo: Lógica de funciones SI</h1>
+  <p>Excel aplicado a seguridad y construcción · ¡Supera los desafíos y gana insignias!</p>
+</header>
+<main>
+  <div class="top-bar">
+    <div class="stats">
+      <div class="stat"><span>Puntos</span><span id="points">0</span></div>
+      <div class="stat"><span>Estrellas</span><span id="stars">0</span></div>
+      <div class="stat"><span>Tiempo</span><span id="timer">00:00</span></div>
+      <div class="stat"><span>Progreso</span><span id="score">0/4</span></div>
+    </div>
+    <div class="progress-container">
+      <div class="progress-fill" id="progressFill"></div>
+      <span class="progress-text" id="progressText">0%</span>
+    </div>
+  </div>
+
+  <div class="character-msg">
+    <span id="charText">¡Bienvenido! Soy el capataz. Construye la fórmula agrupando los bloques de colores.</span>
+  </div>
+
+  <div class="levels">
+    <button class="level-btn active" onclick="load(1,this)">Nivel 1 · SI Simple</button>
+    <button class="level-btn" onclick="load(2,this)">Nivel 2 · SI con Números</button>
+    <button class="level-btn" onclick="load(3,this)">Nivel 3 · SI Anidado</button>
+    <button class="level-btn" onclick="load(4,this)">Nivel 4 · SI + Y</button>
+    <button onclick="resetAll()">Reiniciar todo</button>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>1. Enunciado</h2>
+      <div id="text" class="enunciado"></div>
+      <div id="data"></div>
+      <button onclick="changeData()" style="margin-top:10px">🔄 Cambiar datos</button>
+      
+      <h3>Pistas Progresivas</h3>
+      <button onclick="showHint()">💡 Pedir una pista</button>
+      <div id="hint" class="feedback hint"></div>
+      
+      <h3>Insignias y Logros</h3>
+      <div class="achievements" id="achievements">
+        <div class="badge" id="badge1">🥉 Primer Acierto</div>
+        <div class="badge" id="badge2">⚡ Rapidez</div>
+        <div class="badge" id="badge3">⭐ Maestro del SI</div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>2. Construye la fórmula</h2>
+      <div id="dropZone" class="drop" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+      
+      <h3>Bloques disponibles</h3>
+      <div id="bank" class="bank" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+
+      <p style="margin-top:15px;">
+        <button class="primary" onclick="check()">Comprobar</button>
+        <button onclick="clearBuild()">Limpiar Casilla</button>
+      </p>
+      <div id="feedback" class="feedback"></div>
+      
+      <h3>Fórmula resultante</h3>
+      <div id="formula" class="formula">=SI(...)</div>
+      
+      <h3>Resultado calculado</h3>
+      <div class="result-area">
+        <span id="resultDisplay">—</span>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+const BLOCK_LEVELS = {
+  1: {
+    text: "En una obra, una cuadrilla se considera completa cuando tiene más de 10 trabajadores. Si cumple la condición, mostrar “Cuadrilla completa”; de lo contrario, “Cuadrilla incompleta”.",
+    data: [["B2", "Trabajadores", 12]],
+    blocks: [
+      {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:">", type:"op"}, {text:"10", type:"val"},
+      {text:";", type:"sep"}, {text:'"Cuadrilla completa"', type:"res"}, {text:";", type:"sep"},
+      {text:'"Cuadrilla incompleta"', type:"res"}, {text:")", type:"paren"}
+    ],
+    f: '=SI(B2>10;"Cuadrilla completa";"Cuadrilla incompleta")',
+    hints: [
+      "Pista 1: Comienza evaluando la celda B2 contra el valor 10.",
+      "Pista 2: La prueba lógica utiliza el operador mayor que (>).",
+      "Pista 3: El valor si es verdadero va en el primer argumento de texto: \"Cuadrilla completa\".",
+      "Pista 4: La estructura final debe ser =SI(B2>10;\"Cuadrilla completa\";\"Cuadrilla incompleta\")."
+    ],
+    eval: (d) => d[0][2] > 10 ? 'Cuadrilla completa' : 'Cuadrilla incompleta'
+  },
+  2: {
+    text: "Si un trabajador registra 20 días trabajados o más, obtiene un bono de $50.000. Si registra menos de 20 días, obtiene $0.",
+    data: [["B2", "Días trabajados", 22]],
+    blocks: [
+      {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:">=", type:"op"}, {text:"20", type:"val"},
+      {text:";", type:"sep"}, {text:"50000", type:"val"}, {text:";", type:"sep"},
+      {text:"0", type:"val"}, {text:")", type:"paren"}
+    ],
+    f: '=SI(B2>=20;50000;0)',
+    hints: [
+      "Pista 1: La condición '20 días o más' requiere el operador >=.",
+      "Pista 2: A diferencia del texto, los valores numéricos como 50000 y 0 NO llevan comillas.",
+      "Pista 3: Separa cada argumento con el bloque de punto y coma (;).",
+      "Pista 4: La estructura es =SI(B2>=20;50000;0)."
+    ],
+    eval: (d) => d[0][2] >= 20 ? 50000 : 0
+  },
+  3: {
+    text: "Clasifica el nivel de riesgo: si el puntaje es menor o igual a 4 es “Bajo”; si es menor o igual a 9 es “Medio”; de lo contrario es “Alto”.",
+    data: [["B2", "Puntaje Riesgo", 5]],
+    blocks: [
+      {text:"=SI(", type:"func"}, {text:"B2", type:"var"}, {text:"<=", type:"op"}, {text:"4", type:"val"}, {text:";", type:"sep"},
+      {text:'"Bajo"', type:"res"}, {text:";", type:"sep"}, {text:"SI(", type:"func"}, {text:"B2", type:"var"},
+      {text:"<=", type:"op"}, {text:"9", type:"val"}, {text:";", type:"sep"}, {text:'"Medio"', type:"res"},
+      {text:";", type:"sep"}, {text:'"Alto"', type:"res"}, {text:")", type:"paren"}, {text:")", type:"paren"}
+    ],
+    f: '=SI(B2<=4;"Bajo";SI(B2<=9;"Medio";"Alto"))',
+    hints: [
+      "Pista 1: Este ejercicio requiere anidar un segundo SI en el valor falso del primero.",
+      "Pista 2: La primera evaluación es B2<=4 para \"Bajo\".",
+      "Pista 3: La segunda evaluación dentro del otro SI es B2<=9 para \"Medio\".",
+      "Pista 4: Recuerda cerrar con dos paréntesis finales )) correspondientes a ambas funciones SI."
+    ],
+    eval: (d) => d[0][2] <= 4 ? 'Bajo' : (d[0][2] <= 9 ? 'Medio' : 'Alto')
+  },
+  4: {
+    text: "Un trabajador obtiene un bono si cumple dos condiciones simultáneas: registra 20 días trabajados o más Y su asistencia es igual o superior al 90%.",
+    data: [["B2", "Días", 21], ["C2", "Asistencia", "95%"]],
+    blocks: [
+      {text:"=SI(", type:"func"}, {text:"Y(", type:"func"}, {text:"B2", type:"var"}, {text:">=", type:"op"}, {text:"20", type:"val"},
+      {text:";", type:"sep"}, {text:"C2", type:"var"}, {text:">=", type:"op"}, {text:"90%", type:"val"}, {text:")", type:"paren"},
+      {text:";", type:"sep"}, {text:'"Bono"', type:"res"}, {text:";", type:"sep"}, {text:'"Sin bono"', type:"res"}, {text:")", type:"paren"}
+    ],
+    f: '=SI(Y(B2>=20;C2>=90%);"Bono";"Sin bono")',
+    hints: [
+      "Pista 1: Ambas condiciones deben ir encerradas dentro de la función Y().",
+      "Pista 2: Las condiciones dentro de Y(...) se separan con punto y coma: B2>=20; C2>=90%.",
+      "Pista 3: La función Y() actúa completa como la prueba lógica del SI.",
+      "Pista 4: La forma final es =SI(Y(B2>=20;C2>=90%);\"Bono\";\"Sin bono\")."
+    ],
+    eval: (d) => (d[0][2] >= 20 && parseInt(d[1][2]) >= 90) ? 'Bono' : 'Sin bono'
+  }
+};
+
+let currentLevel = 1, points = 0, stars = 0, solvedLevels = new Set(), hintIndex = 0, timerInterval, seconds = 0;
+
+function startTimer() {
+  clearInterval(timerInterval);
+  seconds = 0;
+  timerInterval = setInterval(() => {
+    seconds++;
+    const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    document.getElementById('timer').textContent = `${m}:${s}`;
+  }, 1000);
+}
+
+function load(lvl, btn) {
+  currentLevel = lvl;
+  hintIndex = 0;
+  if(btn) {
+    document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  const ex = BLOCK_LEVELS[lvl];
+  document.getElementById('text').textContent = ex.text;
+  
+  let html = '<table class="data-table"><tr><th>Celda</th><th>Concepto</th><th>Valor</th></tr>';
+  ex.data.forEach(r => html += `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td></tr>`);
+  html += '</table>';
+  document.getElementById('data').innerHTML = html;
+
+  clearBuild();
+  renderBank(ex.blocks);
+  document.getElementById('hint').style.display = 'none';
+  document.getElementById('feedback').style.display = 'none';
+  document.getElementById('resultDisplay').textContent = '—';
+  startTimer();
+}
+
+function renderBank(blocks) {
+  const bank = document.getElementById('bank');
+  bank.innerHTML = '';
+  const shuffled = [...blocks].sort(() => Math.random() - 0.5);
+  shuffled.forEach((b, i) => {
+    const el = document.createElement('div');
+    el.className = `block ${b.type}`;
+    el.draggable = true;
+    el.id = 'blk_' + i;
+    el.textContent = b.text;
+    el.ondragstart = e => e.dataTransfer.setData('text/plain', e.target.id);
+    bank.appendChild(el);
+  });
+}
+
+function allowDrop(e) { e.preventDefault(); }
+function drop(e) {
+  e.preventDefault();
+  const id = e.dataTransfer.getData('text/plain');
+  const el = document.getElementById(id);
+  if (el) {
+    if (e.target.id === 'dropZone' || e.target.id === 'bank') {
+      e.target.appendChild(el);
+    } else if (e.target.classList.contains('block')) {
+      e.target.parentNode.appendChild(el);
+    }
+    updateFormula();
+  }
+}
+
+function updateFormula() {
+  const zone = document.getElementById('dropZone');
+  const blocks = Array.from(zone.children).map(c => c.textContent);
+  document.getElementById('formula').textContent = blocks.join('') || '=SI(...)';
+}
+
+function check() {
+  const zone = document.getElementById('dropZone');
+  const built = Array.from(zone.children).map(c => c.textContent).join('');
+  const ex = BLOCK_LEVELS[currentLevel];
+  const expected = ex.f;
+
+  const fb = document.getElementById('feedback');
+  fb.style.display = 'block';
+
+  if (built === expected) {
+    fb.className = 'feedback ok';
+    fb.textContent = '¡Correcto! Has construido la sintaxis perfecta.';
+    
+    if(!solvedLevels.has(currentLevel)) {
+      solvedLevels.add(currentLevel);
+      points += 100;
+      stars = Math.min(12, stars + 1);
+      updateStats();
+      checkBadges();
+    }
+    
+    document.getElementById('resultDisplay').textContent = ex.eval(ex.data);
+    showOverlay(`¡Felicidades! Superaste el Nivel ${currentLevel}`);
+  } else {
+    fb.className = 'feedback err';
+    fb.textContent = 'La estructura no coincide con la fórmula esperada. Revisa los bloques y sus posiciones.';
+  }
+}
+
+function updateStats() {
+  document.getElementById('points').textContent = points;
+  document.getElementById('stars').textContent = stars;
+  document.getElementById('score').textContent = solvedLevels.size + '/4';
+  const pct = Math.round((solvedLevels.size / 4) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = pct + '%';
+}
+
+function checkBadges() {
+  if (solvedLevels.size >= 1) document.getElementById('badge1').classList.add('unlocked');
+  if (seconds <= 45 && solvedLevels.size >= 1) document.getElementById('badge2').classList.add('unlocked');
+  if (solvedLevels.size === 4) document.getElementById('badge3').classList.add('unlocked');
+}
+
+function showHint() {
+  const ex = BLOCK_LEVELS[currentLevel];
+  const hBox = document.getElementById('hint');
+  hBox.style.display = 'block';
+  hBox.textContent = ex.hints[hintIndex];
+  hintIndex = (hintIndex + 1) % ex.hints.length;
+}
+
+function clearBuild() {
+  const zone = document.getElementById('dropZone');
+  const bank = document.getElementById('bank');
+  while (zone.firstChild) bank.appendChild(zone.firstChild);
+  updateFormula();
+}
+
+function showOverlay(msg) {
+  document.getElementById('overlayMsg').textContent = msg;
+  document.getElementById('overlay').style.display = 'flex';
+}
+
+function closeOverlay() {
+  document.getElementById('overlay').style.display = 'none';
+}
+
+function resetAll() {
+  points = 0; stars = 0; solvedLevels.clear();
+  updateStats();
+  document.querySelectorAll('.badge').forEach(b => b.classList.remove('unlocked'));
+  load(1, document.querySelector('.level-btn'));
+}
+
+function changeData() {
+  const ex = BLOCK_LEVELS[currentLevel];
+  ex.data[0][2] = Math.floor(Math.random() * 20) + 1;
+  load(currentLevel);
+}
+
+setTimeout(() => load(1), 100);
+</script>
+</body>
+</html>
