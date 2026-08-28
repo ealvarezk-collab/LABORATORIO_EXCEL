@@ -385,7 +385,6 @@ let hintIndex = 0;
 let timerInterval, seconds = 0;
 let exerciseStartTime = Date.now();
 
-// BANCO DE EJERCICIOS (Sin referencias explícitas a celdas B2/C2 en el texto y con 5 Pistas por ejercicio)
 const EXERCISE_BANK = {
   1: [
     {
@@ -769,7 +768,6 @@ function renderBank(blocks) {
   });
 }
 
-/* Control Drag & Drop */
 function allowDrop(ev) {
   ev.preventDefault();
   if (ev.currentTarget.classList.contains('drop-zone-row')) {
@@ -808,13 +806,11 @@ function dropToBank(ev) {
   }
 }
 
-/* Normalización Insensible a Mayúsculas/Minúsculas */
 function normalizeFormula(str) {
   if (!str) return '';
   return str.replace(/\s+/g, '').toUpperCase();
 }
 
-/* Previsualización */
 function updateFormulaPreview() {
   if (activeMode === 'write') return;
   let text = '';
@@ -849,7 +845,6 @@ function updateFormulaFromText() {
   }
 }
 
-/* Verificación Granular con Evaluación Insensible a Mayúsculas */
 function checkCurrentPhase() {
   let formula = '';
   if (activeMode === 'block') {
@@ -897,14 +892,12 @@ function checkCurrentPhase() {
     }
     updateStats();
 
-    // Evento de Registro a Google Sheets
     sendLog("VERIFICAR_RESPUESTA", {
       formula: formula,
       resultado: 'CORRECTO',
       evaluacion: resVal
     });
 
-    // Control de Flotantes de Logro
     if (isNewLevelSolved) {
       handleAchievementModals();
     }
@@ -921,7 +914,6 @@ function checkCurrentPhase() {
   }
 }
 
-/* Análisis Diagnóstico Ampliado de Errores */
 function buildDiagnosticMessage(userFormula) {
   const clean = userFormula.trim().toUpperCase();
   let list = [];
@@ -933,7 +925,6 @@ function buildDiagnosticMessage(userFormula) {
     list.push('Verifica haber iniciado la función correctamente con <code>=SI(</code>.');
   }
   
-  // Conteo de Paréntesis
   const openParen = (clean.match(/\(/g) || []).length;
   const closeParen = (clean.match(/\)/g) || []).length;
   if (openParen !== closeParen) {
@@ -944,13 +935,11 @@ function buildDiagnosticMessage(userFormula) {
     list.push('Te falta colocar el separador punto y coma (<code>;</code>) entre los argumentos de la función.');
   }
 
-  // Verificación de comillas
   const quoteCount = (clean.match(/"/g) || []).length;
   if (quoteCount % 2 !== 0) {
     list.push('Tienes comillas sin cerrar en uno de los textos.');
   }
 
-  // Comprobar celda de la tabla
   const expectedCell = currentExercise.data[0][0].toUpperCase();
   if (!clean.includes(expectedCell)) {
     list.push(`Asegúrate de incluir la celda <b>${expectedCell}</b> indicada en la tabla de datos.`);
@@ -967,7 +956,6 @@ function buildDiagnosticMessage(userFormula) {
   return html;
 }
 
-/* Pistas Graduales (5 por ejercicio) */
 function showHint() {
   const hintBox = document.getElementById('hint');
   if (!currentExercise || !currentExercise.hints) return;
@@ -984,7 +972,6 @@ function showHint() {
   hintIndex = (hintIndex + 1) % currentExercise.hints.length;
 }
 
-/* Limpieza */
 function clearCurrentPhase() {
   if (activeMode === 'block') {
     renderBank(currentExercise.blocks);
@@ -1006,7 +993,6 @@ function resetAll() {
   selectLevel(1);
 }
 
-/* Modales Flotantes Secuenciales de Logro */
 function handleAchievementModals() {
   if (activeMode === 'block') {
     if (solvedBlocks.size === 4) {
@@ -1049,7 +1035,6 @@ function handleAchievementModals() {
   }
 }
 
-/* Actualización de Estadísticas e Insignias */
 function updateStats() {
   document.getElementById('points').textContent = points;
   document.getElementById('stars').textContent = `${stars} ⭐`;
@@ -1101,14 +1086,13 @@ function closeOverlay() {
   }
 }
 
-/* ENVÍO CONTINUO Y COMPLETO DE EVENTOS A GOOGLE SHEETS */
+/* ENVÍO DE EVENTOS A GOOGLE SHEETS MEDIANTE GET */
 function sendLog(eventType, details = {}) {
   if (!GOOGLE_SCRIPT_URL) return;
 
   const currentStudentName = studentName || localStorage.getItem('excel_lab_student') || "Estudiante Anónimo";
   const timeSpentOnExerciseSec = Math.floor((Date.now() - exerciseStartTime) / 1000);
 
-  // Construir parámetros de consulta para GET
   const params = new URLSearchParams({
     estudiante: currentStudentName,
     evento: eventType,
@@ -1123,7 +1107,6 @@ function sendLog(eventType, details = {}) {
     puntos_acumulados: points
   });
 
-  // Realizar petición GET (compatible con doGet de Apps Script)
   fetch(`${GOOGLE_SCRIPT_URL}?${params.toString()}`, { method: 'GET', mode: 'no-cors' })
     .catch(err => console.error("Error al registrar evento:", err));
 }
