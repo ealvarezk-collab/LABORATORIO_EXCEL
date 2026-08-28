@@ -908,9 +908,9 @@ function checkCurrentPhase() {
     fb.innerHTML = `<strong>Fórmula incorrecta.</strong><br>${diagnostic}`;
 
     sendLog("VERIFICAR_RESPUESTA", {
-      formula: formula,
-      resultado: 'INCORRECTO'
-    });
+  formula: formula,
+  resultado: isCorrect ? 'CORRECTO' : 'INCORRECTO'
+});
   }
 }
 
@@ -965,10 +965,9 @@ function showHint() {
   hintBox.innerHTML = `<strong>Pista (${hintIndex + 1}/5):</strong> ${currentHintText}`;
   
   sendLog("SOLICITAR_PISTA", {
-    numero_pista: hintIndex + 1,
-    texto_pista: currentHintText
-  });
-
+  numero_pista: hintIndex + 1,
+  texto_pista: currentHintText
+});
   hintIndex = (hintIndex + 1) % currentExercise.hints.length;
 }
 
@@ -1093,20 +1092,25 @@ function sendLog(eventType, details = {}) {
   const currentStudentName = studentName || localStorage.getItem('excel_lab_student') || "Anónimo";
   const timeSpentOnExerciseSec = Math.floor((Date.now() - exerciseStartTime) / 1000);
 
+  // Construir parámetros con URLSearchParams para una codificación correcta
   const params = new URLSearchParams();
-  params.append('nombre', currentStudentName);        // Compatibilidad con versiones anteriores
-  params.append('estudiante', currentStudentName);    // Parámetro usado por el script actual
-  params.append('evento', eventType);
-  params.append('nivel', currentLevel);
-  params.append('modo', activeMode);
-  params.append('formula', details.formula || '');
+  params.append('estudiante', currentStudentName);      // Nombre del estudiante
+  params.append('evento', eventType);                   // Ej: "VERIFICAR_RESPUESTA"
+  params.append('nivel', currentLevel);                 // Nivel actual
+  params.append('modo', activeMode);                    // 'block' o 'write'
+
+  // Datos detallados según el evento
+  params.append('formula', details.formula || '');      // Fórmula construida
   params.append('resultado_verificacion', details.resultado || '');
   params.append('pista_solicitada', details.texto_pista || '');
   params.append('numero_pista', details.numero_pista || 0);
+
+  // Tiempos y puntos (siempre se envían)
   params.append('tiempo_ejercicio_seg', timeSpentOnExerciseSec);
   params.append('tiempo_total_seg', seconds);
   params.append('puntos_acumulados', points);
 
+  // Enviar mediante GET
   fetch(`${GOOGLE_SCRIPT_URL}?${params.toString()}`, { method: 'GET', mode: 'no-cors' })
     .catch(err => console.error("Error al registrar evento:", err));
 }
