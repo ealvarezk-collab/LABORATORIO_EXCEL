@@ -78,7 +78,6 @@
     .row-label { font-size: 13px; font-weight: 600; color: var(--text-sub); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
     .drop-zone-row { min-height: 52px; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 10px; padding: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; transition: all 0.2s; }
     .drop-zone-row.drag-over { background: #eff6ff; border-color: var(--accent); }
-    .drop-zone-row.zone-error { border-color: var(--danger); background: #fee2e2; }
     .sep-row-container { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
     .sep-box { min-width: 70px; height: 46px; min-height: 46px; }
 
@@ -229,7 +228,7 @@
 </div>
 
 <script>
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTNt780x1-Hg_hD7RzVL1OY5GlSm7bLY3nssmxKFNBR6o8ZoR1QsupDj9qIlRVlyt9vQ/exec";
+const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwP8kOWuDUu4azodnbdqUQvQNUwI6K-6mOb4OFq77-h3TNiiij0uRAjYVngDgNyT9Im/exec";
 
 let studentName = "";
 let activeMode = 'block'; 
@@ -245,7 +244,7 @@ let timerInterval, seconds = 0;
 let exerciseStartTime = Date.now();
 let errorCount = 0;
 
-// BANCO DE EJERCICIOS COMPLETO
+// BANCO DE EJERCICIOS (3 por nivel)
 const EXERCISE_BANK = {
   1: [
     {
@@ -257,7 +256,6 @@ const EXERCISE_BANK = {
         {text:'"Cuadrilla incompleta"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>10;"Cuadrilla completa";"Cuadrilla incompleta")',
-      expectedParts: { prueba: 'B2>10', sep1: ';', vVerdadero: '"Cuadrilla completa"', sep2: ';', vFalso: '"Cuadrilla incompleta"' },
       hints: [
         "1. Revisa la tabla de datos para identificar la celda correspondiente a 'Trabajadores'.",
         "2. Identifica que 'supera los' se traduce como el operador mayor que (>).",
@@ -276,7 +274,6 @@ const EXERCISE_BANK = {
         {text:'"Revisión"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2="Normal";"Aprobado";"Revisión")',
-      expectedParts: { prueba: 'B2="Normal"', sep1: ';', vVerdadero: '"Aprobado"', sep2: ';', vFalso: '"Revisión"' },
       hints: [
         "1. Mira en la tabla de datos qué celda contiene la lectura del 'Sensor Presión'.",
         "2. 'Es exactamente igual a' requiere utilizar el operador de igualdad (=).",
@@ -295,7 +292,6 @@ const EXERCISE_BANK = {
         {text:'"Ingreso denegado"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2="Operativo";"Ingreso permitido";"Ingreso denegado")',
-      expectedParts: { prueba: 'B2="Operativo"', sep1: ';', vVerdadero: '"Ingreso permitido"', sep2: ';', vFalso: '"Ingreso denegado"' },
       hints: [
         "1. Identifica en la tabla la celda asociada al 'Estado Equipo'.",
         "2. Compara dicha celda contra el valor \"Operativo\" usando el operador =.",
@@ -316,7 +312,6 @@ const EXERCISE_BANK = {
         {text:"0", type:"val"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>=20;50000;0)',
-      expectedParts: { prueba: 'B2>=20', sep1: ';', vVerdadero: '50000', sep2: ';', vFalso: '0' },
       hints: [
         "1. Consulta la tabla para ver qué celda representa los 'Días trabajados'.",
         "2. La expresión 'mayor o igual a' equivale al operador combinado >=.",
@@ -335,7 +330,6 @@ const EXERCISE_BANK = {
         {text:"0", type:"val"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>15;120000;0)',
-      expectedParts: { prueba: 'B2>15', sep1: ';', vVerdadero: '120000', sep2: ';', vFalso: '0' },
       hints: [
         "1. Ubica en la tabla la celda de 'Horas Extra'.",
         "2. 'Sobrepasan' significa estrictamente mayor que (>).",
@@ -354,7 +348,6 @@ const EXERCISE_BANK = {
         {text:"0", type:"val"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>40;25000;0)',
-      expectedParts: { prueba: 'B2>40', sep1: ';', vVerdadero: '25000', sep2: ';', vFalso: '0' },
       hints: [
         "1. Localiza en la tabla de datos la celda de la 'Temperatura'.",
         "2. La condición 'superior a' requiere el operador >.",
@@ -434,7 +427,6 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Bono"', type:"res"}, {text:";", type:"sep"}, {text:'"Sin bono"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(Y(B2>=20;C2>=90%);"Bono";"Sin bono")',
-      expectedParts: { prueba: 'Y(B2>=20;C2>=90%)', sep1: ';', vVerdadero: '"Bono"', sep2: ';', vFalso: '"Sin bono"' },
       hints: [
         "1. Revisa en la tabla las celdas correspondientes a 'Días' y 'Asistencia'.",
         "2. Como ambas condiciones se deben cumplir simultáneamente, usa la función Y(...).",
@@ -453,7 +445,6 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Alerta"', type:"res"}, {text:";", type:"sep"}, {text:'"Normal"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(O(B2>50;C2>100);"Alerta";"Normal")',
-      expectedParts: { prueba: 'O(B2>50;C2>100)', sep1: ';', vVerdadero: '"Alerta"', sep2: ';', vFalso: '"Normal"' },
       hints: [
         "1. Identifica las celdas asociadas a 'Temperatura' y 'Presión' en la tabla.",
         "2. La expresión 'O BIEN' exige utilizar la función lógica O(...) dentro de la prueba.",
@@ -472,7 +463,6 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Apto"', type:"res"}, {text:";", type:"sep"}, {text:'"No Apto"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(Y(B2="Sí";C2="Sí");"Apto";"No Apto")',
-      expectedParts: { prueba: 'Y(B2="Sí";C2="Sí")', sep1: ';', vVerdadero: '"Apto"', sep2: ';', vFalso: '"No Apto"' },
       hints: [
         "1. Consulta en la tabla las celdas para 'Casco' y 'Chaleco'.",
         "2. Utiliza la función Y(...) para agrupar las dos validaciones de equipo.",
@@ -672,23 +662,19 @@ function normalizeFormula(str) {
   return str.replace(/\s+/g, '').toUpperCase();
 }
 
-function getZoneContent(zoneId) {
-  return Array.from(document.querySelectorAll(`#${zoneId} .block`)).map(b => b.textContent).join('');
-}
-
 function updateFormulaPreview() {
   if (activeMode === 'write') return;
   let text = '';
   if (currentLevel === 3) {
-    const r1 = getZoneContent('row1');
-    const r2 = getZoneContent('row2');
+    const r1 = Array.from(document.querySelectorAll('#row1 .block')).map(b => b.textContent).join('');
+    const r2 = Array.from(document.querySelectorAll('#row2 .block')).map(b => b.textContent).join('');
     text = r1 + r2;
   } else {
-    const r1 = getZoneContent('row1');
-    const s1 = getZoneContent('sep1');
-    const r2 = getZoneContent('row2');
-    const s2 = getZoneContent('sep2');
-    const r3 = getZoneContent('row3');
+    const r1 = Array.from(document.querySelectorAll('#row1 .block')).map(b => b.textContent).join('');
+    const s1 = Array.from(document.querySelectorAll('#sep1 .block')).map(b => b.textContent).join('');
+    const r2 = Array.from(document.querySelectorAll('#row2 .block')).map(b => b.textContent).join('');
+    const s2 = Array.from(document.querySelectorAll('#sep2 .block')).map(b => b.textContent).join('');
+    const r3 = Array.from(document.querySelectorAll('#row3 .block')).map(b => b.textContent).join('');
     text = r1 + s1 + r2 + s2 + r3;
   }
   document.getElementById('formula').textContent = text || '=SI(...)';
@@ -709,71 +695,19 @@ function updateFormulaFromText() {
   }
 }
 
-function generateSpecificDiagnostic(userFormula, expectedFormula) {
-  const user = normalizeFormula(userFormula);
-  const exp = normalizeFormula(expectedFormula);
-  const messages = [];
-
-  if (!user.startsWith('=SI(')) {
-    messages.push('La fórmula debe comenzar con <b>=SI(</b>.');
-  }
-
-  const openUser = (user.match(/\(/g) || []).length;
-  const closeUser = (user.match(/\)/g) || []).length;
-  if (openUser !== closeUser) {
-    messages.push(`Paréntesis desbalanceados: abriste ${openUser} y cerraste ${closeUser}.`);
-  }
-
-  const sepCountUser = (user.match(/;/g) || []).length;
-  const sepCountExp = (exp.match(/;/g) || []).length;
-  if (sepCountUser !== sepCountExp) {
-    messages.push(`Se esperaban ${sepCountExp} separadores (;), pero hay ${sepCountUser}.`);
-  }
-
-  const cellPattern = /[A-Z]+\d+/g;
-  const cellsExp = exp.match(cellPattern) || [];
-  const cellsUser = user.match(cellPattern) || [];
-  cellsExp.forEach(cell => {
-    if (!cellsUser.includes(cell)) {
-      messages.push(`Falta la referencia de celda <b>${cell}</b>.`);
-    }
-  });
-
-  const textsExp = exp.match(/"[^"]*"/g) || [];
-  const textsUser = user.match(/"[^"]*"/g) || [];
-  textsExp.forEach(txt => {
-    if (!textsUser.map(s => s.toUpperCase()).includes(txt.toUpperCase())) {
-      messages.push(`Falta el texto ${txt.replace(/"/g, '&quot;')} o las comillas no coinciden.`);
-    }
-  });
-
-  const operators = ['>=', '<=', '>', '<', '=', '<>'];
-  const foundExp = operators.find(op => exp.includes(op));
-  const foundUser = operators.find(op => user.includes(op));
-  if (foundExp && foundUser !== foundExp) {
-    messages.push(`El operador lógico no coincide: se esperaba "${foundExp}".`);
-  }
-
-  if (messages.length === 0) {
-    messages.push('La fórmula no es correcta. Revisa el orden de los argumentos o compara con la vista previa.');
-  }
-
-  return messages;
-}
-
 function checkCurrentPhase() {
   let formula = '';
   if (activeMode === 'block') {
     if (currentLevel === 3) {
-      const r1 = getZoneContent('row1');
-      const r2 = getZoneContent('row2');
+      const r1 = Array.from(document.querySelectorAll('#row1 .block')).map(b => b.textContent).join('');
+      const r2 = Array.from(document.querySelectorAll('#row2 .block')).map(b => b.textContent).join('');
       formula = r1 + r2;
     } else {
-      const r1 = getZoneContent('row1');
-      const s1 = getZoneContent('sep1');
-      const r2 = getZoneContent('row2');
-      const s2 = getZoneContent('sep2');
-      const r3 = getZoneContent('row3');
+      const r1 = Array.from(document.querySelectorAll('#row1 .block')).map(b => b.textContent).join('');
+      const s1 = Array.from(document.querySelectorAll('#sep1 .block')).map(b => b.textContent).join('');
+      const r2 = Array.from(document.querySelectorAll('#row2 .block')).map(b => b.textContent).join('');
+      const s2 = Array.from(document.querySelectorAll('#sep2 .block')).map(b => b.textContent).join('');
+      const r3 = Array.from(document.querySelectorAll('#row3 .block')).map(b => b.textContent).join('');
       formula = r1 + s1 + r2 + s2 + r3;
     }
   } else {
@@ -783,45 +717,9 @@ function checkCurrentPhase() {
   const fb = document.getElementById('feedback');
   fb.style.display = 'block';
 
-  let isCorrect = false;
-  let errorMessages = [];
-
-  if (activeMode === 'block' && currentLevel !== 3) {
-    const expectedParts = currentExercise.expectedParts;
-    const zones = ['row1', 'sep1', 'row2', 'sep2', 'row3'];
-    const zoneNames = {
-      'row1': 'Prueba Lógica',
-      'sep1': 'Separador 1',
-      'row2': 'Valor si es Verdadero',
-      'sep2': 'Separador 2',
-      'row3': 'Valor si es Falso'
-    };
-    const expectedValues = [expectedParts.prueba, expectedParts.sep1, expectedParts.vVerdadero, expectedParts.sep2, expectedParts.vFalso];
-
-    let zoneCorrect = true;
-    zones.forEach((zoneId, idx) => {
-      const actual = getZoneContent(zoneId);
-      const expected = expectedValues[idx];
-      const zoneEl = document.getElementById(zoneId);
-      if (actual !== expected) {
-        zoneCorrect = false;
-        zoneEl.classList.add('zone-error');
-        errorMessages.push(`La casilla <b>${zoneNames[zoneId]}</b> no es correcta. Tiene "${actual}" y se esperaba "${expected}".`);
-        setTimeout(() => zoneEl.classList.remove('zone-error'), 3000);
-      } else {
-        zoneEl.classList.remove('zone-error');
-      }
-    });
-
-    isCorrect = zoneCorrect;
-  } else {
-    const userNorm = normalizeFormula(formula);
-    const expNorm = normalizeFormula(currentExercise.expected);
-    isCorrect = (userNorm === expNorm);
-    if (!isCorrect) {
-      errorMessages = generateSpecificDiagnostic(formula, currentExercise.expected);
-    }
-  }
+  const userNorm = normalizeFormula(formula);
+  const expNorm = normalizeFormula(currentExercise.expected);
+  const isCorrect = (userNorm === expNorm);
 
   if (isCorrect) {
     const resVal = currentExercise.eval(currentExercise.data);
@@ -846,17 +744,38 @@ function checkCurrentPhase() {
     if (isNewLevelSolved) { handleAchievementModals(); }
   } else {
     errorCount++;
+    // Penalización baja por error: restar 2 puntos (mínimo 0)
     points = Math.max(0, points - 2);
     updateStats();
 
     fb.className = 'feedback err';
-    let diagnostic = '<strong>Revisa lo siguiente:</strong><ul class="diagnostic-list">';
-    errorMessages.forEach(msg => diagnostic += `<li>${msg}</li>`);
-    diagnostic += '</ul>';
-    diagnostic += '<small style="color:#dc2626;">Se restan 2 puntos por este error.</small>';
-    fb.innerHTML = diagnostic;
+    let diagnostic = buildDiagnosticMessage(formula);
+    fb.innerHTML = `<strong>Fórmula incorrecta.</strong><br>${diagnostic}<br><small style="color:#dc2626;">Se restan 2 puntos por este error.</small>`;
     sendLog("VERIFICAR_RESPUESTA", { formula: formula, resultado: 'INCORRECTO', errores: errorCount, puntos: points });
   }
+}
+
+function buildDiagnosticMessage(userFormula) {
+  const clean = userFormula.trim().toUpperCase();
+  let list = [];
+  if (!clean.startsWith('=')) { list.push('Toda fórmula en Excel debe comenzar obligatoriamente con el signo igual (<code>=</code>).'); }
+  if (!clean.startsWith('=SI(')) { list.push('Verifica haber iniciado la función correctamente con <code>=SI(</code>.'); }
+  const openParen = (clean.match(/\(/g) || []).length;
+  const closeParen = (clean.match(/\)/g) || []).length;
+  if (openParen !== closeParen) { list.push(`Tus paréntesis están desbalanceados: abriste ${openParen} y cerraste ${closeParen}.`); }
+  if (!clean.includes(';')) { list.push('Te falta colocar el separador punto y coma (<code>;</code>) entre los argumentos de la función.'); }
+  const quoteCount = (clean.match(/"/g) || []).length;
+  if (quoteCount % 2 !== 0) { list.push('Tienes comillas sin cerrar en uno de los textos.'); }
+  const expectedCell = currentExercise.data[0][0].toUpperCase();
+  if (!clean.includes(expectedCell)) { list.push(`Asegúrate de incluir la celda <b>${expectedCell}</b> indicada en la tabla de datos.`); }
+  if (list.length === 0) {
+    list.push('Revisa el orden de los argumentos o los operadores lógicos utilizados (>, <, =, >=, <=).');
+    list.push('Recuerda presionar el botón de "Solicitar Pista" para guiarte.');
+  }
+  let html = '<ul class="diagnostic-list">';
+  list.forEach(item => html += `<li>${item}</li>`);
+  html += '</ul>';
+  return html;
 }
 
 function showHint() {
@@ -873,7 +792,6 @@ function clearCurrentPhase() {
   if (activeMode === 'block') {
     renderBank(currentExercise.blocks);
     document.querySelectorAll('.drop-zone-row').forEach(z => z.innerHTML = '');
-    document.querySelectorAll('.drop-zone-row').forEach(z => z.classList.remove('zone-error'));
   } else {
     document.getElementById('manualFormula').value = '';
   }
