@@ -1108,7 +1108,8 @@ function sendLog(eventType, details = {}) {
   const currentStudentName = studentName || localStorage.getItem('excel_lab_student') || "Estudiante Anónimo";
   const timeSpentOnExerciseSec = Math.floor((Date.now() - exerciseStartTime) / 1000);
 
-  const payload = {
+  // Construir parámetros de consulta para GET
+  const params = new URLSearchParams({
     estudiante: currentStudentName,
     evento: eventType,
     nivel: currentLevel,
@@ -1120,14 +1121,11 @@ function sendLog(eventType, details = {}) {
     tiempo_ejercicio_seg: timeSpentOnExerciseSec,
     tiempo_total_seg: seconds,
     puntos_acumulados: points
-  };
+  });
 
-  fetch(GOOGLE_SCRIPT_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  }).catch(err => console.error("Error al registrar evento:", err));
+  // Realizar petición GET (compatible con doGet de Apps Script)
+  fetch(`${GOOGLE_SCRIPT_URL}?${params.toString()}`, { method: 'GET', mode: 'no-cors' })
+    .catch(err => console.error("Error al registrar evento:", err));
 }
 </script>
 </body>
