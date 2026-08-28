@@ -726,6 +726,7 @@ function checkCurrentPhase() {
     document.getElementById('resultDisplay').textContent = resVal;
     fb.className = 'feedback ok';
     fb.innerHTML = `<strong>¡Correcto! 🎉</strong><br>La fórmula está bien construida y evalúa correctamente a: <b>"${resVal}"</b>.`;
+
     let isNewLevelSolved = false;
     if (activeMode === 'block' && !solvedBlocks.has(currentLevel)) {
       solvedBlocks.add(currentLevel);
@@ -739,14 +740,18 @@ function checkCurrentPhase() {
       isNewLevelSolved = true;
     }
     updateStats();
-    sendLog("VERIFICAR_RESPUESTA", { formula: formula, resultado: 'CORRECTO', evaluacion: resVal, errores: errorCount });
+    sendLog("VERIFICAR_RESPUESTA", { formula: formula, resultado: 'CORRECTO', evaluacion: resVal, errores: errorCount, puntos: points });
     if (isNewLevelSolved) { handleAchievementModals(); }
   } else {
     errorCount++;
+    // Penalización baja por error: restar 2 puntos (mínimo 0)
+    points = Math.max(0, points - 2);
+    updateStats();
+
     fb.className = 'feedback err';
     let diagnostic = buildDiagnosticMessage(formula);
-    fb.innerHTML = `<strong>Fórmula incorrecta.</strong><br>${diagnostic}`;
-    sendLog("VERIFICAR_RESPUESTA", { formula: formula, resultado: 'INCORRECTO', errores: errorCount });
+    fb.innerHTML = `<strong>Fórmula incorrecta.</strong><br>${diagnostic}<br><small style="color:#dc2626;">Se restan 2 puntos por este error.</small>`;
+    sendLog("VERIFICAR_RESPUESTA", { formula: formula, resultado: 'INCORRECTO', errores: errorCount, puntos: points });
   }
 }
 
