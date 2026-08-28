@@ -1094,7 +1094,7 @@ function sendLog(eventType, details = {}) {
   const timeSpentOnExerciseSec = Math.floor((Date.now() - exerciseStartTime) / 1000);
 
   const params = new URLSearchParams({
-    estudiante: currentStudentName,
+    nombre: currentStudentName,
     evento: eventType,
     nivel: currentLevel,
     modo: activeMode,
