@@ -1090,22 +1090,22 @@ function closeOverlay() {
 function sendLog(eventType, details = {}) {
   if (!GOOGLE_SCRIPT_URL) return;
 
-  const currentStudentName = studentName || localStorage.getItem('excel_lab_student') || "Estudiante Anónimo";
+  const currentStudentName = studentName || localStorage.getItem('excel_lab_student') || "Anónimo";
   const timeSpentOnExerciseSec = Math.floor((Date.now() - exerciseStartTime) / 1000);
 
-  const params = new URLSearchParams({
-    nombre: currentStudentName,
-    evento: eventType,
-    nivel: currentLevel,
-    modo: activeMode,
-    formula: details.formula || '',
-    resultado_verificacion: details.resultado || '',
-    pista_solicitada: details.texto_pista || '',
-    numero_pista: details.numero_pista || 0,
-    tiempo_ejercicio_seg: timeSpentOnExerciseSec,
-    tiempo_total_seg: seconds,
-    puntos_acumulados: points
-  });
+  const params = new URLSearchParams();
+  params.append('nombre', currentStudentName);        // Compatibilidad con versiones anteriores
+  params.append('estudiante', currentStudentName);    // Parámetro usado por el script actual
+  params.append('evento', eventType);
+  params.append('nivel', currentLevel);
+  params.append('modo', activeMode);
+  params.append('formula', details.formula || '');
+  params.append('resultado_verificacion', details.resultado || '');
+  params.append('pista_solicitada', details.texto_pista || '');
+  params.append('numero_pista', details.numero_pista || 0);
+  params.append('tiempo_ejercicio_seg', timeSpentOnExerciseSec);
+  params.append('tiempo_total_seg', seconds);
+  params.append('puntos_acumulados', points);
 
   fetch(`${GOOGLE_SCRIPT_URL}?${params.toString()}`, { method: 'GET', mode: 'no-cors' })
     .catch(err => console.error("Error al registrar evento:", err));
