@@ -1,463 +1,858 @@
 <!DOCTYPE html>
+
 <html lang="es">
+
 <head>
+
   <meta charset="UTF-8">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Laboratorio Interactivo de Fórmulas SI - Excel</title>
+
   <style>
+
     :root {
+
       --bg: #f8fafc;
+
       --card-bg: #ffffff;
+
       --card-border: #e2e8f0;
+
       --text-main: #0f172a;
+
       --text-sub: #64748b;
+
       --accent: #2563eb;
+
       --accent-hover: #1d4ed8;
+
       --success: #16a34a;
+
       --success-bg: #f0fdf4;
+
       --danger: #dc2626;
+
       --danger-bg: #fef2f2;
+
       --warning: #d97706;
+
       --warning-bg: #fffbeb;
+
       --info-bg: #eff6ff;
+
     }
+
+
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+
     body { background-color: var(--bg); color: var(--text-main); padding: 24px 16px; display: flex; justify-content: center; min-height: 100vh; }
+
     .container { max-width: 1200px; width: 100%; display: flex; flex-direction: column; gap: 20px; }
 
+
+
     /* Modales Flotantes */
+
     .modal-overlay {
+
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+
       background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(5px);
+
       display: flex; justify-content: center; align-items: center; z-index: 1000;
+
       animation: fadeIn 0.3s ease-out;
+
     }
+
     .modal-card {
+
       background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px;
+
       padding: 32px; max-width: 480px; width: 90%; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+
     }
+
     .modal-card input {
+
       width: 100%; padding: 12px 16px; margin: 18px 0; border-radius: 8px; border: 1.5px solid var(--card-border);
+
       background: #f1f5f9; color: var(--text-main); font-size: 16px; outline: none; transition: border 0.2s;
+
     }
+
     .modal-card input:focus { border-color: var(--accent); background: #ffffff; }
 
+
+
     @keyframes fadeIn {
+
       from { opacity: 0; transform: scale(0.95); }
+
       to { opacity: 1; transform: scale(1); }
+
     }
+
+
 
     header {
+
       background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 24px;
+
       box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+
     }
+
     .header-title-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+
     h1 { font-size: 22px; color: var(--text-main); font-weight: 700; }
+
     .stats-bar {
+
       display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 16px;
+
       background: #f1f5f9; padding: 14px 18px; border-radius: 12px; border: 1px solid #e2e8f0;
+
     }
+
     .stat-item { font-size: 13px; font-weight: 600; color: var(--text-sub); }
+
     .stat-value { color: var(--accent); font-size: 15px; font-weight: 700; }
 
+
+
     .nav-section { display: flex; gap: 12px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+
     .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
     button {
+
       background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 8px;
+
       cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(37,99,235,0.15);
+
     }
+
     button:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
     button.secondary { background: #e2e8f0; color: var(--text-main); box-shadow: none; }
+
     button.secondary:hover { background: #cbd5e1; }
+
     .level-btn { background: #ffffff; color: var(--text-main); border: 1.5px solid var(--card-border); box-shadow: none; }
+
     .level-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+
     .level-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
     .mode-btn { background: #ffffff; color: var(--text-main); border: 1.5px solid var(--card-border); box-shadow: none; }
+
     .mode-btn.active { background: var(--success); color: white; border-color: var(--success); }
+
     .mode-btn.locked { opacity: 0.5; cursor: not-allowed; }
 
+
+
     .main-layout {
+
       display: grid;
+
       grid-template-columns: 390px 1fr;
+
       gap: 20px;
+
       align-items: start;
+
     }
+
     @media (max-width: 900px) { .main-layout { grid-template-columns: 1fr; } }
+
     .left-col, .right-col { display: flex; flex-direction: column; gap: 20px; }
 
+
+
     .card {
+
       background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px;
+
       box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+
     }
+
     .data-table { width: 100%; border-collapse: collapse; margin-top: 12px; border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); }
+
     .data-table th, .data-table td { padding: 9px 12px; text-align: left; font-size: 13px; }
+
     .data-table th { background: #f1f5f9; color: var(--text-sub); font-weight: 600; border-bottom: 1px solid var(--card-border); }
+
     .data-table td { background: #ffffff; border-bottom: 1px solid #f1f5f9; }
 
+
+
     .builder-row { margin-bottom: 14px; }
+
     .row-label { font-size: 13px; font-weight: 600; color: var(--text-sub); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+
     .drop-zone-row {
+
       min-height: 52px; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 10px;
+
       padding: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; transition: all 0.2s;
+
     }
+
     .drop-zone-row.drag-over { background: #eff6ff; border-color: var(--accent); }
+
     .sep-row-container { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+
     .sep-box { min-width: 70px; height: 46px; min-height: 46px; }
 
+
+
     .bank-area {
+
       min-height: 80px; background: #f8fafc; border: 1.5px solid var(--card-border); border-radius: 12px;
+
       padding: 12px; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;
+
     }
+
     .block {
+
       padding: 8px 14px; border-radius: 8px; font-family: 'Segoe UI Mono', monospace; font-weight: 700; cursor: grab;
+
       user-select: none; box-shadow: 0 2px 4px rgba(0,0,0,0.06); font-size: 13px; transition: transform 0.15s, box-shadow 0.15s;
+
     }
+
     .block:active { cursor: grabbing; transform: scale(1.03); }
+
     .block.func { background: #8b5cf6; color: white; }
+
     .block.var { background: #0284c7; color: white; }
+
     .block.op { background: #ea580c; color: white; }
+
     .block.val { background: #16a34a; color: white; }
+
     .block.sep { background: #d97706; color: white; }
+
     .block.res { background: #db2777; color: white; }
+
     .block.paren { background: #64748b; color: white; }
 
+
+
     .manual-input {
+
       width: 100%; padding: 14px 16px; background: #f8fafc; border: 1.5px solid var(--card-border);
+
       border-radius: 10px; color: var(--text-main); font-family: monospace; font-size: 15px; margin-top: 10px; outline: none;
+
     }
+
     .manual-input:focus { border-color: var(--accent); background: #ffffff; }
 
+
+
     .formula-preview {
+
       background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 14px 18px;
+
       font-family: monospace; color: #38bdf8; font-size: 15px; word-break: break-all;
+
     }
+
     .result-box {
+
       display: flex; align-items: center; justify-content: space-between; background: #f1f5f9;
+
       padding: 12px 16px; border-radius: 10px; border: 1px solid var(--card-border); margin-top: 14px;
+
     }
+
+
 
     .progress-bar-container { background: #e2e8f0; border-radius: 20px; height: 10px; width: 100%; overflow: hidden; margin-top: 8px; }
+
     .progress-fill { background: var(--success); height: 100%; width: 0%; transition: width 0.4s ease; }
 
+
+
     .achievements-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+
     .achievement-item {
+
       display: flex; align-items: center; justify-content: space-between; background: #f8fafc;
+
       padding: 10px 12px; border-radius: 10px; border: 1px solid var(--card-border); transition: all 0.3s;
+
     }
+
     .achievement-item.unlocked { background: var(--success-bg); border-color: #bbf7d0; }
+
     .achievement-info { display: flex; align-items: center; gap: 10px; }
+
     .achievement-icon { font-size: 22px; filter: grayscale(1); opacity: 0.4; transition: all 0.3s; }
+
     .achievement-item.unlocked .achievement-icon { filter: grayscale(0); opacity: 1; transform: scale(1.1); }
+
     .achievement-text { font-size: 12px; color: var(--text-sub); }
+
     .achievement-title { font-weight: 700; color: var(--text-main); font-size: 13px; }
+
     .status-badge { font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: 700; background: #e2e8f0; color: var(--text-sub); }
+
     .achievement-item.unlocked .status-badge { background: #22c55e; color: white; }
 
+
+
     .feedback { padding: 16px; border-radius: 12px; font-weight: 500; display: none; margin-top: 14px; line-height: 1.5; font-size: 14px; }
+
     .feedback.ok { background: var(--success-bg); color: #14532d; border: 1.5px solid #bbf7d0; }
+
     .feedback.err { background: var(--danger-bg); color: #7f1d1d; border: 1.5px solid #fecaca; }
+
     .diagnostic-list { margin-top: 8px; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+
     .hint-box { background: var(--warning-bg); color: #78350f; border: 1.5px solid #fde68a; padding: 14px; border-radius: 10px; display: none; margin-top: 10px; font-size: 13px; line-height: 1.4; }
+
   </style>
+
 </head>
+
 <body>
 
+
+
 <div class="modal-overlay" id="registroModal">
+
   <div class="modal-card">
+
     <h2>Bienvenido al Laboratorio</h2>
+
     <p style="color: var(--text-sub); margin-top: 8px; font-size: 14px;">Ingresa tu nombre completo para registrar tu avance en la hoja de control.</p>
+
     <input type="text" id="studentNameInput" placeholder="Nombre completo del estudiante..." />
+
     <button onclick="registrarEstudiante()" style="width: 100%;">Comenzar Laboratorio</button>
+
   </div>
+
 </div>
+
+
 
 <div class="modal-overlay" id="overlay" style="display: none;">
+
   <div class="modal-card">
+
     <div id="overlayIcon" style="font-size: 52px; margin-bottom: 12px;">🎉</div>
+
     <h2 id="overlayTitle">¡Excelente trabajo!</h2>
+
     <p id="overlayMsg" style="color: var(--text-sub); margin: 15px 0; font-size: 14px; line-height: 1.5;"></p>
+
     <button onclick="closeOverlay()" style="width: 100%;">Continuar Práctica</button>
+
   </div>
+
 </div>
+
+
 
 <div class="container">
+
   <header>
+
     <div class="header-title-bar">
+
       <h1>Laboratorio de Fórmulas Excel (=SI)</h1>
+
       <span id="userDisplayName" style="font-weight: 700; color: var(--accent); font-size: 15px;">Estudiante</span>
+
     </div>
+
     <div class="stats-bar">
+
       <div class="stat-item">PUNTOS: <span class="stat-value" id="points">0</span></div>
+
       <div class="stat-item">ESTRELLAS: <span class="stat-value" id="stars">0 ⭐</span></div>
+
       <div class="stat-item">BLOQUES: <span class="stat-value" id="blockProg">0/4</span></div>
+
       <div class="stat-item">ESCRITURA: <span class="stat-value" id="writeProg">0/4</span></div>
+
       <div class="stat-item">TIEMPO TOTAL: <span class="stat-value" id="timer">00:00</span></div>
+
     </div>
+
     <div style="margin-top: 16px;">
+
       <div id="progressText" style="font-size: 12px; font-weight: 600; color: var(--text-sub);">Progreso Global del Curso: 0%</div>
+
       <div class="progress-bar-container"><div class="progress-fill" id="progressFill"></div></div>
+
     </div>
+
   </header>
 
+
+
   <div class="nav-section">
+
     <div class="btn-group">
+
       <button class="level-btn active" onclick="selectLevel(1, this)">Nivel 1</button>
+
       <button class="level-btn" onclick="selectLevel(2, this)">Nivel 2</button>
+
       <button class="level-btn" onclick="selectLevel(3, this)">Nivel 3</button>
+
       <button class="level-btn" onclick="selectLevel(4, this)">Nivel 4</button>
+
     </div>
+
     <div class="btn-group">
+
       <button id="btnModeBlock" class="mode-btn active" onclick="switchMode('block')">Modo Bloques</button>
+
       <button id="btnModeWrite" class="mode-btn locked" onclick="switchMode('write')">Modo Escritura</button>
+
       <button class="secondary" onclick="resetAll()">Reiniciar</button>
+
     </div>
+
   </div>
+
+
 
   <div class="main-layout">
+
     <div class="left-col">
+
       <div class="card">
+
         <div style="display: flex; justify-content: space-between; align-items: center;">
+
           <h3 style="color: var(--text-sub); font-size: 11px; letter-spacing: 0.5px; font-weight: 700;">ENUNCIADO DEL CASO</h3>
+
           <button class="secondary" onclick="loadRandomExercise(true)" style="padding: 4px 10px; font-size: 11px;">🔀 Cambiar ejercicio</button>
+
         </div>
+
         <p id="text" style="font-size: 14px; margin-top: 10px; font-weight: 500; color: var(--text-main); line-height: 1.5;"></p>
+
         <div id="data" style="margin-top: 10px;"></div>
+
       </div>
 
+
+
       <div class="card">
+
         <div style="display: flex; justify-content: space-between; align-items: center;">
+
           <h3 style="color: var(--text-sub); font-size: 11px; letter-spacing: 0.5px; font-weight: 700;">PISTAS DE AYUDA (5 PASOS)</h3>
+
           <button class="secondary" onclick="showHint()" style="padding: 4px 10px; font-size: 11px;">💡 Solicitar Pista</button>
+
         </div>
+
         <div id="hint" class="hint-box">Presiona el botón "Solicitar Pista" para obtener asistencia paso a paso.</div>
+
       </div>
 
+
+
       <div class="card">
+
         <h3 style="color: var(--text-sub); font-size: 11px; letter-spacing: 0.5px; font-weight: 700; margin-bottom: 8px;">LOGROS DEL ESTUDIANTE</h3>
+
         <div class="achievements-list">
+
           <div class="achievement-item" id="ach1">
+
             <div class="achievement-info"><span class="achievement-icon">🌱</span><div><div class="achievement-title">Primer Acierto</div><div class="achievement-text">Resuelve tu primer ejercicio</div></div></div><span class="status-badge" id="status-ach1">🔒</span>
+
           </div>
+
           <div class="achievement-item" id="ach2">
+
             <div class="achievement-info"><span class="achievement-icon">🧩</span><div><div class="achievement-title">Maestro de Bloques</div><div class="achievement-text">Completar los 4 niveles en modo bloques</div></div></div><span class="status-badge" id="status-ach2">🔒</span>
+
           </div>
+
           <div class="achievement-item" id="ach3">
+
             <div class="achievement-info"><span class="achievement-icon">✍️</span><div><div class="achievement-title">Sintaxis Perfecta</div><div class="achievement-text">Resuelve 1 ejercicio escrito</div></div></div><span class="status-badge" id="status-ach3">🔒</span>
+
           </div>
+
           <div class="achievement-item" id="ach4">
+
             <div class="achievement-info"><span class="achievement-icon">🏆</span><div><div class="achievement-title">Experto Excel</div><div class="achievement-text">Completar 4 niveles en ambos modos</div></div></div><span class="status-badge" id="status-ach4">🔒</span>
+
           </div>
+
         </div>
+
       </div>
+
     </div>
+
+
 
     <div class="right-col">
-      <div class="card">
-        <h3 id="phaseTitle" style="font-size: 15px; color: var(--text-main);">Construcción por Filas (Bloques)</h3>
-        <div id="blockArea" style="margin-top: 14px;">
-          <div id="builderRows"></div>
-          <p style="font-size: 12px; font-weight: 600; color: var(--text-sub); margin: 14px 0 6px 0;">BANCO DE BLOQUES (Arrastra los elementos a las casillas):</p>
-          <div class="bank-area" id="bank" ondrop="dropToBank(event)" ondragover="allowDrop(event)"></div>
-        </div>
-        <div id="writeArea" style="display: none; margin-top: 14px;">
-          <p style="font-size: 13px; color: var(--text-sub);">Escribe la fórmula respetando la sintaxis de Excel (se aceptan mayúsculas o minúsculas):</p>
-          <input type="text" id="manualFormula" class="manual-input" placeholder='=si(b2>10;"Cuadrilla completa";"Cuadrilla incompleta")' oninput="updateFormulaFromText()" />
-        </div>
-      </div>
 
       <div class="card">
-        <div style="font-size: 12px; font-weight: 600; color: var(--text-sub); margin-bottom: 6px;">VISTA PREVIA DE LA FÓRMULA GENERADA:</div>
-        <div class="formula-preview" id="formula">=SI(...)</div>
-        <div class="result-box"><span style="font-size: 13px; font-weight: 600; color: var(--text-sub);">Resultado Evaluado en Celda:</span><b id="resultDisplay" style="color: var(--success); font-size: 16px;">—</b></div>
-        <div style="display: flex; gap: 10px; margin-top: 14px;"><button onclick="checkCurrentPhase()" style="flex: 2;">Verificar Respuesta</button><button class="secondary" onclick="clearCurrentPhase()" style="flex: 1;">Limpiar</button></div>
-        <div id="feedback" class="feedback"></div>
+
+        <h3 id="phaseTitle" style="font-size: 15px; color: var(--text-main);">Construcción por Filas (Bloques)</h3>
+
+        <div id="blockArea" style="margin-top: 14px;">
+
+          <div id="builderRows"></div>
+
+          <p style="font-size: 12px; font-weight: 600; color: var(--text-sub); margin: 14px 0 6px 0;">BANCO DE BLOQUES (Arrastra los elementos a las casillas):</p>
+
+          <div class="bank-area" id="bank" ondrop="dropToBank(event)" ondragover="allowDrop(event)"></div>
+
+        </div>
+
+        <div id="writeArea" style="display: none; margin-top: 14px;">
+
+          <p style="font-size: 13px; color: var(--text-sub);">Escribe la fórmula respetando la sintaxis de Excel (se aceptan mayúsculas o minúsculas):</p>
+
+          <input type="text" id="manualFormula" class="manual-input" placeholder='=si(b2>10;"Cuadrilla completa";"Cuadrilla incompleta")' oninput="updateFormulaFromText()" />
+
+        </div>
+
       </div>
+
+
+
+      <div class="card">
+
+        <div style="font-size: 12px; font-weight: 600; color: var(--text-sub); margin-bottom: 6px;">VISTA PREVIA DE LA FÓRMULA GENERADA:</div>
+
+        <div class="formula-preview" id="formula">=SI(...)</div>
+
+        <div class="result-box"><span style="font-size: 13px; font-weight: 600; color: var(--text-sub);">Resultado Evaluado en Celda:</span><b id="resultDisplay" style="color: var(--success); font-size: 16px;">—</b></div>
+
+        <div style="display: flex; gap: 10px; margin-top: 14px;"><button onclick="checkCurrentPhase()" style="flex: 2;">Verificar Respuesta</button><button class="secondary" onclick="clearCurrentPhase()" style="flex: 1;">Limpiar</button></div>
+
+        <div id="feedback" class="feedback"></div>
+
+      </div>
+
     </div>
+
   </div>
+
 </div>
 
+
+
 <script>
+
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwTNt780x1-Hg_hD7RzVL1OY5GlSm7bLY3nssmxKFNBR6o8ZoR1QsupDj9qIlRVlyt9vQ/exec";
 
+
+
 let studentName = "";
+
 let activeMode = 'block'; 
+
 let currentLevel = 1;
+
 let currentExercise = null;
+
 let currentExerciseIndex = -1;
+
 let points = 0;
+
 let stars = 0;
+
 let solvedBlocks = new Set();
+
 let solvedWrites = new Set();
+
 let hintIndex = 0;
+
 let timerInterval, seconds = 0;
+
 let exerciseStartTime = Date.now();
+
 let errorCount = 0; // Contador de errores en verificación
+
+
 
 const EXERCISE_BANK = { /* ... igual que antes ... */ };
 
+
+
 window.addEventListener('DOMContentLoaded', () => {
+
   const savedName = localStorage.getItem('excel_lab_student');
+
   if (savedName) { studentName = savedName; document.getElementById('userDisplayName').textContent = studentName; document.getElementById('registroModal').style.display = 'none'; }
+
   selectLevel(1);
+
 });
 
+
+
 function registrarEstudiante() {
+
   const input = document.getElementById('studentNameInput');
+
   const name = input.value.trim();
+
   if (!name) { alert("Por favor ingresa tu nombre completo para comenzar."); return; }
+
   studentName = name;
+
   localStorage.setItem('excel_lab_student', studentName);
+
   document.getElementById('userDisplayName').textContent = studentName;
+
   document.getElementById('registroModal').style.display = 'none';
+
   sendLog("INICIO_SESION", { info: "Sesión iniciada por el estudiante" });
+
 }
+
+
 
 function startTimer() { clearInterval(timerInterval); seconds = 0; timerInterval = setInterval(() => { seconds++; const m = String(Math.floor(seconds / 60)).padStart(2, '0'); const s = String(seconds % 60).padStart(2, '0'); document.getElementById('timer').textContent = `${m}:${s}`; }, 1000); }
 
+
+
 function switchMode(mode) {
+
   if (mode === 'write' && solvedBlocks.size < 4) { showOverlay('🔒 Modo Bloqueado', 'Debes completar los 4 niveles en el Modo Bloques antes de desbloquear el Modo Escritura Manual.', '⚠️'); return; }
+
   activeMode = mode;
+
   document.getElementById('btnModeBlock').className = `mode-btn ${mode === 'block' ? 'active' : ''}`;
+
   document.getElementById('btnModeWrite').className = `mode-btn ${solvedBlocks.size < 4 ? 'locked' : (mode === 'write' ? 'active' : '')}`;
+
   document.getElementById('blockArea').style.display = mode === 'block' ? 'block' : 'none';
+
   document.getElementById('writeArea').style.display = mode === 'write' ? 'block' : 'none';
+
   document.getElementById('phaseTitle').textContent = mode === 'block' ? 'Construcción por Filas (Bloques)' : 'Escritura Manual Libre';
+
   clearCurrentPhase(); document.getElementById('feedback').style.display = 'none';
+
   sendLog("CAMBIO_MODO", { modo: mode });
+
 }
+
+
 
 function selectLevel(lvl, btn) { currentLevel = lvl; if(btn) { document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); } loadRandomExercise(false); sendLog("CAMBIO_NIVEL", { nivel: lvl }); }
 
+
+
 function loadRandomExercise(forceDifferent = false) {
+
   hintIndex = 0; exerciseStartTime = Date.now(); errorCount = 0;
+
   const list = EXERCISE_BANK[currentLevel] || EXERCISE_BANK[1];
+
   let newIndex = Math.floor(Math.random() * list.length);
+
   if (forceDifferent && list.length > 1) { while (newIndex === currentExerciseIndex) { newIndex = Math.floor(Math.random() * list.length); } }
+
   currentExerciseIndex = newIndex; currentExercise = list[currentExerciseIndex];
+
   document.getElementById('text').textContent = currentExercise.text;
+
   let html = '<table class="data-table"><tr><th>Celda</th><th>Concepto</th><th>Valor Actual</th></tr>';
+
   currentExercise.data.forEach(r => html += `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td></tr>`);
+
   html += '</table>'; document.getElementById('data').innerHTML = html;
+
   buildRowsUI(currentLevel); renderBank(currentExercise.blocks); clearCurrentPhase();
+
   const hintBox = document.getElementById('hint'); hintBox.style.display = 'block'; hintBox.innerHTML = 'Presiona el botón "Solicitar Pista" para obtener asistencia paso a paso.';
+
   document.getElementById('feedback').style.display = 'none'; document.getElementById('resultDisplay').textContent = '—';
+
   startTimer();
+
   if (forceDifferent) { sendLog("CAMBIO_EJERCICIO", { ejercicio_index: currentExerciseIndex }); }
+
 }
+
+
 
 function buildRowsUI(lvl) { /* ... igual que antes ... */ }
+
 function renderBank(blocks) { /* ... igual que antes ... */ }
+
 function allowDrop(ev) { ev.preventDefault(); if (ev.currentTarget.classList.contains('drop-zone-row')) { ev.currentTarget.classList.add('drag-over'); } }
+
 function dragLeave(ev) { if (ev.currentTarget.classList.contains('drop-zone-row')) { ev.currentTarget.classList.remove('drag-over'); } }
+
 function drag(ev) { ev.dataTransfer.setData("text/plain", ev.target.id); }
+
 function dropBlock(ev) { ev.preventDefault(); ev.currentTarget.classList.remove('drag-over'); const data = ev.dataTransfer.getData("text/plain"); const draggedEl = document.getElementById(data); if (draggedEl) { ev.currentTarget.appendChild(draggedEl); updateFormulaPreview(); } }
+
 function dropToBank(ev) { ev.preventDefault(); const data = ev.dataTransfer.getData("text/plain"); const draggedEl = document.getElementById(data); if (draggedEl) { document.getElementById('bank').appendChild(draggedEl); updateFormulaPreview(); } }
+
 function normalizeFormula(str) { if (!str) return ''; return str.replace(/\s+/g, '').toUpperCase(); }
+
 function updateFormulaPreview() { /* ... igual que antes ... */ }
+
 function updateFormulaFromText() { /* ... igual que antes ... */ }
 
+
+
 function checkCurrentPhase() {
+
   let formula = '';
+
   if (activeMode === 'block') {
+
     if (currentLevel === 3) {
+
       const r1 = Array.from(document.querySelectorAll('#row1 .block')).map(b => b.textContent).join('');
+
       const r2 = Array.from(document.querySelectorAll('#row2 .block')).map(b => b.textContent).join('');
+
       formula = r1 + r2;
+
     } else {
+
       const r1 = Array.from(document.querySelectorAll('#row1 .block')).map(b => b.textContent).join('');
+
       const s1 = Array.from(document.querySelectorAll('#sep1 .block')).map(b => b.textContent).join('');
+
       const r2 = Array.from(document.querySelectorAll('#row2 .block')).map(b => b.textContent).join('');
+
       const s2 = Array.from(document.querySelectorAll('#sep2 .block')).map(b => b.textContent).join('');
+
       const r3 = Array.from(document.querySelectorAll('#row3 .block')).map(b => b.textContent).join('');
+
       formula = r1 + s1 + r2 + s2 + r3;
+
     }
+
   } else { formula = document.getElementById('manualFormula').value.trim(); }
+
   const fb = document.getElementById('feedback'); fb.style.display = 'block';
+
   const userNorm = normalizeFormula(formula); const expNorm = normalizeFormula(currentExercise.expected);
+
   const isCorrect = (userNorm === expNorm);
+
   if (isCorrect) {
+
     const resVal = currentExercise.eval(currentExercise.data);
+
     document.getElementById('resultDisplay').textContent = resVal;
+
     fb.className = 'feedback ok'; fb.innerHTML = `<strong>¡Correcto! 🎉</strong><br>La fórmula está bien construida y evalúa correctamente a: <b>"${resVal}"</b>.`;
+
     let isNewLevelSolved = false;
+
     if (activeMode === 'block' && !solvedBlocks.has(currentLevel)) { solvedBlocks.add(currentLevel); points += 100; stars += 1; isNewLevelSolved = true; }
+
     else if (activeMode === 'write' && !solvedWrites.has(currentLevel)) { solvedWrites.add(currentLevel); points += 150; stars += 1; isNewLevelSolved = true; }
+
     updateStats();
+
     sendLog("VERIFICAR_RESPUESTA", { formula: formula, resultado: 'CORRECTO', evaluacion: resVal, errores: errorCount });
+
     if (isNewLevelSolved) { handleAchievementModals(); }
+
   } else {
+
     errorCount++;
+
     fb.className = 'feedback err'; let diagnostic = buildDiagnosticMessage(formula); fb.innerHTML = `<strong>Fórmula incorrecta.</strong><br>${diagnostic}`;
+
     sendLog("VERIFICAR_RESPUESTA", { formula: formula, resultado: 'INCORRECTO', errores: errorCount });
+
   }
+
 }
+
+
 
 function buildDiagnosticMessage(userFormula) { /* ... igual que antes ... */ }
+
 function showHint() { const hintBox = document.getElementById('hint'); if (!currentExercise || !currentExercise.hints) return; hintBox.style.display = 'block'; const currentHintText = currentExercise.hints[hintIndex]; hintBox.innerHTML = `<strong>Pista (${hintIndex + 1}/5):</strong> ${currentHintText}`; sendLog("SOLICITAR_PISTA", { numero_pista: hintIndex + 1, texto_pista: currentHintText }); hintIndex = (hintIndex + 1) % currentExercise.hints.length; }
+
 function clearCurrentPhase() { /* ... igual que antes ... */ }
+
 function resetAll() { points = 0; stars = 0; solvedBlocks.clear(); solvedWrites.clear(); updateStats(); selectLevel(1); }
+
 function handleAchievementModals() { /* ... igual que antes ... */ }
+
 function updateStats() { /* ... igual que antes ... */ }
+
 function unlockAchievement(cardId, statusId) { /* ... igual que antes ... */ }
+
 function lockAchievement(cardId, statusId) { /* ... igual que antes ... */ }
+
 let overlayCallback = null;
+
 function showOverlay(title, msg, icon = '🎉', callback = null) { /* ... igual que antes ... */ }
+
 function closeOverlay() { /* ... igual que antes ... */ }
 
+
+
 function sendLog(eventType, details = {}) {
+
   if (!GOOGLE_SCRIPT_URL) return;
 
-  // 1. Nombre del jugador o del estudiante
   const currentStudentName = studentName || localStorage.getItem('excel_lab_student') || "Anónimo";
-  
-  // 8. El tiempo que pasó por nivel (en segundos desde que cargó el ejercicio)
+
   const timeSpentOnExerciseSec = Math.floor((Date.now() - exerciseStartTime) / 1000);
 
-  // 5. Determinar si avanzó y superó el nivel actual
-  const superoNivel = (activeMode === 'block' && solvedBlocks.has(currentLevel)) ||
-                      (activeMode === 'write' && solvedWrites.has(currentLevel));
-
-  // 10. Calcular dinámicamente los logros que obtuvo
-  let logrosArray = [];
-  if (solvedBlocks.size > 0 || solvedWrites.size > 0) logrosArray.push("Primer Acierto");
-  if (solvedBlocks.size === 4) logrosArray.push("Maestro de Bloques");
-  if (solvedWrites.size > 0) logrosArray.push("Sintaxis Perfecta");
-  if (solvedBlocks.size === 4 && solvedWrites.size === 4) logrosArray.push("Experto Excel");
-  const logrosObtenidos = logrosArray.length > 0 ? logrosArray.join(", ") : "Ninguno";
-
-  // 7. Las veces que verificó respuesta y estuvo correcto (acumulado)
-  const aciertosTotales = solvedBlocks.size + solvedWrites.size;
-  const esAciertoActual = details.resultado === 'CORRECTO' ? 1 : 0;
-
-  // Preparar todos los datos para la hoja de Google
   const params = new URLSearchParams();
-  
-  // -- PARÁMETROS SOLICITADOS PARA ANÁLISIS --
+
   params.append('estudiante', currentStudentName);
-  params.append('nivel_actual', currentLevel);                                   // El nivel en que está
-  params.append('tipo_modo', activeMode === 'block' ? 'Bloques' : 'Texto');      // Si es tipo casilla(bloque) o texto
-  params.append('cambio_nivel', eventType === 'CAMBIO_NIVEL' ? 'SI' : 'NO');     // Si cambió de nivel
-  params.append('supero_nivel', superoNivel ? 'SI' : 'NO');                      // Si avanzó y superó ese nivel
-  params.append('errores_en_nivel', errorCount);                                 // Veces que verificó y estuvo en error
-  params.append('aciertos_totales', aciertosTotales);                            // Total de niveles superados (veces correcto)
-  params.append('acierto_en_verificacion_actual', esAciertoActual);              // 1 si la verificación actual fue correcta, 0 si no
-  params.append('tiempo_por_nivel_seg', timeSpentOnExerciseSec);                 // Tiempo que pasó por nivel
-  params.append('puntajes', points);                                             // Los puntajes
-  params.append('logros_obtenidos', logrosObtenidos);                            // Los logros que obtuvo
 
-  // -- DATOS DE CONTEXTO ADICIONALES (Recomendados para tracking) --
-  params.append('evento', eventType);                                            // Tipo de evento (VERIFICAR_RESPUESTA, CAMBIO_MODO, etc)
-  params.append('tiempo_total_sesion_seg', seconds);
-  params.append('formula_ingresada', details.formula || 'N/A');
-  params.append('pista_solicitada', details.texto_pista || 'N/A');
+  params.append('evento', eventType);
 
-  // Enviar a Google Apps Script
-  fetch(`${GOOGLE_SCRIPT_URL}?${params.toString()}`, { 
-    method: 'GET', 
-    mode: 'no-cors' 
-  }).catch(err => console.error("Error al registrar evento:", err));
+  params.append('nivel', currentLevel);
+
+  params.append('modo', activeMode);
+
+  params.append('formula', details.formula || '');
+
+  params.append('resultado_verificacion', details.resultado || '');
+
+  params.append('pista_solicitada', details.texto_pista || '');
+
+  params.append('numero_pista', details.numero_pista || 0);
+
+  params.append('tiempo_ejercicio_seg', timeSpentOnExerciseSec);
+
+  params.append('tiempo_total_seg', seconds);
+
+  params.append('puntos_acumulados', points);
+
+  params.append('errores', details.errores || 0); // Nuevo parámetro de cantidad de errores
+
+  fetch(`${GOOGLE_SCRIPT_URL}?${params.toString()}`, { method: 'GET', mode: 'no-cors' }).catch(err => console.error("Error al registrar evento:", err));
+
 }
+
 </script>
+
 </body>
-</html>
+
+</html> 
+
