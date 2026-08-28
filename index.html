@@ -245,7 +245,7 @@ let timerInterval, seconds = 0;
 let exerciseStartTime = Date.now();
 let errorCount = 0;
 
-// BANCO DE EJERCICIOS COMPLETO
+// BANCO DE EJERCICIOS COMPLETO (con expectedParts actualizados incluyendo =SI( y ) )
 const EXERCISE_BANK = {
   1: [
     {
@@ -257,7 +257,7 @@ const EXERCISE_BANK = {
         {text:'"Cuadrilla incompleta"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>10;"Cuadrilla completa";"Cuadrilla incompleta")',
-      expectedParts: { prueba: 'B2>10', sep1: ';', vVerdadero: '"Cuadrilla completa"', sep2: ';', vFalso: '"Cuadrilla incompleta"' },
+      expectedParts: { prueba: '=SI(B2>10', sep1: ';', vVerdadero: '"Cuadrilla completa"', sep2: ';', vFalso: '"Cuadrilla incompleta")' },
       hints: [
         "1. Revisa la tabla de datos para identificar la celda correspondiente a 'Trabajadores'.",
         "2. Identifica que 'supera los' se traduce como el operador mayor que (>).",
@@ -276,7 +276,7 @@ const EXERCISE_BANK = {
         {text:'"Revisión"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2="Normal";"Aprobado";"Revisión")',
-      expectedParts: { prueba: 'B2="Normal"', sep1: ';', vVerdadero: '"Aprobado"', sep2: ';', vFalso: '"Revisión"' },
+      expectedParts: { prueba: '=SI(B2="Normal"', sep1: ';', vVerdadero: '"Aprobado"', sep2: ';', vFalso: '"Revisión")' },
       hints: [
         "1. Mira en la tabla de datos qué celda contiene la lectura del 'Sensor Presión'.",
         "2. 'Es exactamente igual a' requiere utilizar el operador de igualdad (=).",
@@ -295,7 +295,7 @@ const EXERCISE_BANK = {
         {text:'"Ingreso denegado"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2="Operativo";"Ingreso permitido";"Ingreso denegado")',
-      expectedParts: { prueba: 'B2="Operativo"', sep1: ';', vVerdadero: '"Ingreso permitido"', sep2: ';', vFalso: '"Ingreso denegado"' },
+      expectedParts: { prueba: '=SI(B2="Operativo"', sep1: ';', vVerdadero: '"Ingreso permitido"', sep2: ';', vFalso: '"Ingreso denegado")' },
       hints: [
         "1. Identifica en la tabla la celda asociada al 'Estado Equipo'.",
         "2. Compara dicha celda contra el valor \"Operativo\" usando el operador =.",
@@ -316,7 +316,7 @@ const EXERCISE_BANK = {
         {text:"0", type:"val"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>=20;50000;0)',
-      expectedParts: { prueba: 'B2>=20', sep1: ';', vVerdadero: '50000', sep2: ';', vFalso: '0' },
+      expectedParts: { prueba: '=SI(B2>=20', sep1: ';', vVerdadero: '50000', sep2: ';', vFalso: '0)' },
       hints: [
         "1. Consulta la tabla para ver qué celda representa los 'Días trabajados'.",
         "2. La expresión 'mayor o igual a' equivale al operador combinado >=.",
@@ -335,7 +335,7 @@ const EXERCISE_BANK = {
         {text:"0", type:"val"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>15;120000;0)',
-      expectedParts: { prueba: 'B2>15', sep1: ';', vVerdadero: '120000', sep2: ';', vFalso: '0' },
+      expectedParts: { prueba: '=SI(B2>15', sep1: ';', vVerdadero: '120000', sep2: ';', vFalso: '0)' },
       hints: [
         "1. Ubica en la tabla la celda de 'Horas Extra'.",
         "2. 'Sobrepasan' significa estrictamente mayor que (>).",
@@ -354,7 +354,7 @@ const EXERCISE_BANK = {
         {text:"0", type:"val"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>40;25000;0)',
-      expectedParts: { prueba: 'B2>40', sep1: ';', vVerdadero: '25000', sep2: ';', vFalso: '0' },
+      expectedParts: { prueba: '=SI(B2>40', sep1: ';', vVerdadero: '25000', sep2: ';', vFalso: '0)' },
       hints: [
         "1. Localiza en la tabla de datos la celda de la 'Temperatura'.",
         "2. La condición 'superior a' requiere el operador >.",
@@ -434,7 +434,7 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Bono"', type:"res"}, {text:";", type:"sep"}, {text:'"Sin bono"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(Y(B2>=20;C2>=90%);"Bono";"Sin bono")',
-      expectedParts: { prueba: 'Y(B2>=20;C2>=90%)', sep1: ';', vVerdadero: '"Bono"', sep2: ';', vFalso: '"Sin bono"' },
+      expectedParts: { prueba: '=SI(Y(B2>=20;C2>=90%)', sep1: ';', vVerdadero: '"Bono"', sep2: ';', vFalso: '"Sin bono")' },
       hints: [
         "1. Revisa en la tabla las celdas correspondientes a 'Días' y 'Asistencia'.",
         "2. Como ambas condiciones se deben cumplir simultáneamente, usa la función Y(...).",
@@ -453,7 +453,7 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Alerta"', type:"res"}, {text:";", type:"sep"}, {text:'"Normal"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(O(B2>50;C2>100);"Alerta";"Normal")',
-      expectedParts: { prueba: 'O(B2>50;C2>100)', sep1: ';', vVerdadero: '"Alerta"', sep2: ';', vFalso: '"Normal"' },
+      expectedParts: { prueba: '=SI(O(B2>50;C2>100)', sep1: ';', vVerdadero: '"Alerta"', sep2: ';', vFalso: '"Normal")' },
       hints: [
         "1. Identifica las celdas asociadas a 'Temperatura' y 'Presión' en la tabla.",
         "2. La expresión 'O BIEN' exige utilizar la función lógica O(...) dentro de la prueba.",
@@ -472,7 +472,7 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Apto"', type:"res"}, {text:";", type:"sep"}, {text:'"No Apto"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(Y(B2="Sí";C2="Sí");"Apto";"No Apto")',
-      expectedParts: { prueba: 'Y(B2="Sí";C2="Sí")', sep1: ';', vVerdadero: '"Apto"', sep2: ';', vFalso: '"No Apto"' },
+      expectedParts: { prueba: '=SI(Y(B2="Sí";C2="Sí")', sep1: ';', vVerdadero: '"Apto"', sep2: ';', vFalso: '"No Apto")' },
       hints: [
         "1. Consulta en la tabla las celdas para 'Casco' y 'Chaleco'.",
         "2. Utiliza la función Y(...) para agrupar las dos validaciones de equipo.",
@@ -652,7 +652,23 @@ function dropBlock(ev) {
   const data = ev.dataTransfer.getData("text/plain");
   const draggedEl = document.getElementById(data);
   if (draggedEl) {
-    ev.currentTarget.appendChild(draggedEl);
+    const rect = ev.currentTarget.getBoundingClientRect();
+    const clientX = ev.clientX;
+    const clientY = ev.clientY;
+    if (clientY < rect.top || clientY > rect.bottom || clientX < rect.left || clientX > rect.right) return;
+    if (draggedEl.parentNode) draggedEl.parentNode.removeChild(draggedEl);
+    const children = [...ev.currentTarget.children];
+    let insertIndex = children.length;
+    for (let i = 0; i < children.length; i++) {
+      const childRect = children[i].getBoundingClientRect();
+      const centerX = childRect.left + childRect.width / 2;
+      if (clientX < centerX) { insertIndex = i; break; }
+    }
+    if (insertIndex >= children.length) {
+      ev.currentTarget.appendChild(draggedEl);
+    } else {
+      ev.currentTarget.insertBefore(draggedEl, children[insertIndex]);
+    }
     updateFormulaPreview();
   }
 }
