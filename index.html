@@ -709,6 +709,78 @@ function updateFormulaFromText() {
   }
 }
 
+// Nueva función de diagnóstico específico
+function generateSpecificDiagnostic(userFormula, expectedFormula) {
+  const user = normalizeFormula(userFormula);
+  const exp = normalizeFormula(expectedFormula);
+  const messages = [];
+
+  // Comparar longitudes y caracteres
+  if (user.length !== exp.length) {
+    messages.push(`La longitud de tu fórmula es ${user.length} caracteres, pero debería ser ${exp.length}. Revisa si faltan o sobran elementos.`);
+  }
+
+  // Buscar diferencias carácter por carácter
+  const maxLen = Math.max(user.length, exp.length);
+  let diffPositions = [];
+  for (let i = 0; i < maxLen; i++) {
+    if (user[i] !== exp[i]) {
+      diffPositions.push(i);
+      if (diffPositions.length >= 5) break;
+    }
+  }
+
+  if (diffPositions.length > 0) {
+    let posMsg = 'Diferencias encontradas en las posiciones: ';
+    diffPositions.forEach((pos, idx) => {
+      posMsg += `posición ${pos + 1} (tu: "${user[pos] || 'falta'}", esperado: "${exp[pos] || 'falta'}")`;
+      if (idx < diffPositions.length - 1) posMsg += ', ';
+    });
+    messages.push(posMsg);
+  }
+
+  // Verificar operadores comunes
+  const operators = ['>=', '<=', '>', '<', '=', '<>'];
+  const foundOpUser = operators.find(op => user.includes(op));
+  const foundOpExp = operators.find(op => exp.includes(op));
+  if (foundOpUser !== foundOpExp) {
+    messages.push(`El operador lógico no coincide: usaste "${foundOpUser || 'ninguno'}" pero se esperaba "${foundOpExp || 'ninguno'}".`);
+  }
+
+  // Verificar separadores ;
+  const sepCountUser = (user.match(/;/g) || []).length;
+  const sepCountExp = (exp.match(/;/g) || []).length;
+  if (sepCountUser !== sepCountExp) {
+    messages.push(`Número de separadores ; incorrecto: usaste ${sepCountUser} y se esperaban ${sepCountExp}.`);
+  }
+
+  // Verificar paréntesis
+  const openUser = (user.match(/\(/g) || []).length;
+  const closeUser = (user.match(/\)/g) || []).length;
+  if (openUser !== closeUser) {
+    messages.push(`Paréntesis desbalanceados: abriste ${openUser} y cerraste ${closeUser}.`);
+  }
+
+  // Verificar celdas
+  const cellPattern = /[A-Z]+\d+/g;
+  const cellsUser = user.match(cellPattern) || [];
+  const cellsExp = exp.match(cellPattern) || [];
+  const cellDiff = cellsExp.filter(c => !cellsUser.includes(c));
+  if (cellDiff.length > 0) {
+    messages.push(`Falta hacer referencia a la(s) celda(s): ${cellDiff.join(', ')}.`);
+  }
+
+  // Verificar textos entre comillas
+  const textsUser = (user.match(/"[^"]*"/g) || []).map(s => s.toUpperCase());
+  const textsExp = (exp.match(/"[^"]*"/g) || []).map(s => s.toUpperCase());
+  const missingTexts = textsExp.filter(t => !textsUser.includes(t));
+  if (missingTexts.length > 0) {
+    messages.push(`Texto(s) esperados entre comillas no encontrados: ${missingTexts.join(', ')}.`);
+  }
+
+  return messages;
+}
+
 function checkCurrentPhase() {
   let formula = '';
   if (activeMode === 'block') {
@@ -764,12 +836,12 @@ function checkCurrentPhase() {
 
     isCorrect = zoneCorrect;
   } else {
-    // Modo escritura o nivel 3: comparación completa
+    // Modo escritura o nivel 3: comparación completa con diagnóstico específico
     const userNorm = normalizeFormula(formula);
     const expNorm = normalizeFormula(currentExercise.expected);
     isCorrect = (userNorm === expNorm);
     if (!isCorrect) {
-      errorMessages.push('La fórmula no es correcta. Revisa la sintaxis general.');
+      errorMessages = generateSpecificDiagnostic(formula, currentExercise.expected);
     }
   }
 
@@ -810,25 +882,10 @@ function checkCurrentPhase() {
 }
 
 function buildDiagnosticMessage(userFormula) {
-  // Esta función ya no se usa para niveles 1,2,4 en bloques, pero se mantiene para compatibilidad
-  const clean = userFormula.trim().toUpperCase();
-  let list = [];
-  if (!clean.startsWith('=')) { list.push('Toda fórmula en Excel debe comenzar obligatoriamente con el signo igual (<code>=</code>).'); }
-  if (!clean.startsWith('=SI(')) { list.push('Verifica haber iniciado la función correctamente con <code>=SI(</code>.'); }
-  const openParen = (clean.match(/\(/g) || []).length;
-  const closeParen = (clean.match(/\)/g) || []).length;
-  if (openParen !== closeParen) { list.push(`Tus paréntesis están desbalanceados: abriste ${openParen} y cerraste ${closeParen}.`); }
-  if (!clean.includes(';')) { list.push('Te falta colocar el separador punto y coma (<code>;</code>) entre los argumentos de la función.'); }
-  const quoteCount = (clean.match(/"/g) || []).length;
-  if (quoteCount % 2 !== 0) { list.push('Tienes comillas sin cerrar en uno de los textos.'); }
-  const expectedCell = currentExercise.data[0][0].toUpperCase();
-  if (!clean.includes(expectedCell)) { list.push(`Asegúrate de incluir la celda <b>${expectedCell}</b> indicada en la tabla de datos.`); }
-  if (list.length === 0) {
-    list.push('Revisa el orden de los argumentos o los operadores lógicos utilizados (>, <, =, >=, <=).');
-    list.push('Recuerda presionar el botón de "Solicitar Pista" para guiarte.');
-  }
+  // Función original reemplazada por generateSpecificDiagnostic, se mantiene por compatibilidad
+  const messages = generateSpecificDiagnostic(userFormula, currentExercise.expected);
   let html = '<ul class="diagnostic-list">';
-  list.forEach(item => html += `<li>${item}</li>`);
+  messages.forEach(msg => html += `<li>${msg}</li>`);
   html += '</ul>';
   return html;
 }
