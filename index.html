@@ -407,22 +407,56 @@ function closeOverlay() { /* ... igual que antes ... */ }
 
 function sendLog(eventType, details = {}) {
   if (!GOOGLE_SCRIPT_URL) return;
+
+  // 1. Nombre del jugador o del estudiante
   const currentStudentName = studentName || localStorage.getItem('excel_lab_student') || "Anónimo";
+  
+  // 8. El tiempo que pasó por nivel (en segundos desde que cargó el ejercicio)
   const timeSpentOnExerciseSec = Math.floor((Date.now() - exerciseStartTime) / 1000);
+
+  // 5. Determinar si avanzó y superó el nivel actual
+  const superoNivel = (activeMode === 'block' && solvedBlocks.has(currentLevel)) ||
+                      (activeMode === 'write' && solvedWrites.has(currentLevel));
+
+  // 10. Calcular dinámicamente los logros que obtuvo
+  let logrosArray = [];
+  if (solvedBlocks.size > 0 || solvedWrites.size > 0) logrosArray.push("Primer Acierto");
+  if (solvedBlocks.size === 4) logrosArray.push("Maestro de Bloques");
+  if (solvedWrites.size > 0) logrosArray.push("Sintaxis Perfecta");
+  if (solvedBlocks.size === 4 && solvedWrites.size === 4) logrosArray.push("Experto Excel");
+  const logrosObtenidos = logrosArray.length > 0 ? logrosArray.join(", ") : "Ninguno";
+
+  // 7. Las veces que verificó respuesta y estuvo correcto (acumulado)
+  const aciertosTotales = solvedBlocks.size + solvedWrites.size;
+  const esAciertoActual = details.resultado === 'CORRECTO' ? 1 : 0;
+
+  // Preparar todos los datos para la hoja de Google
   const params = new URLSearchParams();
+  
+  // -- PARÁMETROS SOLICITADOS PARA ANÁLISIS --
   params.append('estudiante', currentStudentName);
-  params.append('evento', eventType);
-  params.append('nivel', currentLevel);
-  params.append('modo', activeMode);
-  params.append('formula', details.formula || '');
-  params.append('resultado_verificacion', details.resultado || '');
-  params.append('pista_solicitada', details.texto_pista || '');
-  params.append('numero_pista', details.numero_pista || 0);
-  params.append('tiempo_ejercicio_seg', timeSpentOnExerciseSec);
-  params.append('tiempo_total_seg', seconds);
-  params.append('puntos_acumulados', points);
-  params.append('errores', details.errores || 0); // Nuevo parámetro de cantidad de errores
-  fetch(`${GOOGLE_SCRIPT_URL}?${params.toString()}`, { method: 'GET', mode: 'no-cors' }).catch(err => console.error("Error al registrar evento:", err));
+  params.append('nivel_actual', currentLevel);                                   // El nivel en que está
+  params.append('tipo_modo', activeMode === 'block' ? 'Bloques' : 'Texto');      // Si es tipo casilla(bloque) o texto
+  params.append('cambio_nivel', eventType === 'CAMBIO_NIVEL' ? 'SI' : 'NO');     // Si cambió de nivel
+  params.append('supero_nivel', superoNivel ? 'SI' : 'NO');                      // Si avanzó y superó ese nivel
+  params.append('errores_en_nivel', errorCount);                                 // Veces que verificó y estuvo en error
+  params.append('aciertos_totales', aciertosTotales);                            // Total de niveles superados (veces correcto)
+  params.append('acierto_en_verificacion_actual', esAciertoActual);              // 1 si la verificación actual fue correcta, 0 si no
+  params.append('tiempo_por_nivel_seg', timeSpentOnExerciseSec);                 // Tiempo que pasó por nivel
+  params.append('puntajes', points);                                             // Los puntajes
+  params.append('logros_obtenidos', logrosObtenidos);                            // Los logros que obtuvo
+
+  // -- DATOS DE CONTEXTO ADICIONALES (Recomendados para tracking) --
+  params.append('evento', eventType);                                            // Tipo de evento (VERIFICAR_RESPUESTA, CAMBIO_MODO, etc)
+  params.append('tiempo_total_sesion_seg', seconds);
+  params.append('formula_ingresada', details.formula || 'N/A');
+  params.append('pista_solicitada', details.texto_pista || 'N/A');
+
+  // Enviar a Google Apps Script
+  fetch(`${GOOGLE_SCRIPT_URL}?${params.toString()}`, { 
+    method: 'GET', 
+    mode: 'no-cors' 
+  }).catch(err => console.error("Error al registrar evento:", err));
 }
 </script>
 </body>
