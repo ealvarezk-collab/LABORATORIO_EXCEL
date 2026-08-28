@@ -26,6 +26,13 @@
     body { background-color: var(--bg); color: var(--text-main); padding: 24px 16px; display: flex; justify-content: center; min-height: 100vh; }
     .container { max-width: 1200px; width: 100%; display: flex; flex-direction: column; gap: 20px; }
 
+    /* Layout principal: dos columnas para ejercicio y construcción */
+    .main-grid { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
+    @media (max-width: 800px) { .main-grid { grid-template-columns: 1fr; } }
+
+    .left-col { display: flex; flex-direction: column; gap: 20px; }
+    .right-col { display: flex; flex-direction: column; gap: 20px; }
+
     /* Modales */
     .modal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -42,14 +49,13 @@
     }
     .modal-card input:focus { border-color: var(--accent); background: #ffffff; }
 
-    /* Encabezado y Estadísticas */
+    /* Encabezado y estadísticas */
     header {
       background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 24px;
       box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
     }
     .header-title-bar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
     h1 { font-size: 22px; color: var(--text-main); font-weight: 700; }
-    
     .stats-bar {
       display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 16px;
       background: #f1f5f9; padding: 14px 18px; border-radius: 12px; border: 1px solid #e2e8f0;
@@ -60,7 +66,6 @@
     /* Navegación */
     .nav-section { display: flex; gap: 12px; flex-wrap: wrap; justify-content: space-between; align-items: center; }
     .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
-    
     button {
       background: var(--accent); color: white; border: none; padding: 10px 18px; border-radius: 8px;
       cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(37,99,235,0.15);
@@ -68,45 +73,24 @@
     button:hover { background: var(--accent-hover); transform: translateY(-1px); }
     button.secondary { background: #e2e8f0; color: var(--text-main); box-shadow: none; }
     button.secondary:hover { background: #cbd5e1; }
-    
     .level-btn { background: #ffffff; color: var(--text-main); border: 1.5px solid var(--card-border); box-shadow: none; }
     .level-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
     .level-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
-    
     .mode-btn { background: #ffffff; color: var(--text-main); border: 1.5px solid var(--card-border); box-shadow: none; }
     .mode-btn.active { background: var(--success); color: white; border-color: var(--success); }
     .mode-btn.locked { opacity: 0.5; cursor: not-allowed; }
 
-    /* LAYOUT PRINCIPAL EN 2 COLUMNAS */
-    .main-layout {
-      display: grid;
-      grid-template-columns: 380px 1fr;
-      gap: 20px;
-      align-items: start;
-    }
-
-    @media (max-width: 900px) {
-      .main-layout { grid-template-columns: 1fr; }
-    }
-
-    .left-col, .right-col {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    /* Tarjetas principales */
+    /* Tarjetas */
     .card {
-      background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px;
+      background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 24px;
       box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
     }
-    
     .data-table { width: 100%; border-collapse: collapse; margin-top: 12px; border-radius: 8px; overflow: hidden; border: 1px solid var(--card-border); }
-    .data-table th, .data-table td { padding: 9px 12px; text-align: left; font-size: 13px; }
+    .data-table th, .data-table td { padding: 10px 14px; text-align: left; font-size: 14px; }
     .data-table th { background: #f1f5f9; color: var(--text-sub); font-weight: 600; border-bottom: 1px solid var(--card-border); }
     .data-table td { background: #ffffff; border-bottom: 1px solid #f1f5f9; }
 
-    /* Área de Construcción de Bloques por Filas */
+    /* Áreas de construcción */
     .builder-row { margin-bottom: 14px; }
     .row-label { font-size: 13px; font-weight: 600; color: var(--text-sub); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
     .drop-zone-row {
@@ -114,22 +98,18 @@
       padding: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; transition: all 0.2s;
     }
     .drop-zone-row.drag-over { background: #eff6ff; border-color: var(--accent); }
-    
     .sep-row-container { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
     .sep-box { min-width: 70px; height: 46px; min-height: 46px; }
 
-    /* Banco de Bloques Arrastrables */
     .bank-area {
       min-height: 80px; background: #f8fafc; border: 1.5px solid var(--card-border); border-radius: 12px;
       padding: 12px; display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;
     }
     .block {
-      padding: 8px 14px; border-radius: 8px; font-family: 'Segoe UI Mono', monospace; font-weight: 700; cursor: grab;
-      user-select: none; box-shadow: 0 2px 4px rgba(0,0,0,0.06); font-size: 13px; transition: transform 0.15s, box-shadow 0.15s;
+      padding: 8px 16px; border-radius: 8px; font-family: 'Segoe UI Mono', monospace; font-weight: 700; cursor: grab;
+      user-select: none; box-shadow: 0 2px 4px rgba(0,0,0,0.06); font-size: 14px; transition: transform 0.15s, box-shadow 0.15s;
     }
     .block:active { cursor: grabbing; transform: scale(1.03); }
-    
-    /* Colores por Categoría de Bloque */
     .block.func { background: #8b5cf6; color: white; }
     .block.var { background: #0284c7; color: white; }
     .block.op { background: #ea580c; color: white; }
@@ -138,49 +118,38 @@
     .block.res { background: #db2777; color: white; }
     .block.paren { background: #64748b; color: white; }
 
-    /* Entrada Manual */
     .manual-input {
       width: 100%; padding: 14px 16px; background: #f8fafc; border: 1.5px solid var(--card-border);
-      border-radius: 10px; color: var(--text-main); font-family: monospace; font-size: 15px; margin-top: 10px; outline: none;
+      border-radius: 10px; color: var(--text-main); font-family: monospace; font-size: 16px; margin-top: 10px; outline: none;
     }
     .manual-input:focus { border-color: var(--accent); background: #ffffff; }
 
-    /* Vista previa de fórmula y evaluación */
     .formula-preview {
       background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 14px 18px;
-      font-family: monospace; color: #38bdf8; font-size: 15px; word-break: break-all;
+      font-family: monospace; color: #38bdf8; font-size: 16px; word-break: break-all;
     }
     .result-box {
       display: flex; align-items: center; justify-content: space-between; background: #f1f5f9;
-      padding: 12px 16px; border-radius: 10px; border: 1px solid var(--card-border); margin-top: 14px;
+      padding: 14px 18px; border-radius: 10px; border: 1px solid var(--card-border); margin-top: 16px;
     }
 
-    /* Barra de Progreso e Insignias */
     .progress-bar-container { background: #e2e8f0; border-radius: 20px; height: 10px; width: 100%; overflow: hidden; margin-top: 8px; }
     .progress-fill { background: var(--success); height: 100%; width: 0%; transition: width 0.4s ease; }
-
-    /* Lista de Logros en Columna Izquierda */
-    .achievements-list { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
-    .achievement-item {
-      display: flex; align-items: center; justify-content: space-between; background: #f8fafc;
-      padding: 10px 12px; border-radius: 10px; border: 1px solid var(--card-border); transition: all 0.3s;
+    .badges-container { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+    .badge { opacity: 0.25; filter: grayscale(1); transition: all 0.3s; font-size: 26px; position: relative; }
+    .badge.unlocked { opacity: 1; filter: grayscale(0); transform: scale(1.1); }
+    .badge .tooltip {
+      visibility: hidden; width: 120px; background-color: #0f172a; color: #fff; text-align: center;
+      border-radius: 6px; padding: 5px; position: absolute; z-index: 1; bottom: 125%; left: 50%;
+      margin-left: -60px; opacity: 0; transition: opacity 0.3s; font-size: 12px;
     }
-    .achievement-item.unlocked { background: var(--success-bg); border-color: #bbf7d0; }
-    .achievement-info { display: flex; align-items: center; gap: 10px; }
-    .achievement-icon { font-size: 22px; filter: grayscale(1); opacity: 0.4; transition: all 0.3s; }
-    .achievement-item.unlocked .achievement-icon { filter: grayscale(0); opacity: 1; transform: scale(1.1); }
-    .achievement-text { font-size: 12px; color: var(--text-sub); }
-    .achievement-title { font-weight: 700; color: var(--text-main); font-size: 13px; }
-    .status-badge { font-size: 11px; padding: 3px 8px; border-radius: 12px; font-weight: 700; background: #e2e8f0; color: var(--text-sub); }
-    .achievement-item.unlocked .status-badge { background: #22c55e; color: white; }
+    .badge:hover .tooltip { visibility: visible; opacity: 1; }
 
-    /* Retroalimentación Granular y Pistas */
     .feedback { padding: 16px; border-radius: 12px; font-weight: 500; display: none; margin-top: 14px; line-height: 1.5; font-size: 14px; }
     .feedback.ok { background: var(--success-bg); color: #14532d; border: 1.5px solid #bbf7d0; }
     .feedback.err { background: var(--danger-bg); color: #7f1d1d; border: 1.5px solid #fecaca; }
-    
     .diagnostic-list { margin-top: 8px; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
-    .hint-box { background: var(--warning-bg); color: #78350f; border: 1.5px solid #fde68a; padding: 14px; border-radius: 10px; display: none; margin-top: 10px; font-size: 13px; line-height: 1.4; }
+    .hint-box { background: var(--warning-bg); color: #78350f; border: 1.5px solid #fde68a; padding: 14px; border-radius: 10px; display: none; margin-top: 14px; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -206,13 +175,12 @@
 </div>
 
 <div class="container">
-  <!-- Encabezado con estadísticas y progreso -->
+  <!-- Encabezado -->
   <header>
     <div class="header-title-bar">
       <h1>Laboratorio de Fórmulas Excel (=SI)</h1>
-      <span id="userDisplayName" style="font-weight: 700; color: var(--accent); font-size: 15px;">Estudiante</span>
+      <span id="userDisplayName" style="font-weight: 600; color: var(--accent); font-size: 14px;">Estudiante</span>
     </div>
-    
     <div class="stats-bar">
       <div class="stat-item">PUNTOS: <span class="stat-value" id="points">0</span></div>
       <div class="stat-item">ESTRELLAS: <span class="stat-value" id="stars">0 ⭐</span></div>
@@ -220,16 +188,21 @@
       <div class="stat-item">ESCRITURA: <span class="stat-value" id="writeProg">0/4</span></div>
       <div class="stat-item">TIEMPO: <span class="stat-value" id="timer">00:00</span></div>
     </div>
-    
     <div style="margin-top: 16px;">
       <div id="progressText" style="font-size: 12px; font-weight: 600; color: var(--text-sub);">Progreso Global del Curso: 0%</div>
-      <div class="progress-bar-container">
-        <div class="progress-fill" id="progressFill"></div>
+      <div class="progress-bar-container"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="badges-container">
+        <span class="badge" id="badge1" title="Primer Acierto">🌱<span class="tooltip">Primer Acierto</span></span>
+        <span class="badge" id="badge2" title="Maestro de Bloques">🧩<span class="tooltip">Maestro de Bloques</span></span>
+        <span class="badge" id="badge3" title="Sintaxis Perfecta">✍️<span class="tooltip">Sintaxis Perfecta</span></span>
+        <span class="badge" id="badge4" title="Experto Excel">🏆<span class="tooltip">Experto Excel</span></span>
+        <span class="badge" id="badge5" title="Cambiador de Datos">🔄<span class="tooltip">Cambiador de Datos</span></span>
+        <span class="badge" id="badge6" title="Sin Ayuda">🚫💡<span class="tooltip">Sin Ayuda</span></span>
       </div>
     </div>
   </header>
 
-  <!-- Navegación de Niveles y Modos -->
+  <!-- Navegación -->
   <div class="nav-section">
     <div class="btn-group">
       <button class="level-btn active" onclick="loadLevel(1, this)">Nivel 1</button>
@@ -244,120 +217,71 @@
     </div>
   </div>
 
-  <!-- DISPOSICIÓN PRINCIPAL EN 2 COLUMNAS -->
-  <div class="main-layout">
-    
-    <!-- COLUMNA IZQUIERDA: Caso, Pistas y Logros -->
+  <!-- Contenido principal: columna izquierda (ejercicio, pistas, logros) y columna derecha (construcción) -->
+  <div class="main-grid">
+    <!-- Columna izquierda -->
     <div class="left-col">
-      <!-- Enunciado y Datos -->
+      <!-- Enunciado y tabla de datos -->
       <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h3 style="color: var(--text-sub); font-size: 11px; letter-spacing: 0.5px; font-weight: 700;">ENUNCIADO DEL CASO</h3>
-          <button class="secondary" onclick="loadRandomExercise(true)" style="padding: 4px 10px; font-size: 11px;">🔀 Cambiar ejercicio</button>
+          <h3 style="color: var(--text-sub); font-size: 12px; letter-spacing: 0.5px; font-weight: 700;">ENUNCIADO DEL CASO</h3>
+          <button class="secondary" onclick="loadRandomExercise()" style="padding: 4px 10px; font-size: 12px;">🔀 Otro ejercicio</button>
         </div>
-        <p id="text" style="font-size: 14px; margin-top: 10px; font-weight: 500; color: var(--text-main); line-height: 1.5;"></p>
-        <div id="data" style="margin-top: 10px;"></div>
+        <p id="text" style="font-size: 16px; margin-top: 10px; font-weight: 500; color: var(--text-main); line-height: 1.5;"></p>
+        <div id="data" style="margin-top: 14px;"></div>
+        <button class="secondary" onclick="changeExerciseData()" style="width: 100%; margin-top: 12px;">🔄 Cambiar datos</button>
       </div>
 
-      <!-- Sección de Pistas -->
+      <!-- Pistas -->
       <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <h3 style="color: var(--text-sub); font-size: 11px; letter-spacing: 0.5px; font-weight: 700;">PISTAS DE AYUDA</h3>
-          <button class="secondary" onclick="showHint()" style="padding: 4px 10px; font-size: 11px;">💡 Solicitar Pista</button>
-        </div>
-        <div id="hint" class="hint-box">Presiona el botón "Solicitar Pista" si necesitas orientación para resolver la fórmula.</div>
+        <h3 style="color: var(--text-sub); font-size: 12px; letter-spacing: 0.5px; font-weight: 700;">PISTAS</h3>
+        <button class="secondary" onclick="showHint()" style="width: 100%; margin-top: 10px;">Mostrar pista 💡</button>
+        <div id="hint" class="hint-box"></div>
       </div>
 
-      <!-- Panel de Logros del Estudiante -->
+      <!-- Logros -->
       <div class="card">
-        <h3 style="color: var(--text-sub); font-size: 11px; letter-spacing: 0.5px; font-weight: 700; margin-bottom: 8px;">LOGROS DEL ESTUDIANTE</h3>
-        <div class="achievements-list">
-          <div class="achievement-item" id="ach1">
-            <div class="achievement-info">
-              <span class="achievement-icon">🌱</span>
-              <div>
-                <div class="achievement-title">Primer Acierto</div>
-                <div class="achievement-text">Resuelve tu primer ejercicio</div>
-              </div>
-            </div>
-            <span class="status-badge" id="status-ach1">🔒</span>
-          </div>
-
-          <div class="achievement-item" id="ach2">
-            <div class="achievement-info">
-              <span class="achievement-icon">🧩</span>
-              <div>
-                <div class="achievement-title">Maestro de Bloques</div>
-                <div class="achievement-text">Completar 4 niveles en bloques</div>
-              </div>
-            </div>
-            <span class="status-badge" id="status-ach2">🔒</span>
-          </div>
-
-          <div class="achievement-item" id="ach3">
-            <div class="achievement-info">
-              <span class="achievement-icon">✍️</span>
-              <div>
-                <div class="achievement-title">Sintaxis Perfecta</div>
-                <div class="achievement-text">Resuelve 1 ejercicio escrito</div>
-              </div>
-            </div>
-            <span class="status-badge" id="status-ach3">🔒</span>
-          </div>
-
-          <div class="achievement-item" id="ach4">
-            <div class="achievement-info">
-              <span class="achievement-icon">🏆</span>
-              <div>
-                <div class="achievement-title">Experto Excel</div>
-                <div class="achievement-text">Completar 4 niveles en ambos modos</div>
-              </div>
-            </div>
-            <span class="status-badge" id="status-ach4">🔒</span>
-          </div>
-        </div>
+        <h3 style="color: var(--text-sub); font-size: 12px; letter-spacing: 0.5px; font-weight: 700;">LOGROS DESBLOQUEADOS</h3>
+        <div class="badges-container" id="logrosContainer"></div>
       </div>
     </div>
 
-    <!-- COLUMNA DERECHA: Área interactiva, Construcción y Verificación -->
+    <!-- Columna derecha: construcción -->
     <div class="right-col">
-      <!-- Área interactiva (Bloques por filas o Escritura) -->
       <div class="card">
         <h3 id="phaseTitle" style="font-size: 15px; color: var(--text-main);">Construcción por Filas (Bloques)</h3>
 
         <!-- Modo Bloques -->
-        <div id="blockArea" style="margin-top: 14px;">
+        <div id="blockArea" style="margin-top: 16px;">
           <div id="builderRows"></div>
-          <p style="font-size: 12px; font-weight: 600; color: var(--text-sub); margin: 14px 0 6px 0;">BANCO DE BLOQUES (Arrastra los elementos a las casillas):</p>
+          <p style="font-size: 12px; font-weight: 600; color: var(--text-sub); margin: 16px 0 8px 0;">BANCO DE BLOQUES (Arrastra los elementos a las casillas superiores):</p>
           <div class="bank-area" id="bank" ondrop="dropToBank(event)" ondragover="allowDrop(event)"></div>
         </div>
 
-        <!-- Modo Escritura Manual -->
-        <div id="writeArea" style="display: none; margin-top: 14px;">
-          <p style="font-size: 13px; color: var(--text-sub);">Escribe la fórmula completa manualmente respetando la sintaxis exacta de Excel:</p>
+        <!-- Modo Escritura -->
+        <div id="writeArea" style="display: none; margin-top: 16px;">
+          <p style="font-size: 14px; color: var(--text-sub);">Escribe la fórmula completa manualmente respetando la sintaxis exacta de Excel:</p>
           <input type="text" id="manualFormula" class="manual-input" placeholder='=SI(B2>10;"Cuadrilla completa";"Cuadrilla incompleta")' oninput="updateFormulaFromText()" />
         </div>
       </div>
 
-      <!-- Vista previa, evaluación y acciones -->
+      <!-- Vista previa, resultado y acciones -->
       <div class="card">
-        <div style="font-size: 12px; font-weight: 600; color: var(--text-sub); margin-bottom: 6px;">VISTA PREVIA DE LA FÓRMULA GENERADA:</div>
+        <div style="font-size: 12px; font-weight: 600; color: var(--text-sub); margin-bottom: 8px;">VISTA PREVIA DE LA FÓRMULA GENERADA:</div>
         <div class="formula-preview" id="formula">=SI(...)</div>
-
         <div class="result-box">
-          <span style="font-size: 13px; font-weight: 600; color: var(--text-sub);">Resultado Evaluado en Celda:</span>
-          <b id="resultDisplay" style="color: var(--success); font-size: 16px;">—</b>
+          <span style="font-size: 14px; font-weight: 600; color: var(--text-sub);">Resultado Evaluado en Celda:</span>
+          <b id="resultDisplay" style="color: var(--success); font-size: 18px;">—</b>
         </div>
-
-        <div style="display: flex; gap: 10px; margin-top: 14px;">
+        <div style="display: flex; gap: 10px; margin-top: 16px;">
           <button onclick="checkCurrentPhase()" style="flex: 2;">Verificar Respuesta</button>
+          <button class="secondary" onclick="showHint()" style="flex: 1;">Pista 💡</button>
           <button class="secondary" onclick="clearCurrentPhase()" style="flex: 1;">Limpiar</button>
         </div>
-
+        <div id="hint" class="hint-box"></div>
         <div id="feedback" class="feedback"></div>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -368,15 +292,15 @@ let studentName = "";
 let activeMode = 'block'; 
 let currentLevel = 1;
 let currentExercise = null;
-let currentExerciseIndex = -1;
 let points = 0;
 let stars = 0;
 let solvedBlocks = new Set();
 let solvedWrites = new Set();
 let hintIndex = 0;
 let timerInterval, seconds = 0;
+let previousExerciseIndex = -1;
+let dataChanged = false;
 
-// BANCO DE EJERCICIOS COMPLETO
 const EXERCISE_BANK = {
   1: [
     {
@@ -388,8 +312,10 @@ const EXERCISE_BANK = {
         {text:'"Cuadrilla incompleta"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>10;"Cuadrilla completa";"Cuadrilla incompleta")',
+      expectedParts: { prueba: "B2>10", vVerdadero: '"Cuadrilla completa"', vFalso: '"Cuadrilla incompleta"' },
       hints: ["Identifica que 'supera los' se traduce como el operador mayor que (>).", "Usa el separador ; entre cada argumento.", "Respuesta verdadera: \"Cuadrilla completa\". Respuesta falsa: \"Cuadrilla incompleta\"."],
-      eval: (d) => d[0][2] > 10 ? 'Cuadrilla completa' : 'Cuadrilla incompleta'
+      eval: (d) => d[0][2] > 10 ? 'Cuadrilla completa' : 'Cuadrilla incompleta',
+      randomData: () => [["B2", "Trabajadores", Math.floor(Math.random()*20)+1]]
     },
     {
       text: "En control de calidad, si la lectura del sensor en B2 es exactamente igual a la palabra “Normal”, reportar “Aprobado”; si se presenta algo distinto, colocar “Revisión”.",
@@ -400,8 +326,10 @@ const EXERCISE_BANK = {
         {text:'"Revisión"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2="Normal";"Aprobado";"Revisión")',
+      expectedParts: { prueba: 'B2="Normal"', vVerdadero: '"Aprobado"', vFalso: '"Revisión"' },
       hints: ["'Es exactamente igual a' requiere el operador = en la prueba lógica.", "Recuerda que los textos se comparan entre comillas.", "Separadores ; en los casilleros correspondientes."],
-      eval: (d) => d[0][2] === 'Normal' ? 'Aprobado' : 'Revisión'
+      eval: (d) => d[0][2] === 'Normal' ? 'Aprobado' : 'Revisión',
+      randomData: () => [["B2", "Sensor Presión", Math.random() > 0.5 ? "Normal" : "Anormal"]]
     },
     {
       text: "Si el estado del equipo en B2 resulta ser idéntico a “Operativo”, marcar “Ingreso permitido”; de manera contraria, registrar “Ingreso denegado”.",
@@ -412,8 +340,10 @@ const EXERCISE_BANK = {
         {text:'"Ingreso denegado"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2="Operativo";"Ingreso permitido";"Ingreso denegado")',
-      hints: ["Compara B2 con \"Operativo\" usando el signo =.", "Comprueba que la respuesta verdadera y falsa coincidan con el texto exacto."],
-      eval: (d) => d[0][2] === 'Operativo' ? 'Ingreso permitido' : 'Ingreso denegado'
+      expectedParts: { prueba: 'B2="Operativo"', vVerdadero: '"Ingreso permitido"', vFalso: '"Ingreso denegado"' },
+      hints: ["Compara B2 con \"Operativo\" usando el signo =.", "Comprueba que la respuesta verdadera y falsa coincidan con el texto exacto del enunciado."],
+      eval: (d) => d[0][2] === 'Operativo' ? 'Ingreso permitido' : 'Ingreso denegado',
+      randomData: () => [["B2", "Estado Equipo", Math.random() > 0.5 ? "Operativo" : "Mantenimiento"]]
     }
   ],
   2: [
@@ -426,8 +356,10 @@ const EXERCISE_BANK = {
         {text:"0", type:"val"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>=20;50000;0)',
+      expectedParts: { prueba: "B2>=20", vVerdadero: "50000", vFalso: "0" },
       hints: ["La frase 'mayor o igual a' requiere el operador >=.", "Los valores numéricos (50000 y 0) no llevan comillas.", "Separa los argumentos con ;."],
-      eval: (d) => d[0][2] >= 20 ? 50000 : 0
+      eval: (d) => d[0][2] >= 20 ? 50000 : 0,
+      randomData: () => [["B2", "Días trabajados", Math.floor(Math.random()*30)+1]]
     },
     {
       text: "Si las horas extraordinarias registradas en la celda B2 sobrepasan las 15 horas, liquidar un pago de 120000; de lo contrario, indicar 0.",
@@ -438,8 +370,10 @@ const EXERCISE_BANK = {
         {text:"0", type:"val"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>15;120000;0)',
-      hints: ["'Sobrepasan' significa estrictamente mayor que (>).", "Verdadero: 120000, Falso: 0.", "Recuerda no colocar comillas a los números."],
-      eval: (d) => d[0][2] > 15 ? 120000 : 0
+      expectedParts: { prueba: "B2>15", vVerdadero: "120000", vFalso: "0" },
+      hints: ["'Sobrepasan' significa strictly mayor que (>).", "Verdadero: 120000, Falso: 0.", "Recuerda no colocar comillas a los números."],
+      eval: (d) => d[0][2] > 15 ? 120000 : 0,
+      randomData: () => [["B2", "Horas Extra", Math.floor(Math.random()*30)]]
     },
     {
       text: "Si la temperatura reportada en B2 es superior a 40 grados, calcular un recargo de 25000; en caso contrario, registrar 0.",
@@ -450,8 +384,10 @@ const EXERCISE_BANK = {
         {text:"0", type:"val"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>40;25000;0)',
+      expectedParts: { prueba: "B2>40", vVerdadero: "25000", vFalso: "0" },
       hints: ["'Es superior a' equivale al operador mayor que (>).", "Números sin comillas.", "Verifica ubicar el punto y coma en las cajas separadoras."],
-      eval: (d) => d[0][2] > 40 ? 25000 : 0
+      eval: (d) => d[0][2] > 40 ? 25000 : 0,
+      randomData: () => [["B2", "Temperatura", Math.floor(Math.random()*60)+1]]
     }
   ],
   3: [
@@ -465,8 +401,10 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Alto"', type:"res"}, {text:")", type:"paren"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2<=4;"Bajo";SI(B2<=9;"Medio";"Alto"))',
+      expectedParts: { prueba: "B2<=4", vVerdadero: '"Bajo"', vFalso: 'SI(B2<=9;"Medio";"Alto")' },
       hints: ["'Menor o igual a' corresponde al símbolo <=.", "En la Fila 1 evalúa la primera condición y en la Fila 2 inicia el segundo SI.", "Recuerda cerrar ambos paréntesis al final."],
-      eval: (d) => d[0][2] <= 4 ? 'Bajo' : (d[0][2] <= 9 ? 'Medio' : 'Alto')
+      eval: (d) => d[0][2] <= 4 ? 'Bajo' : (d[0][2] <= 9 ? 'Medio' : 'Alto'),
+      randomData: () => [["B2", "Puntaje Riesgo", Math.floor(Math.random()*20)+1]]
     },
     {
       text: "Evalúa desempeño: si la nota en B2 es mayor o igual a 6, calificar como “Excelente”; si alcanza o supera los 4 puntos, calificar como “Aprobado”; si no, marcar “Reprobado”.",
@@ -478,8 +416,10 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Reprobado"', type:"res"}, {text:")", type:"paren"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2>=6;"Excelente";SI(B2>=4;"Aprobado";"Reprobado"))',
-      hints: ["Inicia evaluando la nota máxima (>=6).", "El segundo SI anidado evalúa >=4.", "Comprueba cerrar con dos paréntesis finales ))."],
-      eval: (d) => d[0][2] >= 6 ? 'Excelente' : (d[0][2] >= 4 ? 'Aprobado' : 'Reprobado')
+      expectedParts: { prueba: "B2>=6", vVerdadero: '"Excelente"', vFalso: 'SI(B2>=4;"Aprobado";"Reprobado")' },
+      hints: ["Inicia evaluando la nota máxima (>=6).", "El segundo SI anidado evalúa >=4.", "Comprueba cerrar con dos paréntesis final ))."],
+      eval: (d) => d[0][2] >= 6 ? 'Excelente' : (d[0][2] >= 4 ? 'Aprobado' : 'Reprobado'),
+      randomData: () => [["B2", "Nota Final", Math.floor(Math.random()*10)+1]]
     },
     {
       text: "Clasifica antigüedad: si los años en B2 son inferiores a 2, asigna “Inicial”; si son menores a 5, asigna “Intermedio”; para cualquier otro caso, asigna “Avanzado”.",
@@ -491,8 +431,10 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Avanzado"', type:"res"}, {text:")", type:"paren"}, {text:")", type:"paren"}
       ],
       expected: '=SI(B2<2;"Inicial";SI(B2<5;"Intermedio";"Avanzado"))',
+      expectedParts: { prueba: "B2<2", vVerdadero: '"Inicial"', vFalso: 'SI(B2<5;"Intermedio";"Avanzado")' },
       hints: ["'Inferiores a' o 'menores a' es el operador menor que (<).", "Ubica el segundo SI dentro de la respuesta falsa del primer SI."],
-      eval: (d) => d[0][2] < 2 ? 'Inicial' : (d[0][2] < 5 ? 'Intermedio' : 'Avanzado')
+      eval: (d) => d[0][2] < 2 ? 'Inicial' : (d[0][2] < 5 ? 'Intermedio' : 'Avanzado'),
+      randomData: () => [["B2", "Años Antigüedad", Math.floor(Math.random()*10)]]
     }
   ],
   4: [
@@ -505,8 +447,10 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Bono"', type:"res"}, {text:";", type:"sep"}, {text:'"Sin bono"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(Y(B2>=20;C2>=90%);"Bono";"Sin bono")',
+      expectedParts: { prueba: "Y(B2>=20;C2>=90%)", vVerdadero: '"Bono"', vFalso: '"Sin bono"' },
       hints: ["Al requerir dos condiciones obligatorias simultáneas, usa la función Y().", "Cierra la función Y() con su paréntesis antes del primer punto y coma."],
-      eval: (d) => (d[0][2] >= 20 && parseInt(d[1][2]) >= 90) ? 'Bono' : 'Sin bono'
+      eval: (d) => (d[0][2] >= 20 && parseInt(d[1][2]) >= 90) ? 'Bono' : 'Sin bono',
+      randomData: () => [["B2", "Días", Math.floor(Math.random()*30)+1], ["C2", "Asistencia", (Math.floor(Math.random()*50)+50)+"%"]]
     },
     {
       text: "[SI + O] Activa una alerta si la temperatura en B2 sobrepasa los 50 grados O BIEN si la presión en C2 es mayor a 100. De cumplirse cualquiera, mostrar “Alerta”; si ninguna se presenta, registrar “Normal”.",
@@ -517,8 +461,10 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Alerta"', type:"res"}, {text:";", type:"sep"}, {text:'"Normal"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(O(B2>50;C2>100);"Alerta";"Normal")',
+      expectedParts: { prueba: "O(B2>50;C2>100)", vVerdadero: '"Alerta"', vFalso: '"Normal"' },
       hints: ["La presencia de 'O BIEN' exige utilizar la función lógica O() en la prueba.", "Verifica que ambas comparaciones usen el operador mayor que (>)."],
-      eval: (d) => (d[0][2] > 50 || d[1][2] > 100) ? 'Alerta' : 'Normal'
+      eval: (d) => (d[0][2] > 50 || d[1][2] > 100) ? 'Alerta' : 'Normal',
+      randomData: () => [["B2", "Temperatura", Math.floor(Math.random()*80)+1], ["C2", "Presión", Math.floor(Math.random()*150)+1]]
     },
     {
       text: "[SI + Y] Declara una inspección como aprobada únicamente si el casco en B2 es igual a “Sí” Y ADEMÁS el chaleco en C2 es igual a “Sí”. Si se cumplen ambas, indicar “Apto”; caso contrario “No Apto”.",
@@ -529,19 +475,15 @@ const EXERCISE_BANK = {
         {text:";", type:"sep"}, {text:'"Apto"', type:"res"}, {text:";", type:"sep"}, {text:'"No Apto"', type:"res"}, {text:")", type:"paren"}
       ],
       expected: '=SI(Y(B2="Sí";C2="Sí");"Apto";"No Apto")',
+      expectedParts: { prueba: 'Y(B2="Sí";C2="Sí")', vVerdadero: '"Apto"', vFalso: '"No Apto"' },
       hints: ["Utiliza Y() conteniendo las dos igualdades de texto.", "Asegúrate de incluir comillas en \"Sí\"."],
-      eval: (d) => (d[0][2] === 'Sí' && d[1][2] === 'Sí') ? 'Apto' : 'No Apto'
+      eval: (d) => (d[0][2] === 'Sí' && d[1][2] === 'Sí') ? 'Apto' : 'No Apto',
+      randomData: () => [["B2", "Casco", Math.random() > 0.5 ? "Sí" : "No"], ["C2", "Chaleco", Math.random() > 0.5 ? "Sí" : "No"]]
     }
   ]
 };
 
 window.addEventListener('DOMContentLoaded', () => {
-  const savedName = localStorage.getItem('excel_lab_student');
-  if (savedName) {
-    studentName = savedName;
-    document.getElementById('userDisplayName').textContent = studentName;
-    document.getElementById('registroModal').style.display = 'none';
-  }
   loadLevel(1);
 });
 
@@ -550,10 +492,9 @@ function registrarEstudiante() {
   const name = input.value.trim();
   if (!name) { alert("Por favor ingresa tu nombre para comenzar."); return; }
   studentName = name;
-  localStorage.setItem('excel_lab_student', studentName);
   document.getElementById('userDisplayName').textContent = studentName;
   document.getElementById('registroModal').style.display = 'none';
-  enviarDatosAGoogleSheets("Inicio", "Sesión iniciada");
+  enviarDatosAGoogleSheets('inicio', 'Sesión iniciada');
 }
 
 function startTimer() {
@@ -590,39 +531,52 @@ function loadLevel(lvl, btn) {
     document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
   }
-  loadRandomExercise(false);
+  loadRandomExercise();
 }
 
-function loadRandomExercise(forceDifferent = false) {
+function loadRandomExercise() {
   hintIndex = 0;
   const list = EXERCISE_BANK[currentLevel] || EXERCISE_BANK[1];
+  let index;
+  do {
+    index = Math.floor(Math.random() * list.length);
+  } while (index === previousExerciseIndex && list.length > 1);
+  previousExerciseIndex = index;
+  currentExercise = list[index];
   
-  let newIndex = Math.floor(Math.random() * list.length);
-  if (forceDifferent && list.length > 1) {
-    while (newIndex === currentExerciseIndex) {
-      newIndex = Math.floor(Math.random() * list.length);
-    }
-  }
-  currentExerciseIndex = newIndex;
-  currentExercise = list[currentExerciseIndex];
-  
+  renderExercise();
+  buildRowsUI(currentLevel);
+  renderBank(currentExercise.blocks);
+  clearCurrentPhase();
+  document.getElementById('hint').style.display = 'none';
+  document.getElementById('feedback').style.display = 'none';
+  document.getElementById('resultDisplay').textContent = '—';
+  startTimer();
+  enviarDatosAGoogleSheets('cambio_ejercicio', 'Nuevo ejercicio cargado');
+}
+
+function renderExercise() {
   document.getElementById('text').textContent = currentExercise.text;
+  buildDataTable();
+}
+
+function buildDataTable() {
   let html = '<table class="data-table"><tr><th>Celda</th><th>Concepto</th><th>Valor</th></tr>';
   currentExercise.data.forEach(r => html += `<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td></tr>`);
   html += '</table>';
   document.getElementById('data').innerHTML = html;
+}
 
-  buildRowsUI(currentLevel);
-  renderBank(currentExercise.blocks);
+function changeExerciseData() {
+  if (!currentExercise.randomData) return;
+  currentExercise.data = currentExercise.randomData();
+  dataChanged = true;
+  buildDataTable();
   clearCurrentPhase();
-  
-  const hintBox = document.getElementById('hint');
-  hintBox.style.display = 'block';
-  hintBox.innerHTML = 'Presiona el botón "Solicitar Pista" si necesitas orientación para resolver la fórmula.';
-  
   document.getElementById('feedback').style.display = 'none';
   document.getElementById('resultDisplay').textContent = '—';
-  startTimer();
+  document.getElementById('badge5').classList.add('unlocked');
+  enviarDatosAGoogleSheets('cambio_datos', 'Datos modificados');
 }
 
 function buildRowsUI(lvl) {
@@ -679,7 +633,6 @@ function renderBank(blocks) {
   });
 }
 
-/* Control Drag & Drop */
 function allowDrop(ev) {
   ev.preventDefault();
   if (ev.currentTarget.classList.contains('drop-zone-row')) {
@@ -718,7 +671,6 @@ function dropToBank(ev) {
   }
 }
 
-/* Previsualización */
 function updateFormulaPreview() {
   if (activeMode === 'write') return;
   let text = '';
@@ -753,7 +705,6 @@ function updateFormulaFromText() {
   }
 }
 
-/* Verificación */
 function checkCurrentPhase() {
   let formula = '';
   if (activeMode === 'block') {
@@ -799,7 +750,7 @@ function checkCurrentPhase() {
 
     if (solvedBlocks.size === 4 && activeMode === 'block') {
       document.getElementById('btnModeWrite').classList.remove('locked');
-      showOverlay('¡Modo Escritura Desbloqueado!', 'Has completado los 4 niveles en el Modo Bloques. ¡Ponte a prueba en el Modo Escritura Manual!', '🏆');
+      showOverlay('¡Modo Escritura Desbloqueado!', 'Has completado exitosamente los 4 niveles en el Modo Bloques. ¡Ahora puedes intentar resolverlos escribiendo manualmente la fórmula!', '🏆');
     }
   } else {
     fb.className = 'feedback err';
@@ -813,22 +764,25 @@ function checkCurrentPhase() {
     if (!cleanUser.includes(';')) {
       diagnostic += '<li>Verifica haber colocado los separadores de argumentos <code>;</code>.</li>';
     }
-    diagnostic += '<li>Revisa el orden de las comparaciones o consulta la columna de pistas.</li>';
+    diagnostic += '<li>Revisa el orden de las comparaciones o consulta la pista.</li>';
     diagnostic += '</ul>';
     fb.innerHTML = `<strong>Fórmula incorrecta.</strong><br>${diagnostic}`;
   }
 }
 
-/* Pistas */
 function showHint() {
   const hintBox = document.getElementById('hint');
   if (!currentExercise || !currentExercise.hints) return;
   hintBox.style.display = 'block';
-  hintBox.innerHTML = `<strong>Pista (${hintIndex + 1}/${currentExercise.hints.length}):</strong> ${currentExercise.hints[hintIndex]}`;
-  hintIndex = (hintIndex + 1) % currentExercise.hints.length;
+  if (hintIndex < currentExercise.hints.length) {
+    hintBox.innerHTML = `<strong>Pista (${hintIndex + 1}/${currentExercise.hints.length}):</strong> ${currentExercise.hints[hintIndex]}`;
+    hintIndex++;
+  } else {
+    hintBox.innerHTML = `<strong>Sin más pistas.</strong> Intenta revisar la estructura general.`;
+  }
+  enviarDatosAGoogleSheets('pista', 'Solicitó pista');
 }
 
-/* Limpieza */
 function clearCurrentPhase() {
   if (activeMode === 'block') {
     renderBank(currentExercise.blocks);
@@ -850,7 +804,6 @@ function resetAll() {
   loadLevel(1);
 }
 
-/* Actualización de estadísticas y medallas */
 function updateStats() {
   document.getElementById('points').textContent = points;
   document.getElementById('stars').textContent = `${stars} ⭐`;
@@ -861,44 +814,11 @@ function updateStats() {
   document.getElementById('progressText').textContent = `Progreso Global del Curso: ${totalProgress}%`;
   document.getElementById('progressFill').style.width = `${totalProgress}%`;
 
-  // Actualizar Estado de Logros en Panel Izquierdo
-  if (solvedBlocks.size >= 1 || solvedWrites.size >= 1) {
-    unlockAchievement('ach1', 'status-ach1');
-  } else {
-    lockAchievement('ach1', 'status-ach1');
-  }
-
-  if (solvedBlocks.size === 4) {
-    unlockAchievement('ach2', 'status-ach2');
-  } else {
-    lockAchievement('ach2', 'status-ach2');
-  }
-
-  if (solvedWrites.size >= 1) {
-    unlockAchievement('ach3', 'status-ach3');
-  } else {
-    lockAchievement('ach3', 'status-ach3');
-  }
-
-  if (solvedBlocks.size === 4 && solvedWrites.size === 4) {
-    unlockAchievement('ach4', 'status-ach4');
-  } else {
-    lockAchievement('ach4', 'status-ach4');
-  }
-}
-
-function unlockAchievement(cardId, statusId) {
-  const card = document.getElementById(cardId);
-  const status = document.getElementById(statusId);
-  card.classList.add('unlocked');
-  status.textContent = '✅';
-}
-
-function lockAchievement(cardId, statusId) {
-  const card = document.getElementById(cardId);
-  const status = document.getElementById(statusId);
-  card.classList.remove('unlocked');
-  status.textContent = '🔒';
+  if (solvedBlocks.size >= 1 || solvedWrites.size >= 1) document.getElementById('badge1').classList.add('unlocked');
+  if (solvedBlocks.size === 4) document.getElementById('badge2').classList.add('unlocked');
+  if (solvedWrites.size >= 1) document.getElementById('badge3').classList.add('unlocked');
+  if (solvedBlocks.size === 4 && solvedWrites.size === 4) document.getElementById('badge4').classList.add('unlocked');
+  if (dataChanged) document.getElementById('badge5').classList.add('unlocked');
 }
 
 function showOverlay(title, msg, icon = '🎉') {
@@ -912,26 +832,20 @@ function closeOverlay() {
   document.getElementById('overlay').style.display = 'none';
 }
 
-/* Envío asegurado a Google Sheets */
-function enviarDatosAGoogleSheets(modo, formula) {
+function enviarDatosAGoogleSheets(evento, detalle = '') {
   if (!GOOGLE_SCRIPT_URL) return;
-  const currentStudentName = studentName || localStorage.getItem('excel_lab_student') || "Estudiante Anónimo";
-  
-  const payload = {
-    estudiante: currentStudentName,
+  const params = new URLSearchParams({
+    nombre: studentName || 'Anónimo',
     nivel: currentLevel,
-    modo: modo,
-    formula: formula,
+    modo: activeMode,
+    evento: evento,
+    detalle: detalle,
     puntos: points,
-    tiempo: seconds
-  };
-  
-  fetch(GOOGLE_SCRIPT_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  }).catch(err => console.error("Error al registrar avance:", err));
+    tiempo: seconds,
+    estrellas: stars
+  });
+  fetch(`${GOOGLE_SCRIPT_URL}?${params.toString()}`, { method: 'GET', mode: 'no-cors' })
+    .catch(err => console.error("Error al enviar datos:", err));
 }
 </script>
 </body>
