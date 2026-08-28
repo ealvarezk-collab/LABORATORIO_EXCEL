@@ -974,8 +974,12 @@ function closeOverlay() {
 
 function sendLog(eventType, details = {}) {
   if (!GOOGLE_SCRIPT_URL) return;
+
+  // Corregido: usa studentName o localStorage correctamente
   const currentStudentName = studentName || localStorage.getItem('excel_lab_student') || "Anónimo";
+
   const timeSpentOnExerciseSec = Math.floor((Date.now() - exerciseStartTime) / 1000);
+
   const params = new URLSearchParams();
   params.append('estudiante', currentStudentName);
   params.append('evento', eventType);
@@ -989,7 +993,9 @@ function sendLog(eventType, details = {}) {
   params.append('tiempo_total_seg', seconds);
   params.append('puntos_acumulados', points);
   params.append('errores', details.errores || 0);
-  fetch(`${GOOGLE_SCRIPT_URL}?${params.toString()}`, { method: 'GET', mode: 'no-cors' }).catch(err => console.error("Error al registrar evento:", err));
+
+  fetch(`${GOOGLE_SCRIPT_URL}?${params.toString()}`, { method: 'GET', mode: 'no-cors' })
+    .catch(err => console.error("Error al registrar evento:", err));
 }
 </script>
 </body>
